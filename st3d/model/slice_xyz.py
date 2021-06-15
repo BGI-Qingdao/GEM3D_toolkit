@@ -72,6 +72,8 @@ class slice_xyz:
 
     def model3D_coordinates_from_graph_pixels(self, spots: np.ndarray) -> np.ndarray :
         """Get the 3D coordinate based on pixel coordinate and alignment info """
+        # move center to zero
+        spots -= np.mean(spots, axis=0)
         # prepare 3d coordinates
         z_coords = np.zeros(spots.shape[0])
         z_coord = self.slice_z_index * 20

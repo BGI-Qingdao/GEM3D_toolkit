@@ -5,7 +5,7 @@ One slice_dataframe object corresponding to one gem file
 
 import numpy as np
 import pandas as pd
-
+from sklearn import preprocessing
 from  st3d.model.slice_xyz import slice_xyz
 
 class slice_dataframe:
@@ -90,7 +90,12 @@ class slice_dataframe:
         Return :  (x,y,z,v) matrix for all valid spots. v represent total UMI number.
         """
         mask_value = self.get_expression_count(binsize)
+        mask_value = mask_value.reshape(-1)
+        mask_value = preprocessing.normalize([mask_value])
+        mask_value *=1000
+        mask_value = mask_value.astype(int)
         mask_coord = self.m_xyz.model3D_coordinate_of_slice(binsize)
+        
         data_array = np.hstack( ( mask_coord,mask_value.reshape(-1,1) ) )
         return data_array[mask_value.reshape(-1)>0,:]
 

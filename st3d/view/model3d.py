@@ -17,13 +17,13 @@ def heat3D_and_saveas_html( model : np.ndarray , borders : [] , fname : str):
 
     df = pd.DataFrame(model , columns = ['x','y','z','v'])
 
-    fig = px.scatter_3d(df,x='x',y='y',z='z',color='v',color_continuous_scale='Inferno')
+    fig = px.scatter_3d(df,x='x',y='y',z='z',color='v',color_continuous_scale='hot')
 
-    for bs in borders:
-        fig.add_trace(go.Scatter3d(x=bs[:,0],
-                                   y=bs[:,1], 
-                                   z=bs[:,2],
-                                   mode='lines'))
+    #for bs in borders:
+    #    fig.add_trace(go.Scatter3d(x=bs[:,0],
+    #                               y=bs[:,1], 
+    #                               z=bs[:,2],
+    #                               mode='lines'))
 
     #fig.update_traces( marker_line_width=2, marker_size=1)
     fig.write_html(fname)
