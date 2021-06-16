@@ -17,7 +17,7 @@ class slice_dataframe:
         most of the time we only want to see one aspect of the slice at one time.
     """
 
-    def __init__(self,gem_file_name:str, slice_index : int  , move_x =0  , move_y=0 , rotate=0 ):
+    def __init__(self,gem_file_name:str, slice_index : int  , aff_mat ):
         self.m_dataframe=pd.read_csv(gem_file_name,sep='\t')
         min_x=np.min(self.m_dataframe.x)
         max_x=np.max(self.m_dataframe.x)
@@ -25,32 +25,29 @@ class slice_dataframe:
         max_y=np.max(self.m_dataframe.y)
         # init slice_xyz
         self.m_xyz=slice_xyz(max_x-min_x+1,max_y-min_y+1, min_x,max_y)
-        self.m_xyz.set_alignment_info(slice_index,move_x,move_y,rotate)
+        self.m_xyz.set_alignment_info(slice_index,aff_mat)
         # init mask
-        self.m_mask = np.zeros((self.m_xyz.spot_width,self.m_xyz.spot_height))
+        #self.m_mask = np.zeros((self.m_xyz.spot_width,self.m_xyz.spot_height))
         #print(self.m_mask.shape)
-        for _,row in self.m_dataframe.iterrows():
-            slice_x , slice_y = self.m_xyz.slice_index_from_spot(row['x'],row['y'])
-            self.m_mask[slice_x,slice_y]=1
+        #for _,row in self.m_dataframe.iterrows():
+        #    slice_x , slice_y = self.m_xyz.slice_index_from_spot(row['x'],row['y'])
+        #    self.m_mask[slice_x,slice_y]=1
 
-    def get_mask(self,binsize=50) -> np.ndarray:
-        """
-        Return : rectangar matrix with 1 for valid spot, 0 for invalid spot
-        """
-        if binsize == 1:
-            return self.m_mask.copy()
-        else :
-            xyz = self.m_xyz
-            draw_width , draw_height  = xyz.get_bin_wh(binsize)
-            coords=np.zeros((draw_width,draw_height))
+    #def get_mask(self,binsize=50) -> np.ndarray:
+    #    """
+    #    Return : rectangar matrix with 1 for valid spot, 0 for invalid spot
+    #    """
+    #    xyz = self.m_xyz
+    #    draw_width , draw_height  = xyz.get_bin_wh(binsize)
+    #    coords=np.zeros((draw_width,draw_height))
 
-            for x in range(xyz.spot_width):
-                for y in range(xyz.spot_height):
-                    if self.m_mask[x,y] == 1 : 
-                        bin_x = x // binsize 
-                        bin_y = y // binsize
-                        coords[bin_x,bin_y]=1
-            return coords
+    #    for x in range(xyz.spot_width):
+    #        for y in range(xyz.spot_height):
+    #            if self.m_mask[x,y] == 1 : 
+    #                bin_x = x // binsize 
+    #                bin_y = y // binsize
+    #                coords[bin_x,bin_y]=1
+    #    return coords
 
     def get_expression_count(self,binsize=50) -> np.ndarray:
         """
@@ -95,7 +92,7 @@ class slice_dataframe:
         mask_value *=1000
         mask_value = mask_value.astype(int)
         mask_coord = self.m_xyz.model3D_coordinate_of_slice(binsize)
-        
+
         data_array = np.hstack( ( mask_coord,mask_value.reshape(-1,1) ) )
         return data_array[mask_value.reshape(-1)>0,:]
 
