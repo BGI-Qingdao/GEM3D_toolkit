@@ -18,7 +18,7 @@ def heat3D_and_saveas_html( model : np.ndarray , borders : [] , fname : str):
     df = pd.DataFrame(model , columns = ['x','y','z','v'])
 
     fig = px.scatter_3d(df,x='x',y='y',z='z',color='v',color_continuous_scale='hot')
-
+    fig.update_scenes(aspectmode='data')
     #for bs in borders:
     #    fig.add_trace(go.Scatter3d(x=bs[:,0],
     #                               y=bs[:,1], 

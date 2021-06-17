@@ -28,7 +28,7 @@ class slice_xyz:
 
     def set_alignment_info(self, z_index :float , affines : np.ndarray):
         self.slice_z_index = z_index
-        self.affines = affines
+        self.affines = np.matrix(affines)
 
     ###########################################################################
     # coordinate operations
@@ -73,22 +73,21 @@ class slice_xyz:
     def model3D_coordinates_from_graph_pixels(self, spots: np.ndarray) -> np.ndarray :
         """Get the 3D coordinate based on pixel coordinate and alignment info """
         # move center to zero
-        spots -= np.mean(spots, axis=0)
+        #spots -= np.mean(spots, axis=0)
         # prepare 3d coordinates
+        spots = spots/5 # turn into bin5
         z_coords = np.zeros(spots.shape[0])
         f_ones = np.ones(spots.shape[0])
-        z_coord = self.slice_z_index * 20
+        z_coord = self.slice_z_index * 20 
+        z_coord = z_coord / 5 ## turn into bin5
         z_coords = z_coords + z_coord
+        #in_xyz = np.hstack( ( spots ,z_coords.reshape(-1,1))) 
+        #return in_xyz
         in_xyz = np.hstack( ( spots ,z_coords.reshape(-1,1),f_ones.reshape(-1,1)) )
-        # rotate and move
-        new_xyz1 =  np.matmul(self.affines, in_xyz.T)
-        # remove last dim
-        new_xyz = new_xyz1[: ,0:3]
+        
+        new_xyz1 =  np.matmul(self.affines.I, in_xyz.T)
+        new_xyz = new_xyz1[0:3: ,:]
         return new_xyz.T
-        #r = R.from_euler('z',self.slice_rotate, degrees=True)
-        #rotate_xyz = r.apply(in_xyz)
-        #move_xyz = rotate_xyz + (self.slice_x_move, self.slice_y_move, 0)
-        #return move_xyz
 
     def model3D_coordinate_from_spot(self, spot_x : int , spot_y : int ) -> ( float , float, float ):
         """Get the 3D coordinate based on spot coordinate"""

@@ -18,7 +18,7 @@ class slices_manager:
         self.slices=[]
 
     def add_slice(self,gem_file_name,z_index,aff_mat):
-        one_slice = slice_dataframe(gem_file_name,self.slices_num,move_x,move_y,-rotate)
+        one_slice = slice_dataframe(gem_file_name,z_index,aff_mat)
         self.slices.append(one_slice)
         xyz = one_slice.get_xyz()
         self.slices_num=self.slices_num+1
