@@ -79,7 +79,7 @@ class slice_dataframe:
         #return mask_value;
         mask_coord = self.m_xyz.model2D_coordinate_of_slice(binsize)
         data_array = np.hstack( ( mask_coord,mask_value.reshape(-1,1) ) )
-        np.savetxt("test.txt",data_array,"%d")
+        #np.savetxt("test.txt",data_array,"%d")
         return data_array
 
     def get_expression_count3d(self,binsize=50) -> np.ndarray:

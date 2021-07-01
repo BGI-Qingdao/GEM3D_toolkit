@@ -84,7 +84,7 @@ class slice_xyz:
         #in_xyz = np.hstack( ( spots ,z_coords.reshape(-1,1))) 
         #return in_xyz
         in_xyz = np.hstack( ( spots ,z_coords.reshape(-1,1),f_ones.reshape(-1,1)) )
-        
+        print(self.slice_z_index)
         new_xyz1 =  np.matmul(self.affines.I, in_xyz.T)
         new_xyz = new_xyz1[0:3: ,:]
         return new_xyz.T
