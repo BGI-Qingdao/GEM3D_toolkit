@@ -17,7 +17,7 @@ class slice_dataframe:
         most of the time we only want to see one aspect of the slice at one time.
     """
 
-    def __init__(self,gem_file_name:str, slice_index : int  , aff_mat ):
+    def __init__(self,gem_file_name:str, slice_index ):
         self.m_dataframe=pd.read_csv(gem_file_name,sep='\t')
         min_x=np.min(self.m_dataframe.x)
         max_x=np.max(self.m_dataframe.x)
@@ -25,29 +25,7 @@ class slice_dataframe:
         max_y=np.max(self.m_dataframe.y)
         # init slice_xyz
         self.m_xyz=slice_xyz(max_x-min_x+1,max_y-min_y+1, min_x,max_y)
-        self.m_xyz.set_alignment_info(slice_index,aff_mat)
-        # init mask
-        #self.m_mask = np.zeros((self.m_xyz.spot_width,self.m_xyz.spot_height))
-        #print(self.m_mask.shape)
-        #for _,row in self.m_dataframe.iterrows():
-        #    slice_x , slice_y = self.m_xyz.slice_index_from_spot(row['x'],row['y'])
-        #    self.m_mask[slice_x,slice_y]=1
-
-    #def get_mask(self,binsize=50) -> np.ndarray:
-    #    """
-    #    Return : rectangar matrix with 1 for valid spot, 0 for invalid spot
-    #    """
-    #    xyz = self.m_xyz
-    #    draw_width , draw_height  = xyz.get_bin_wh(binsize)
-    #    coords=np.zeros((draw_width,draw_height))
-
-    #    for x in range(xyz.spot_width):
-    #        for y in range(xyz.spot_height):
-    #            if self.m_mask[x,y] == 1 : 
-    #                bin_x = x // binsize 
-    #                bin_y = y // binsize
-    #                coords[bin_x,bin_y]=1
-    #    return coords
+        #self.m_xyz.set_alignment_info(slice_index,aff_mat)
 
     def get_expression_count(self,binsize=50) -> np.ndarray:
         """
@@ -99,13 +77,15 @@ class slice_dataframe:
     def get_xyz(self) -> slice_xyz:
         return self.m_xyz
 
-    def get_gene(gene_name : str) -> np.ndarray :
+    def get_gene(self,gene_name : str) -> np.ndarray :
         """
         Return : rectangar matrix with gene expression value
         """
         #TODO
+    def get_uniq_genes(self) -> []:
+        return self.m_dataframe['geneID'].unique().tolist()
 
-    def get_factor(factor_item) -> np.ndarray :
+    def get_factor(self,factor_item) -> np.ndarray :
         """
         Return : rectangar matrix with factor strength value
         """

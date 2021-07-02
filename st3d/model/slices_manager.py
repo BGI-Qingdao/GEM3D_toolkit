@@ -17,8 +17,8 @@ class slices_manager:
         self.slices_num = 0
         self.slices=[]
 
-    def add_slice(self,gem_file_name,z_index,aff_mat):
-        one_slice = slice_dataframe(gem_file_name,z_index,aff_mat)
+    def add_slice(self,gem_file_name,z_index):
+        one_slice = slice_dataframe(gem_file_name,z_index)
         self.slices.append(one_slice)
         xyz = one_slice.get_xyz()
         self.slices_num=self.slices_num+1
@@ -43,3 +43,10 @@ class slices_manager:
 
     def get_expression_count2d(self,slice_id : int , binsize=50) -> np.ndarray:
         return self.slices[slice_id].get_expression_count2d(binsize)
+
+    def get_uniq_genes(self) -> [] :
+        tmp_datas=[]
+        for one_slice in self.slices:
+            tmp_datas.append(one_slice.get_uniq_genes())
+        return list(set(tmp_datas))
+
