@@ -10,6 +10,14 @@ It support below feathures:
 * convert serveral GEM files into one 10X format BFM file.
     * all raw slices will be horizontal stacked to build one scroll-like slice.
 
+## Dependencies
+
+* pandas
+* numpy
+* scipy
+* matplotlib
+* plotly
+
 ## Usage :
 
 ### Basic usage
