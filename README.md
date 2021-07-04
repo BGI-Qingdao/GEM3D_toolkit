@@ -14,7 +14,6 @@ It support below feathures:
 
 * pandas
 * numpy
-* scipy
 * matplotlib
 * plotly
 
