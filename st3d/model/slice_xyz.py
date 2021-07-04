@@ -3,7 +3,6 @@
 One slice_xyz object corresponding to one gem file
 """
 import numpy as np
-from scipy.spatial.transform import Rotation as R
 
 class slice_xyz:
     """
@@ -13,6 +12,13 @@ class slice_xyz:
     Step by Step:
         1. transform spot x,y into graph x,y
         2. transform graph x,y into 3D x,y,z
+
+    Define:
+        raw gem coordinate : ( spot_x , spot_y ), step 1, start from chip (0,0)
+        spot_index         : step1 spots , start from (0,0)
+        bin     coordinate : ( bin_x  , bin_y  ), step binsize, start from (0,0)
+        graph pixel        : bin5 as 1 pixel ,start from (0,0)
+            3D  coordinate : use registrationed pixel as x,y, use slice_index/4 as z
     """
 
     ###########################################################################
@@ -26,6 +32,7 @@ class slice_xyz:
         self.spot_min_x = min_x
         self.spot_min_y = min_y
 
+    # only used for 3D coordinate
     def set_alignment_info(self, z_index :float , affines : np.ndarray):
         self.slice_z_index = z_index
         self.affines = np.matrix(affines)
@@ -48,6 +55,16 @@ class slice_xyz:
         """
         return spots - (self.spot_min_x,self.spot_min_y)
 
+    def bin_coord_from_spot(self, spot_x:int, spot_y:int, binsize:int, bin_width:int) -> (int,int)
+        """
+        @input  : spot_x,y ; binsize ; bin_width of this slice
+        @return : bin_x, bin_y, bin_index of this slice
+        """
+        slice_index_x , slice_index_y = self.slice_index_from_spot(spot_x,spot_y)
+        bin_x_index = slice_index_x//binsize
+        bin_y_index = slice_index_y//binsize
+        return bin_x_index*binsize ,bin_y_index*binsize, bin_y_index*bin_width+bin_x_index
+
     def graph_pixel_from_spot(self, spot_x : int , spot_y : int ) ->( float , float) :
         """Get the pixel coordinate of dyeing graph based on spot coordinate"""
         # TODO :
@@ -63,10 +80,6 @@ class slice_xyz:
     def model3D_coordinate_from_graph_pixel(self, graph_x , graph_y ) -> ( float , float, float ):
         """Get the 3D coordinate based on pixel coordinate and alignment info """
         z_coord = self.slice_z_index * 20
-        #r = R.from_euler('z',self.slice_rotate, degrees=True)
-        #rotate_xyz = r.apply(np.ndarray([graph_x,graph_y,z_coord]))
-        #move_xyz = rotate_xyz + (self.slice_x_move, self.slice_y_move, 0)
-
         new_xyz1 = np.matmul(self.affines,np.ndarray([graph_x,graph_y,z_coord,1]))
         return new_xyz1[0:3]
 

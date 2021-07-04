@@ -56,15 +56,15 @@ def gem2bfm_main(argv):
 
     init_outputs(prefix)
     slice_data = load_slices(json.load(open(config)))
-    gene_ids   = build_genes_ids(slice_data)
-    bin_ids    = build_bins(slice_data,binsize=binsize)
-    mtx        = gen_mtx(slice_data,gene_ids,bin_ids)
+    gene_names , gene_ids    = build_genes_ids(slice_data)
+    slices_info , bin_ids    = slice_data.get_bins_of_slices(binsize=binsize)
+    mtx , valid_bin_num      = slice_data.get_mtx(gene_ids,bin_ids)
 
-    print_slices_csv(slice_data,prefix)
-    print_features_tsv(gene_ids,prefix)
+    print_features_tsv(gene_names,prefix)
     print_barcodes_tsv(bin_ids,prefix)
     print_tissue_positions_list(bin_ids,prefix)
     print_matrix_mtx(mtx,prefix)
+    print_slices_json(slices_info,prefix)
 
     if draw_heatmap :
         # build detailed heatmap by bin5

@@ -7,6 +7,17 @@ import numpy as np
 import pandas as pd
 from sklearn import preprocessing
 from  st3d.model.slice_xyz import slice_xyz
+from st3d.model.rect_bin import bins_of_slice
+
+
+class slice_meta_data:
+    def __init__(self, slice_id , slice_min_x , slice_min_y, slice_width, slice_height):
+        self.slice_id    = slice_id
+        self.slice_min_x = slice_min_x
+        self.slice_min_y = slice_min_y
+        self.slice_width = slice_width
+        self.slice_height= slice_height
+        return self
 
 class slice_dataframe:
     """
@@ -26,6 +37,7 @@ class slice_dataframe:
         # init slice_xyz
         self.m_xyz=slice_xyz(max_x-min_x+1,max_y-min_y+1, min_x,max_y)
         #self.m_xyz.set_alignment_info(slice_index,aff_mat)
+        self.slice_index = slice_index
 
     def get_expression_count(self,binsize=50) -> np.ndarray:
         """
@@ -90,3 +102,30 @@ class slice_dataframe:
         Return : rectangar matrix with factor strength value
         """
         #TODO
+
+    def get_bins_of_slice(self,  bin_min :int,binsize=50):
+        """
+        @input  bin_min , binsize 
+        @return meta data of slice , bins of slices
+        """
+        bos = bins_of_slice(self.slice_index,bin_min)
+        bin_xy = self.m_xyz.get_bins(binsize)
+        bos.init_bins(bin_xy)
+        slice_meta = slice_meta_data(self.slice_index,
+                                     self.m_xyz.spot_min_x,
+                                     self.m_xyz.spot_min_y, 
+                                     self.m_xyz.width,
+                                     self.m_xyz.height)
+        return slice_meta , bos
+
+    def get_mtx( self, gen_map, bos:bins_of_slice, df : pd.DataFrame ) :
+        for _,row in self.m_dataframe.iterrows():
+            bin_x,bin_y,bin_index=self.m_xyz.bin_coord_from_spot(row['x'],row['y'])
+            bos.set_valid(bin_index)
+            bid = bos.get_bin(bin_index).bin_id
+            count=row['MIDCounts']
+            gid=gen_map[row['geneID']]
+            row_num = df.size()[0]
+            df[row_num]=[gid,bid,count]
+        return bos.valid_bin_num()
+    

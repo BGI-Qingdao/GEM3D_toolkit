@@ -6,6 +6,7 @@
 import numpy as np
 from st3d.model.slice_dataframe import slice_dataframe
 from st3d.model.slice_xyz import slice_xyz
+from st3d.model.rect_bin import bins_of_slices
 
 class slices_manager:
     """
@@ -50,3 +51,18 @@ class slices_manager:
             tmp_datas.append(one_slice.get_uniq_genes())
         return list(set(tmp_datas))
 
+    def get_bins_of_slices(self, binsize=50):
+        bsos = bins_of_slices()
+        meta_of_bins = {}
+        for one_slice in self.slices:
+            mtb, bos = one_slice.get_bin_of_slice(bsos.bin_nu,bin_size)
+            bsos.add_slice(mtb.slice_id,bos)
+            meta_of_bins[mtb.slice_id]=mtb
+        return meta_of_bins , bsos
+
+    def get_mtx(self, gen_map, bin_info):
+        valid_bin_num = 0 ;
+        mtx=pd.DataFrame(columns=('gid','bid','count'))
+        for one_slice in self.slices:
+            valid_bin_num += one_slice.get_mtx(gen_map, bin_info.get_slice(one_slice.slice_index),mtx)
+        return mtx , valid_bin_num
