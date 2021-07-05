@@ -61,12 +61,18 @@ class slices_manager:
             meta_of_bins[mtb.slice_id]=mtb
         return meta_of_bins , bsos
 
-    def get_mtx(self, gen_map, bin_info):
+    def get_mtx(self, gen_map, bin_info,threads=4):
         valid_bin_num = 0 ;
         items_num = 0
         mtx=pd.DataFrame(columns=('gid','bid','count'))
         for one_slice in self.slices:
-            new_valid_bin_num , new_items = one_slice.get_mtx(gen_map, bin_info.get_slice(one_slice.slice_index),mtx,items_num)
+            new_mtx, new_valid_bin_num  = one_slice.get_mtx(gen_map,
+                                               bin_info.get_slice(one_slice.slice_index),
+                                               threads)
+            #print(len(new_mtx))
             valid_bin_num +=new_valid_bin_num
-            items_num +=new_items
+            mtx=pd.concat([mtx,new_mtx])
+
+        items_num =len(mtx)
+        #print(items_num)
         return mtx , valid_bin_num ,items_num

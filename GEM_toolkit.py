@@ -3,6 +3,7 @@
 import sys
 import getopt 
 import json
+import time
 
 from st3d.view.model3d import * 
 from st3d.view.slice2d import *
@@ -29,9 +30,10 @@ def gem2bfm_main(argv):
     config = ''
     prefix = ''
     binsize= 50
+    threads=8
     draw_heatmap=True
     try:
-        opts, args = getopt.getopt(argv,"hnc:o:b:",["help",'no_heatmap',"iconf=","ofile=","bin="])
+        opts, args = getopt.getopt(argv,"hnc:o:b:t:",["help",'no_heatmap',"iconf=","ofile=","bin=","threads="])
     except getopt.GetoptError:
         gem2bfm_usage()
         sys.exit(2)
@@ -45,22 +47,36 @@ def gem2bfm_main(argv):
             binsize = int(arg)
         elif opt in ("-c", "--iconf"):
             config = arg
+        elif opt in ("-t", "--threads"):
+            threads= int(arg)
         elif opt in ("-o", "--ofile"):
             prefix = arg
 
-    if config == "" or prefix == "" or binsize<1:
+    if config == "" or prefix == "" or binsize<1 or threads <1:
         gem2bfm_usage()
         sys.exit(3)
     print("config file is {}".format(config))
     print("output prefix is {}".format( prefix))
     print("binsize is {}".format(binsize))
+    print("threads is {}".format(threads))
 
     init_outputs(prefix)
+    print('start loading slice(s)...')
+    print(time.strftime("%Y-%m-%d %H:%M:%S"))
     slice_data = load_slices(json.load(open(config)))
+    print('build_genes_ids ...')
+    print(time.strftime("%Y-%m-%d %H:%M:%S"))
     gene_names , gene_ids    = build_genes_ids(slice_data)
+    print('get bins of slice(s)...')
+    print(time.strftime("%Y-%m-%d %H:%M:%S"))
     slices_info , bin_ids    = slice_data.get_bins_of_slices(binsize=binsize)
-    mtx, valid_bin_num,_     = slice_data.get_mtx(gene_ids,bin_ids)
+    print('get mtx of slice(s)...')
+    print(time.strftime("%Y-%m-%d %H:%M:%S"))
+    mtx, valid_bin_num,_     = slice_data.get_mtx(gene_ids,bin_ids,threads)
 
+    
+    print('save data into disk ...')
+    print(time.strftime("%Y-%m-%d %H:%M:%S"))
     print_features_tsv(gene_names,prefix)
     print_barcodes_tsv(bin_ids,prefix)
     print_tissue_positions_list(bin_ids,prefix)
@@ -68,10 +84,14 @@ def gem2bfm_main(argv):
     print_slices_json(slices_info,prefix)
 
     if draw_heatmap :
+        print('draw heatmap(s) ...')
+        print(time.strftime("%Y-%m-%d %H:%M:%S"))
         # build detailed heatmap by bin5
         bin_5_ids  = build_bins(slice_data,binsize=5)
         gen_heatmap(slice_data,bin_5_ids,prefix)
 
+    print('all done ...')
+    print(time.strftime("%Y-%m-%d %H:%M:%S"))
 ############################################################################
 # section 2 : apply_affinematrix
 #############################################################################
