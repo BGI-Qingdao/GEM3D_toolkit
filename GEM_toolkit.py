@@ -20,7 +20,8 @@ def gem2bfm_usage():
     print("""
 Usage : GEM_toolkit.py gem2bcm -c <config.json> \\
                                -o <output-prefix>  \\
-                               -b [bin-size (default 50)]
+                               -b [bin-size (default 50)] \\
+                               [-n/--no_heatmap]
 """)
 
 # main of gem2bfm
@@ -58,12 +59,12 @@ def gem2bfm_main(argv):
     slice_data = load_slices(json.load(open(config)))
     gene_names , gene_ids    = build_genes_ids(slice_data)
     slices_info , bin_ids    = slice_data.get_bins_of_slices(binsize=binsize)
-    mtx , valid_bin_num      = slice_data.get_mtx(gene_ids,bin_ids)
+    mtx, valid_bin_num,_     = slice_data.get_mtx(gene_ids,bin_ids)
 
     print_features_tsv(gene_names,prefix)
     print_barcodes_tsv(bin_ids,prefix)
     print_tissue_positions_list(bin_ids,prefix)
-    print_matrix_mtx(mtx,prefix)
+    print_matrix_mtx(mtx,prefix,len(gene_names),valid_bin_num)
     print_slices_json(slices_info,prefix)
 
     if draw_heatmap :
@@ -107,7 +108,7 @@ if __name__ == "__main__":
     if len(sys.argv) == 2 and sys.argv[1] in ( "-h" , "--help" ):
         main_usage()
         exit(0)
-    elif len(sys.argv) < 2 :
+    elif len(sys.argv) < 2 or not sys.argv[1] in ("gem2bfm", "apply_affinematrix"):
         main_usage()
         exit(1)
     elif sys.argv[1] == "gem2bfm" :

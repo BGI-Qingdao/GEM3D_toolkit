@@ -8,7 +8,7 @@ class rect_bin:
         self.spot_x   = spot_x
         self.spot_y   = spot_y
         self.valid    = False
-        return self
+        #return self
 
     def set_valid(self):
         self.valid    = True
@@ -19,7 +19,7 @@ class bins_of_slice:
         self.bins     = []
         self.slice_id = slice_id
         self.min_binid= bin_id_min
-        return self
+        #return self
 
     def init_bins(self,bins : np.ndarray):
         for x in range(bins.shape[0]):
@@ -30,7 +30,7 @@ class bins_of_slice:
 
     def valid_bin_num(self):
         ret=0
-        for abin in self.bin:
+        for abin in self.bins:
             if abin.valid :
                 ret =ret+1
         return ret
@@ -48,11 +48,11 @@ class bins_of_slices:
     def __init__(self):
         self.slices={}
         self.bin_num=0
-        return self
+        #return self
 
     def add_slice(self,slice_id : int , bos : bins_of_slice):
         self.slices[slice_id] = bos
-        self.bin_num += len(bos)
+        self.bin_num += len(bos.bins)
 
     def get_slice(self,slice_id:int) -> bins_of_slice:
         return self.slices[slice_id]

@@ -17,7 +17,14 @@ class slice_meta_data:
         self.slice_min_y = slice_min_y
         self.slice_width = slice_width
         self.slice_height= slice_height
-        return self
+
+    def assign_bininfo(self, binsize, binwidth, binheight):
+        self.binsize     = binsize
+        self.binwidth 	 = binwidth
+        self.binheight   = binheight
+	     
+        #return self
+
 
 class slice_dataframe:
     """
@@ -30,12 +37,13 @@ class slice_dataframe:
 
     def __init__(self,gem_file_name:str, slice_index ):
         self.m_dataframe=pd.read_csv(gem_file_name,sep='\t')
+        #print("{} size of self.m_dataframe".format(len(self.m_dataframe)))
         min_x=np.min(self.m_dataframe.x)
         max_x=np.max(self.m_dataframe.x)
         min_y=np.min(self.m_dataframe.y)
         max_y=np.max(self.m_dataframe.y)
         # init slice_xyz
-        self.m_xyz=slice_xyz(max_x-min_x+1,max_y-min_y+1, min_x,max_y)
+        self.m_xyz=slice_xyz(max_x-min_x+1,max_y-min_y+1, min_x,min_y)
         #self.m_xyz.set_alignment_info(slice_index,aff_mat)
         self.slice_index = slice_index
 
@@ -109,23 +117,28 @@ class slice_dataframe:
         @return meta data of slice , bins of slices
         """
         bos = bins_of_slice(self.slice_index,bin_min)
+        bin_w, bin_h = self.m_xyz.get_bin_wh(binsize)
         bin_xy = self.m_xyz.get_bins(binsize)
         bos.init_bins(bin_xy)
         slice_meta = slice_meta_data(self.slice_index,
                                      self.m_xyz.spot_min_x,
                                      self.m_xyz.spot_min_y, 
-                                     self.m_xyz.width,
-                                     self.m_xyz.height)
+                                     self.m_xyz.spot_width,
+                                     self.m_xyz.spot_height)
+        slice_meta.assign_bininfo(binsize,bin_w,bin_h)
+        self.slice_info = slice_meta
         return slice_meta , bos
 
-    def get_mtx( self, gen_map, bos:bins_of_slice, df : pd.DataFrame ) :
-        for _,row in self.m_dataframe.iterrows():
-            bin_x,bin_y,bin_index=self.m_xyz.bin_coord_from_spot(row['x'],row['y'])
+    def get_mtx( self, gen_map, bos:bins_of_slice, df : pd.DataFrame , min_index ) :
+        #print("{} size of 2 self.m_dataframe".format(len(self.m_dataframe)))
+        new_item=0
+        for index ,row in self.m_dataframe.iterrows():
+            bin_x,bin_y,bin_index=self.m_xyz.bin_coord_from_spot(row['x'],row['y'],self.slice_info.binsize,self.slice_info.binwidth)
             bos.set_valid(bin_index)
             bid = bos.get_bin(bin_index).bin_id
             count=row['MIDCounts']
             gid=gen_map[row['geneID']]
-            row_num = df.size()[0]
-            df[row_num]=[gid,bid,count]
-        return bos.valid_bin_num()
-    
+            df.loc[min_index+index]=[gid,bid,count]
+            new_item+=1
+        return bos.valid_bin_num() , new_item
+  

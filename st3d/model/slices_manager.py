@@ -4,6 +4,7 @@
 """
 
 import numpy as np
+import pandas as pd
 from st3d.model.slice_dataframe import slice_dataframe
 from st3d.model.slice_xyz import slice_xyz
 from st3d.model.rect_bin import bins_of_slices
@@ -48,21 +49,24 @@ class slices_manager:
     def get_uniq_genes(self) -> [] :
         tmp_datas=[]
         for one_slice in self.slices:
-            tmp_datas.append(one_slice.get_uniq_genes())
+            tmp_datas=tmp_datas+one_slice.get_uniq_genes()
         return list(set(tmp_datas))
 
     def get_bins_of_slices(self, binsize=50):
         bsos = bins_of_slices()
         meta_of_bins = {}
         for one_slice in self.slices:
-            mtb, bos = one_slice.get_bin_of_slice(bsos.bin_nu,bin_size)
+            mtb, bos = one_slice.get_bins_of_slice(bsos.bin_num,binsize)
             bsos.add_slice(mtb.slice_id,bos)
             meta_of_bins[mtb.slice_id]=mtb
         return meta_of_bins , bsos
 
     def get_mtx(self, gen_map, bin_info):
         valid_bin_num = 0 ;
+        items_num = 0
         mtx=pd.DataFrame(columns=('gid','bid','count'))
         for one_slice in self.slices:
-            valid_bin_num += one_slice.get_mtx(gen_map, bin_info.get_slice(one_slice.slice_index),mtx)
-        return mtx , valid_bin_num
+            new_valid_bin_num , new_items = one_slice.get_mtx(gen_map, bin_info.get_slice(one_slice.slice_index),mtx,items_num)
+            valid_bin_num +=new_valid_bin_num
+            items_num +=new_items
+        return mtx , valid_bin_num ,items_num

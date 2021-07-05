@@ -11,7 +11,7 @@ def load_slices(files : [] ):
     return slices
 
 def build_genes_ids( data : slices_manager):
-    uniq_gene_names = slices_manager.get_uniq_genes()
+    uniq_gene_names = data.get_uniq_genes()
     gene_ids={}
     for index, name in enumerate(uniq_gene_names):
         gene_ids[name]=index

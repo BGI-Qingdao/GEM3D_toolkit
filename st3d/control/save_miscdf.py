@@ -1,9 +1,14 @@
 import os
 import json
+from json import JSONEncoder
 import numpy as np
 import pandas as pd
 
 from st3d.model.rect_bin import *
+
+class General_Encoder(JSONEncoder):
+    def default(self, o):
+        return o.__dict__
 
 def init_outputs(prefix : str):
     if os.path.exists(prefix):
@@ -49,7 +54,7 @@ def print_matrix_mtx(mtx,prefix,gnum,bnum):
 """%%MatrixMarket matrix coordinate integer general
 %metadata_json: {"software_version": "Cell Ranger 4", "format_version": 2}
 """)
-    sourceFile.writelines("{} {} {}\n".format(gnum,bnum,mtx.size()[0]))
+    sourceFile.writelines("{} {} {}\n".format(gnum,bnum,len(mtx)))
     for _, row in mtx.iterrows():
         sourceFile.writelines("{} {} {}\n".format(row['gid'],row['bid'],row['count']))
     sourceFile.close()
@@ -62,15 +67,15 @@ def print_tissue_positions_list(bin_ids : bins_of_slices , prefix:str):
         for abin in bos.bins:
             sourceFile.writelines("{},{},{},{},-1,-1,{},-1,-1,-1\n".format(abin.bin_name,
                                                                            int(abin.valid),
-                                                                           abin.spot_x,
-                                                                           abin.spot_y,
-                                                                           abin,slice_id
+                                                                           int(abin.spot_x),
+                                                                           int(abin.spot_y),
+                                                                           abin.slice_id
                                                                            ))
     sourceFile.close()
 
 def print_slices_json(slices_info : {} , prefix: str):
     filename="{}/spatial/slices.json".format(prefix)
     sourceFile = open(filename, 'w')
-    sourceFile.writelines(json.dumps(df, sort_keys=False, indent=4, separators=(',', ':')))
+    sourceFile.writelines(json.dumps(slices_info, sort_keys=False, indent=4, separators=(',', ':'),cls=General_Encoder))
     sourceFile.close()
 
