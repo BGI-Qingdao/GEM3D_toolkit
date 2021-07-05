@@ -55,7 +55,7 @@ class slice_xyz:
         """
         return spots - (self.spot_min_x,self.spot_min_y)
 
-    def bin_coord_from_spot(self, spot_x:int, spot_y:int, binsize:int, bin_width:int) -> (int,int)
+    def bin_coord_from_spot(self, spot_x:int, spot_y:int, binsize:int, bin_width:int) -> (int,int):
         """
         @input  : spot_x,y ; binsize ; bin_width of this slice
         @return : bin_x, bin_y, bin_index of this slice

@@ -1,7 +1,7 @@
 import numpy as np
 
 class rect_bin:
-    def __init__(self,bin_id:int , slice_id : int, spot_x: int spot_y:int):
+    def __init__(self,bin_id:int , slice_id : int, spot_x: int ,spot_y:int):
         self.bin_name = "bin_{}".format(bin_id)
         self.bin_id   = bin_id
         self.slice_id = slice_id
@@ -30,7 +30,7 @@ class bins_of_slice:
 
     def valid_bin_num(self):
         ret=0
-        for abin in self.bin
+        for abin in self.bin:
             if abin.valid :
                 ret =ret+1
         return ret

@@ -104,10 +104,10 @@ Action:
 
 # logic codes
 if __name__ == "__main__":
-    if len(sys.argv) ==2 and sys.argv[1] in ( "-h" , "--help" ):
+    if len(sys.argv) == 2 and sys.argv[1] in ( "-h" , "--help" ):
         main_usage()
         exit(0)
-    elif len(sys.argv) < 2 or not ( sys.argv[1] in ( "-h" , "--help" ) ) :
+    elif len(sys.argv) < 2 :
         main_usage()
         exit(1)
     elif sys.argv[1] == "gem2bfm" :
