@@ -45,9 +45,9 @@ class muti_thread_helper(threading.Thread):
                 self.slice_data.slice_info.binwidth)
 
             self.bos.set_valid(bin_index)
-            bid = self.bos.get_bin(bin_index).bin_id
+            bid = self.bos.get_bin(bin_index).bin_id + 1
             count=row['MIDCounts']
-            gid=self.gene_map[row['geneID']]
+            gid=self.gene_map[row['geneID']] +1
             self.mtx.loc[i]=[gid,bid,count]
 
 class slice_dataframe:
@@ -178,9 +178,9 @@ class slice_dataframe:
         print("hanle a gem : groupby, slice {}".format(self.slice_index))
         print(time.strftime("%Y-%m-%d %H:%M:%S"),flush=True)
         mtx=mtx.groupby(['gid','bid']).agg({'count': ['sum']}).reset_index()
-        print('#line in mtx: {}, slice_id'.format(len(mtx)))
+        print('#line in mtx: {}, slice_id {}'.format(len(mtx),self.slice_index))
         mtx.columns=['gid','bid','count']
         print("hanle a gem : done slice {}".format(self.slice_info))
         print(time.strftime("%Y-%m-%d %H:%M:%S"),flush=True)
-        return mtx,bos.valid_bin_num()
+        return mtx
 

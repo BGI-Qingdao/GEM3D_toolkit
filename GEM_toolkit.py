@@ -18,7 +18,10 @@ def gem2bfm_usage():
 Usage : GEM_toolkit.py gem2bcm -c <config.json> \\
                                -o <output-prefix>  \\
                                -b [bin-size (default 50)] \\
-                               [-n/--no_heatmap]
+                               -t [threads (default 8)]
+
+Notice : Since one gem file will be handled only in one thread,
+         there is no need to set -t greater than slice number.
 """)
 
 # main of gem2bfm
@@ -67,15 +70,19 @@ def gem2bfm_main(argv):
 #############################################################################
 def heatmap_usage():
     print("""
-Usage : GEM_toolkit.py heatmap     -c <affinematix.conf.json> \\
-                                   -o <output-prefix>  \\
-                                   -b [binsize (default 5)]
+Usage : GEM_toolkit.py heatmap  -c <conf.json> \\
+                                -o <output-prefix>  \\
+                                -b [binsize (default 5)] \\
+                                -t [threads (default 8)]
+
+Notice : Since one gem file will be handled only in one thread,
+         ther is no need to set -t greater than slice number.
 """)
 
 def heatmap_main(argv:[]):
     config = ''
     prefix = ''
-    binsize= 50
+    binsize= 5
     threads=8
     try:
         opts, args = getopt.getopt(argv,"hc:o:b:t:",["help","iconf=","ofile=","bin=","threads="])
@@ -138,15 +145,27 @@ def main_usage():
 Usage : GEM_toolkit.py action [options ]
 
 Action:
-    gem2bfm
-    heatmap
-    apply_affinematrix
+    gem2bfm                 convert GEM into BFM.
+    heatmap                 heatmap of expression counts.
+    apply_affinematrix      apply affinematrix to add 3D
+                            coordinates into tissue-position-list.csv
+
+    -h                      show this short usage
+    --help                  show detailed usage
 """)
 
 # logic codes
 if __name__ == "__main__":
     if len(sys.argv) == 2 and sys.argv[1] in ( "-h" , "--help" ):
         main_usage()
+        if sys.argv[1] ==  "--help":
+            print('-----------------------')
+            gem2bfm_usage()
+            print('-----------------------')
+            heatmap_usage()
+            print('-----------------------')
+            affine_usage()
+            print('')
         exit(0)
     elif len(sys.argv) < 2 or not sys.argv[1] in ("gem2bfm","heatmap","apply_affinematrix"):
         main_usage()

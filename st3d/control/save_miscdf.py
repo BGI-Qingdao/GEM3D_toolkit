@@ -3,10 +3,7 @@ import json
 from json import JSONEncoder
 import numpy as np
 import pandas as pd
-
-from st3d.model.rect_bin import *
-from st3d.view.slice2d import *
-from st3d.view.model3d import *
+from subprocess import check_call
 
 from st3d.model.rect_bin import bins_of_slice, bins_of_slices
 from st3d.model.slices_manager import slices_manager
@@ -52,8 +49,9 @@ def print_features_tsv(gene_names : [] , prefix:str,slice_id):
     filename="{}/slice_{}/raw_feature_bc_matrix/features.tsv".format(prefix,slice_id)
     sourceFile = open(filename, 'w')
     for items in gene_names:
-        sourceFile.writelines(items+'\n')
+        sourceFile.writelines(items.replace('_','-')+'\n')
     sourceFile.close()
+    check_call('gzip {}'.format(filename),shell=True)
 
 def print_barcodes_tsv(bos: bins_of_slices , prefix:str,slice_id):
     filename="{}/slice_{}/raw_feature_bc_matrix/barcodes.tsv".format(prefix,slice_id)
@@ -61,6 +59,7 @@ def print_barcodes_tsv(bos: bins_of_slices , prefix:str,slice_id):
     for abin in bos.bins:
         sourceFile.writelines(abin.bin_name+'\n')
     sourceFile.close()
+    check_call('gzip {}'.format(filename),shell=True)
 
 def print_tissue_positions_list(bos: bins_of_slice , prefix:str,slice_id):
     filename="{}/slice_{}/spatial/tissue_positions_list.csv".format(prefix,slice_id)
@@ -85,27 +84,16 @@ def print_matrix_mtx(mtx,prefix,slice_id,gnum,bnum):
     for _, row in mtx.iterrows():
         sourceFile.writelines("{} {} {}\n".format(row['gid'],row['bid'],row['count']))
     sourceFile.close()
+    check_call('gzip {}'.format(filename),shell=True)
 
 ###########################################################
 # section3 : heatmap
 ###########################################################
 
 def init_heatmap(prefix:str):
-    if os.path.exists(prefix):
-        print("output path {} exist ! exit ...".format(prefix))
-        exit(101)
-    os.mkdir(prefix)
-    if not os.path.exists(prefix):
-        print("create output path {}  failed! exit ...".format(prefix))
-        exit(102)
-    os.mkdir(os.path.join(prefix,"heatmap"))
+    create_a_folder(prefix)
+    os.mkdir("{}/heatmaps".format(prefix))
 
-def save_3D_heatmap( data : np.ndarray , filename :str) :
-    df = pd.DataFrame(data, columns = ['x','y','z','v'])
-    df.to_csv(filename)
-
-def gen_heatmaps(slice_data,slices_info,bin_ids,prefix) :
-    heatmaps = slice_data.get_expression2d()
 
 def print_slices_heatmap_json(slices_info : {} , prefix: str):
     filename="{}/slices.json".format(prefix)

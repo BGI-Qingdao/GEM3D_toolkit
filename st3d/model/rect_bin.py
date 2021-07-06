@@ -28,6 +28,9 @@ class bins_of_slice:
     def get_bin(self,bin_index) ->rect_bin:
         return self.bins[bin_index]
 
+    def bin_num(self):
+        return len(self.bins)
+
     def valid_bin_num(self):
         ret=0
         for abin in self.bins:
