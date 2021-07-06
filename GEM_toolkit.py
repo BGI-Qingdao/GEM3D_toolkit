@@ -104,10 +104,10 @@ def heatmap_main(argv:[]):
     if config == "" or prefix == "" or binsize<1 or threads <1:
         heatmap_usage()
         sys.exit(3)
-    init_heatmap(prefix)
+
     print('start loading slice(s)...')
     print(time.strftime("%Y-%m-%d %H:%M:%S"))
-    slice_data = load_slices(config))
+    slice_data = load_slices(config)
     print('handle slice(s)...')
     print(time.strftime("%Y-%m-%d %H:%M:%S"))
     heatmap_slices_one_by_one(slice_data,prefix,binsize,threads)

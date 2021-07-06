@@ -38,7 +38,7 @@ class muti_thread_helper(threading.Thread):
     def run(self):
         for i in range(self.thread_id ,len(self.slice_data.m_dataframe),self.threads):
             row=self.slice_data.m_dataframe.loc[i]
-            bin_x,bin_y,bin_index=self.slice_data.m_xyz.bin_coord_from_spot(
+            bin_x,bin_y,bin_index,_,_=self.slice_data.m_xyz.bin_coord_from_spot(
                 row['x'],
                 row['y'],
                 self.slice_data.slice_info.binsize,
@@ -79,9 +79,7 @@ class slice_dataframe:
         draw_width , draw_height  = xyz.get_bin_wh(binsize)
         coords=np.zeros((draw_height,draw_width))
         for _,row in self.m_dataframe.iterrows():
-            x , y = self.m_xyz.slice_index_from_spot(row['x'],row['y'])
-            bin_x = x // binsize
-            bin_y = y // binsize
+            _,_,_,bin_x , bin_y = self.m_xyz.bin_coord_from_spot(row['x'],row['y'],binsize,draw_width)
             coords[bin_y,bin_x]+= row['MIDCounts']
         return coords
 

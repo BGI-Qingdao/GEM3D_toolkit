@@ -59,12 +59,16 @@ class slice_xyz:
     def bin_coord_from_spot(self, spot_x:int, spot_y:int, binsize:int, bin_width:int) -> (int,int):
         """
         @input  : spot_x,y ; binsize ; bin_width of this slice
-        @return : bin_x, bin_y, bin_index of this slice
+        @return : bin_anchor_spot_x,
+                  bin_anchor_spot_y,
+                  bin_index if all bins in one row
+                  bin_x if all bins in rectangle matrix
+                  bin_y if all bins in rectangle matrix
         """
         slice_index_x , slice_index_y = self.slice_index_from_spot(spot_x,spot_y)
         bin_x_index = slice_index_x//binsize
         bin_y_index = slice_index_y//binsize
-        return bin_x_index*binsize ,bin_y_index*binsize, bin_y_index*bin_width+bin_x_index
+        return bin_x_index*binsize ,bin_y_index*binsize, bin_y_index*bin_width+bin_x_index ,bin_x_index ,bin_y_index
 
     def graph_pixel_from_spot(self, spot_x : int , spot_y : int ) ->( float , float) :
         """Get the pixel coordinate of dyeing graph based on spot coordinate"""

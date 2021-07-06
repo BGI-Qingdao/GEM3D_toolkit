@@ -13,6 +13,11 @@ class rect_bin:
     def set_valid(self):
         self.valid    = True
 
+    def assign_graph_xy(graph_x,graph_y):
+        self.graph_x  = graph_x
+        self.graph_y  = graph_y
+
+
 
 class bins_of_slice:
     def __init__(self,slice_id:int, bin_id_min:int):
@@ -25,6 +30,12 @@ class bins_of_slice:
         for x in range(bins.shape[0]):
             one_bin = rect_bin(self.min_binid+x, self.slice_id, bins[x][0], bins[x][1])
             self.bins.append(one_bin)
+
+    def assign_graph_xy_matrix(data:np.ndarray):
+        for x in range(bins.shape[0]):
+            one_bin=self.bins[x]
+            one_bin.assign_graph_xy(data[x][0],data[x][1])
+
     def get_bin(self,bin_index) ->rect_bin:
         return self.bins[bin_index]
 

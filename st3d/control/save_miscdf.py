@@ -90,13 +90,11 @@ def print_matrix_mtx(mtx,prefix,slice_id,gnum,bnum):
 # section3 : heatmap
 ###########################################################
 
-def init_heatmap(prefix:str):
+def init_heatmap_output(prefix:str):
     create_a_folder(prefix)
-    os.mkdir("{}/heatmaps".format(prefix))
 
-
-def print_slices_heatmap_json(slices_info : {} , prefix: str):
-    filename="{}/slices.json".format(prefix)
+def print_slices_heatmap_json(slices_info : {} , prefix: str,slice_id:int):
+    filename="{}/slices_{}.json".format(prefix,slice_id)
     sourceFile = open(filename, 'w')
     sourceFile.writelines(json.dumps(slices_info, sort_keys=False, indent=4, separators=(',', ':'),cls=General_Encoder))
     sourceFile.close()
