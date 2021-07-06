@@ -85,17 +85,9 @@ class slice_dataframe:
             coords[bin_y,bin_x]+= row['MIDCounts']
         return coords
 
-    def get_mask3d(self,binsize=50) -> np.ndarray:
-        """
-        Return :  (x,y,z) coords for all valid spots
-        """
-        mask_value = self.get_mask(binsize)
-        mask_coord = self.m_xyz.model3D_coordinate_of_slice(binsize)
-        return mask_coord[mask_value.reshape(-1)==1,:]
-
     def get_expression_count2d(self,binsize=50) -> np.ndarray:
         """
-        Return :  (x,y,z,v) matrix for all valid spots. v represent total UMI number.
+        Return :  (x,y,v) matrix for all valid spots. v represent total UMI number.
         """
         mask_value = self.get_expression_count(binsize)
         #return mask_value;

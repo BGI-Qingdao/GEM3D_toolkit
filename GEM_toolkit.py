@@ -5,8 +5,8 @@ import getopt
 import time
 
 from st3d.control.load_slices import *
-#from st3d.control.save_miscdf import *
-from st3d.control.gem2bfm import handle_slice_one_by_one
+from st3d.control.gem2bfm import gem2bfm_slices_one_by_one
+from st3d.control.gem2heatmap import heatmap_slices_one_by_one
 
 ############################################################################
 # section 1 : gem2bfm
@@ -61,7 +61,7 @@ def gem2bfm_main(argv):
     slice_data = load_slices(config)
     print('handle slice(s)...')
     print(time.strftime("%Y-%m-%d %H:%M:%S"),flush=True)
-    handle_slice_one_by_one(slice_data,prefix,binsize,threads)
+    gem2bfm_slices_one_by_one(slice_data,prefix,binsize,threads)
     print('all done ...')
     print(time.strftime("%Y-%m-%d %H:%M:%S"),flush=True)
 
@@ -107,14 +107,10 @@ def heatmap_main(argv:[]):
     init_heatmap(prefix)
     print('start loading slice(s)...')
     print(time.strftime("%Y-%m-%d %H:%M:%S"))
-    slice_data = load_slices(open(config))
-    print('get bins of slice(s)...')
+    slice_data = load_slices(config))
+    print('handle slice(s)...')
     print(time.strftime("%Y-%m-%d %H:%M:%S"))
-    slices_info , bin_ids    = slice_data.get_bins_of_slices(binsize=binsize)
-    print_slices_heatmap_json(slices_info,prefix)
-    print('draw heatmap(s) ...')
-    print(time.strftime("%Y-%m-%d %H:%M:%S"))
-    gen_heatmaps(slice_data,slices_info,bin_ids,prefix)
+    heatmap_slices_one_by_one(slice_data,prefix,binsize,threads)
     print('all done ...')
     print(time.strftime("%Y-%m-%d %H:%M:%S"))
 

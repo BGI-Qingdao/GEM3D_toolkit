@@ -25,6 +25,7 @@ class slice_xyz:
     # Init and configuare functions 
     ##########################################################################
 
+    # mark used
     def __init__(self, width : int , height : int, min_x: int , min_y : int):
         """Init the rectangle area of the slice"""
         self.spot_width = width
@@ -32,7 +33,7 @@ class slice_xyz:
         self.spot_min_x = min_x
         self.spot_min_y = min_y
 
-    # only used for 3D coordinate
+    # mark used
     def set_alignment_info(self, z_index :float , affines : np.ndarray):
         self.slice_z_index = z_index
         self.affines = np.matrix(affines)
