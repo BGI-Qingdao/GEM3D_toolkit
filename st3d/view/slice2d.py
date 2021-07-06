@@ -1,13 +1,10 @@
-import plotly.express as px
-import numpy as np
-import pandas as pd
+import matplotlib as mpl
+mpl.use('Agg')
+import matplotlib.pyplot as plt
 
+def heatmap2D_png(values,out_f,spot_width,spot_height,binsize):
+    plt.figure(figsize=(spot_width/(binsize*100),spot_height/(binsize*100)))
+    plt.imshow(values, cmap='hot')
+    plt.subplots_adjust(left=0, bottom=0, right=0, top=0,hspace=0,wspace=0)
+    plt.savefig(out_f,dpi=100)
 
-def heatmap2D_and_saveas_html( model : np.ndarray , fname : str):
-    fig = px.imshow(model)
-    fig.write_html(fname)
-
-def scatter2D_and_saveas_html( model : np.ndarray , fname : str):
-    df = pd.DataFrame(model , columns = ['x','y','v'])
-    fig = px.scatter(df,x='x',y='y',color='v',color_continuous_scale='Inferno')
-    fig.write_html(fname)

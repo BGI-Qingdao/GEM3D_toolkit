@@ -8,10 +8,7 @@ import pandas as pd
 from sklearn import preprocessing
 from st3d.model.slice_xyz import slice_xyz
 from st3d.model.rect_bin import bins_of_slice
-#from  _thread import *
 import threading
-
-#from multiprocessing import Pool
 
 class slice_meta_data:
     def __init__(self, slice_id , slice_min_x , slice_min_y, slice_width, slice_height):
@@ -129,8 +126,17 @@ class slice_dataframe:
         Return : rectangar matrix with gene expression value
         """
         #TODO
-    def get_uniq_genes(self) -> []:
-        return self.m_dataframe['geneID'].unique().tolist()
+
+    def get_gene_ids(self) -> []:
+        """
+        Return : dict {gene_name : gene_id, ...}
+        """
+        uniq_gene_names=self.m_dataframe['geneID'].unique().tolist()
+        gene_ids={}
+        for index, name in enumerate(uniq_gene_names):
+            gene_ids[name]=index
+        return gene_ids
+
 
     def get_factor(self,factor_item) -> np.ndarray :
         """
@@ -138,12 +144,12 @@ class slice_dataframe:
         """
         #TODO
 
-    def get_bins_of_slice(self,  bin_min :int,binsize=50):
+    def get_bins_of_slice(self,  binsize=50):
         """
         @input  bin_min , binsize 
         @return meta data of slice , bins of slices
         """
-        bos = bins_of_slice(self.slice_index,bin_min)
+        bos = bins_of_slice(self.slice_index,0)
         bin_w, bin_h = self.m_xyz.get_bin_wh(binsize)
         bin_xy = self.m_xyz.get_bins(binsize)
         bos.init_bins(bin_xy)
@@ -156,15 +162,11 @@ class slice_dataframe:
         self.slice_info = slice_meta
         return slice_meta , bos
 
-    def get_mtx( self, gen_map, bos:bins_of_slice ,threads=4) :
+    def get_mtx( self, gen_map:{}, bos:bins_of_slice ,threads=4) :
         mtx=pd.DataFrame(columns=('gid','bid','count'),index=range(0,len(self.m_dataframe)))
-        print("hanle a gem : foreach in {} threads".format(threads))
-        print(time.strftime("%Y-%m-%d %H:%M:%S"))
-        #print(mtx.loc[0])
-        #print(mtx.loc[1])
-        #mhelper = muti_thread_helper(self,gen_map,bos,mtx)
-        #with Pool(threads) as p:
-        #    p.map(mhelper,range(0,len(self.m_dataframe)))
+        print("hanle a gem : foreach {} threads, slice {}".format(threads,self.slice_index))
+        print('#line in gem: {}, slice {}'.format(len(mtx),self.slice_index))
+        print(time.strftime("%Y-%m-%d %H:%M:%S"),flush=True)
         works=[]
         for i in range(0,threads):
             t=muti_thread_helper(self,gen_map,bos,mtx,i,threads)
@@ -172,16 +174,13 @@ class slice_dataframe:
             works.append(t)
         for x in works:
             x.join()
-        #print(mtx.loc[0])
-        #print(mtx.loc[1])
-        #print(mtx.loc[100])
-        #print('mtx length  : {}'.format(len(mtx)))
-        print('hanle a gem : groupby ')
-        print(time.strftime("%Y-%m-%d %H:%M:%S"))
+
+        print("hanle a gem : groupby, slice {}".format(self.slice_index))
+        print(time.strftime("%Y-%m-%d %H:%M:%S"),flush=True)
         mtx=mtx.groupby(['gid','bid']).agg({'count': ['sum']}).reset_index()
-        print('mtx length  : {}'.format(len(mtx)))
+        print('#line in mtx: {}, slice_id'.format(len(mtx)))
         mtx.columns=['gid','bid','count']
-        print('hanle a gem : done')
-        print(time.strftime("%Y-%m-%d %H:%M:%S"))
+        print("hanle a gem : done slice {}".format(self.slice_info))
+        print(time.strftime("%Y-%m-%d %H:%M:%S"),flush=True)
         return mtx,bos.valid_bin_num()
 
