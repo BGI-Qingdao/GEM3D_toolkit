@@ -187,8 +187,6 @@ Action:
     heatmap                 heatmap of expression counts.
     apply_affinematrix      apply affinematrix to add 3D (x,y,z)
                             coordinates into tissue-position-list.csv
-    -----------------------------------------------------------------
-
     gen3d_heatmap           join expression counts with (x,y,z) coord
     get3d_cluster           join cluster results with (x,y,z) coord
     -----------------------------------------------------------------

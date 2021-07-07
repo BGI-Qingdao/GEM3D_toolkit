@@ -7,8 +7,10 @@
 It support below feathures:
 
 * convert a single GEM file into 10X format barcode feature matix (BFM)  file.
-* convert serveral GEM files into one 10X format BFM file.
-    * all raw slices will be horizontal stacked to build one scroll-like slice.
+* generate expression counts heatmap from GEM file
+* apply affine matrix to add 3d (x,y,z0 into tissue-position-list.csv
+* visualize 3D expression count scatter 
+* visualize 3D cluster results
 
 ## Dependencies
 
@@ -33,10 +35,8 @@ Action:
     heatmap                 heatmap of expression counts.
     apply_affinematrix      apply affinematrix to add 3D (x,y,z)
                             coordinates into tissue-position-list.csv
-    -----------------------------------------------------------------
-
     gen3d_heatmap           join expression counts with (x,y,z) coord
-    get3d_cluster           join cluster results with (x,y,z) coord
+    gen3d_cluster           join cluster results with (x,y,z) coord
     -----------------------------------------------------------------
 
     -h/--help               show this short usage
