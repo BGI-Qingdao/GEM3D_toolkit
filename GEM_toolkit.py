@@ -193,8 +193,7 @@ Action:
     get3d_cluster           join cluster results with (x,y,z) coord
     -----------------------------------------------------------------
 
-    -h                      show this short usage
-    --help                  show detailed usage
+    -h/--help               show this short usage
     -----------------------------------------------------------------
 """)
 
@@ -202,14 +201,6 @@ Action:
 if __name__ == "__main__":
     if len(sys.argv) == 2 and sys.argv[1] in ( "-h" , "--help" ):
         main_usage()
-        if sys.argv[1] ==  "--help":
-            print('')
-            gem2bfm_usage()
-            print('')
-            heatmap_usage()
-            print('')
-            affine_usage()
-            print('')
         exit(0)
     elif len(sys.argv) < 2 or not sys.argv[1] in ("gem2bfm","heatmap","apply_affinematrix"):
         main_usage()

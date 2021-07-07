@@ -22,34 +22,53 @@ It support below feathures:
 ### Basic usage
 
 ```
+
 Usage : GEM_toolkit.py action [options ]
 
 Action:
-        gem2bfm
-        apply_affinematrix
+
+    -----------------------------------------------------------------
+
+    gem2bfm                 convert GEM into BFM.
+    heatmap                 heatmap of expression counts.
+    apply_affinematrix      apply affinematrix to add 3D (x,y,z)
+                            coordinates into tissue-position-list.csv
+    -----------------------------------------------------------------
+
+    gen3d_heatmap           join expression counts with (x,y,z) coord
+    get3d_cluster           join cluster results with (x,y,z) coord
+    -----------------------------------------------------------------
+
+    -h/--help               show this short usage
+    -----------------------------------------------------------------
 
 ```
 
 ### gem2bfm usage
 
 ```
+
 Usage : GEM_toolkit.py gem2bcm -c <config.json> \
-                               -o <output-prefix> \
-                               -b [bin-size (default 50)]
+                               -o <output-folder>  \
+                               -b [bin-size (default 50)] \
+                               -t [threads (default 8)]
+
+Notice : Since one gem file will be handled only in one thread,
+         there is no need to set -t greater than slice number.
 ```
 
-#### Detail of gem2bcf.conf.json :
+#### Detail of gem2bfm.conf.json :
 
-##### structure of each item in conf.json
+##### structure of each item in gem2bfm.conf.json
 
 * PF : path to this raw gene expression matrix ( GEM ) files
 * ID : index of this GEM
 
-##### structure of conf.json
+##### structure of gem2bfm.conf.json
 
 [ [ PF1, ID1 ] , [PF2, ID2 ] ...,[PFn, IDn] ]
 
-##### example of conf.json
+##### example of gem2bfm.conf.json
 
 example of 1 slice :
 
@@ -68,6 +87,24 @@ example of 3 slices :
     ["../all_slices/DP8400016191TL_D1.19.gem", 19]
 ]
 ```
+
+### heatmap usage
+
+* heatmap generate gene expression heatmap picture for slice registration.
+
+```
+
+Usage : GEM_toolkit.py heatmap  -c <conf.json> \
+                                -o <output-folder>  \
+                                -b [binsize (default 5)] \
+                                -t [threads (default 8)]
+
+Notice : Since one gem file will be handled only in one thread,
+         ther is no need to set -t greater than slice number.
+
+```
+
+The config file follow the same format of gem2bfm
 
 ### apply_affinematrix usage
 
@@ -91,7 +128,7 @@ Notice: input-tissue_positions.csv and scroll.conf.csv are output files of gem2b
 
 [ [ ID1 ,AM1 ] , [ ID2,AM2 ] ...[ IDn,AMn ] ]
 
-### example of conf.json
+### example of affinematix.conf.json
 
 ```
 [
@@ -112,32 +149,41 @@ Notice: input-tissue_positions.csv and scroll.conf.csv are output files of gem2b
 ]
 ```
 
-## output of gem2bfm
+## outputs
 
-#### file tree of output folder
+### file tree of gem2bfm's output folder
 
 ```
-  example
-  ├── raw_feature_bc_matrix
-  │   ├── barcodes.tsv.gz
-  │   ├── features.tsv.gz
-  │   └── matrix.mtx.gz
-  ├── spatial
-  │   ├── scroll.csv
-  │   └── tissue_positions_list.csv
-  └── heatmap
-     ├── slice_01_heatmap.png
-     ├── slice_02_heatmap.png
-     ....
-     ├── slice_n_heatmap.png
-     └── bin_expression.csv
+test_g
+└── slice_88
+    ├── raw_feature_bc_matrix
+    │   ├── barcodes.tsv.gz
+    │   ├── features.tsv.gz
+    │   └── matrix.mtx.gz
+    ├── slices.json
+    └── spatial
+        └── tissue_positions_list.csv
+
+    ... other slices if have...
 ```
 
 * raw_feature_bc_matrix folder contain everything we need to analysis stereo data by scRNA tools
 * spatial folder contain coordinate data that used by apply_affinematrix and other ST tools
-* heatmap folder contain gene expression heatmap picture for slice registration.
 
-#### header of tissue_positions_list.csv
+### file tree of heatmap's output folder
+
+```
+test_h
+└── slice_88
+    ├── heatmap.png
+    ├── slice.json
+    └── tissue_positions_list.csv
+
+    ... other slices if have...
+```
+
+
+## header of tissue_positions_list.csv
 
 The first five columns are the same with 10X format, we append the last four columns.
 
@@ -145,7 +191,8 @@ The first five columns are the same with 10X format, we append the last four col
 bin_name    masked  bin_x   bin_y   png_x   png_y   slice_id    3d_x    3d_y    3d_z
 ```
 
-* In the result of gem2bfm, the last 3 columns are all -1.
+* In the result of gem2bfm, the last 3 columns, png_x and png_y are all -1 . 
+* In the result of heatmap, only the last 3 columns are -1, png_x and png_y represent the pixel in heatmap.
 * The apply_affinematrix command will only change the last 3 columns.
 
 
