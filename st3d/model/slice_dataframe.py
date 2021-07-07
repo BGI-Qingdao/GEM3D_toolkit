@@ -142,6 +142,7 @@ class slice_dataframe:
         bos = bins_of_slice(self.slice_index,0)
         bin_w, bin_h = self.m_xyz.get_bin_wh(binsize)
         bin_xy = self.m_xyz.get_bins(binsize)
+        #print(bin_xy.shape)
         bos.init_bins(bin_xy)
         slice_meta = slice_meta_data(self.slice_index,
                                      self.m_xyz.spot_min_x,
@@ -150,6 +151,7 @@ class slice_dataframe:
                                      self.m_xyz.spot_height)
         slice_meta.assign_bininfo(binsize,bin_w,bin_h)
         self.slice_info = slice_meta
+        #print(len(bos.bins))
         return slice_meta , bos
 
     def get_mtx( self, gen_map:{}, bos:bins_of_slice ,threads=4) :

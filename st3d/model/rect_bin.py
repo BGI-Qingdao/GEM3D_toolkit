@@ -2,7 +2,7 @@ import numpy as np
 
 class rect_bin:
     def __init__(self,bin_id:int , slice_id : int, spot_x: int ,spot_y:int):
-        self.bin_name = "bin-{}".format(bin_id)
+        self.bin_name = "slice{}bin-{}".format(slice_id,bin_id)
         self.bin_id   = bin_id
         self.slice_id = slice_id
         self.spot_x   = spot_x
@@ -13,11 +13,14 @@ class rect_bin:
     def set_valid(self):
         self.valid    = True
 
-    def assign_graph_xy(graph_x,graph_y):
+    def assign_graph_xy(self,graph_x,graph_y):
         self.graph_x  = graph_x
         self.graph_y  = graph_y
 
-
+    def assign_3d_xyz(self,x,y,z):
+        self.d3_x     = x
+        self.d3_y     = y
+        self.d3_z     = z
 
 class bins_of_slice:
     def __init__(self,slice_id:int, bin_id_min:int):
@@ -26,13 +29,13 @@ class bins_of_slice:
         self.min_binid= bin_id_min
         #return self
 
-    def init_bins(self,bins : np.ndarray):
-        for x in range(bins.shape[0]):
-            one_bin = rect_bin(self.min_binid+x, self.slice_id, bins[x][0], bins[x][1])
+    def init_bins(self,bin_coords: np.ndarray):
+        for x in range(len(bin_coords)):
+            one_bin = rect_bin(self.min_binid+x, self.slice_id, bin_coords[x][0], bin_coords[x][1])
             self.bins.append(one_bin)
 
-    def assign_graph_xy_matrix(data:np.ndarray):
-        for x in range(bins.shape[0]):
+    def assign_graph_xy_matrix(self,data:np.ndarray):
+        for x in range(len(self.bins)):
             one_bin=self.bins[x]
             one_bin.assign_graph_xy(data[x][0],data[x][1])
 

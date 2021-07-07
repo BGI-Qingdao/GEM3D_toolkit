@@ -26,13 +26,51 @@ def create_a_folder(prefix):
         exit(102)
 
 def print_tp_bins_of_slice(bos: bins_of_slice ,file_hander):
+    #print(len(bos.bins))
     for abin in bos.bins:
-        file_hander.writelines("{},{},{},{},-1,-1,{},-1,-1,-1\n".format(abin.bin_name,
-                                                                       int(abin.valid),
-                                                                       int(abin.spot_x),
-                                                                       int(abin.spot_y),
-                                                                       abin.slice_id
-                                                                       ))
+        if not hasattr(abin,'graph_x') and not hasattr(abin,'d3_x') :
+            file_hander.writelines("{},{},{},{},-1,-1,{},-1,-1,-1\n".format(
+                        abin.bin_name,
+                        int(abin.valid),
+                        int(abin.spot_x),
+                        int(abin.spot_y),
+                        abin.slice_id
+                        ))
+        elif hasattr(abin,'graph_x') and not hasattr(abin,'d3_x') :
+            file_hander.writelines("{},{},{},{},{},{},{},-1,-1,-1\n".format(
+                        abin.bin_name,
+                        int(abin.valid),
+                        int(abin.spot_x),
+                        int(abin.spot_y),
+                        int(abin.graph_x),
+                        int(abin.graph_y),
+                        abin.slice_id
+                        ))
+        elif not hasattr(abin,'graph_x') and hasattr(abin,'d3_x') :
+            file_hander.writelines("{},{},{},{},-1,-1,{},{},{},{}\n".format(
+                        abin.bin_name,
+                        int(abin.valid),
+                        int(abin.spot_x),
+                        int(abin.spot_y),
+                        abin.slice_id,
+                        abin.d3_x,
+                        abin.d3_y,
+                        abin.d3_z
+                        ))
+        else :
+            file_hander.writelines("{},{},{},{},{},{},{},{},{},{}\n".format(
+                        abin.bin_name,
+                        int(abin.valid),
+                        int(abin.spot_x),
+                        int(abin.spot_y),
+                        int(abin.graph_x),
+                        int(abin.graph_y),
+                        abin.slice_id,
+                        abin.d3_x,
+                        abin.d3_y,
+                        abin.d3_z
+                        ))
+
 ###########################################################
 # section2 : gem2bfm
 ###########################################################
@@ -93,9 +131,17 @@ def print_matrix_mtx(mtx,prefix,slice_id,gnum,bnum):
 def init_heatmap_output(prefix:str):
     create_a_folder(prefix)
 
+def init_heatmap_slice(prefix:str , slice_id :int):
+    create_a_folder('{}/slice_{}'.format(prefix,slice_id))
+
 def print_slices_heatmap_json(slices_info : {} , prefix: str,slice_id:int):
-    filename="{}/slices_{}.json".format(prefix,slice_id)
+    filename="{}/slice_{}/slice.json".format(prefix,slice_id)
     sourceFile = open(filename, 'w')
     sourceFile.writelines(json.dumps(slices_info, sort_keys=False, indent=4, separators=(',', ':'),cls=General_Encoder))
     sourceFile.close()
 
+def print_heatmap_tissue_positions_list(bos: bins_of_slice , prefix:str,slice_id):
+    filename="{}/slice_{}/tissue_positions_list.csv".format(prefix,slice_id)
+    sourceFile = open(filename, 'w')
+    print_tp_bins_of_slice(bos,sourceFile)
+    sourceFile.close()

@@ -16,7 +16,7 @@ from st3d.control.gem2heatmap import heatmap_slices_one_by_one
 def gem2bfm_usage():
     print("""
 Usage : GEM_toolkit.py gem2bcm -c <config.json> \\
-                               -o <output-prefix>  \\
+                               -o <output-folder>  \\
                                -b [bin-size (default 50)] \\
                                -t [threads (default 8)]
 
@@ -51,6 +51,7 @@ def gem2bfm_main(argv):
     if config == "" or prefix == "" or binsize<1 or threads <1:
         gem2bfm_usage()
         sys.exit(3)
+
     print("config file is {}".format(config))
     print("output prefix is {}".format( prefix))
     print("binsize is {}".format(binsize))
@@ -62,7 +63,7 @@ def gem2bfm_main(argv):
     print('handle slice(s)...')
     print(time.strftime("%Y-%m-%d %H:%M:%S"),flush=True)
     gem2bfm_slices_one_by_one(slice_data,prefix,binsize,threads)
-    print('all done ...')
+    print('gem2bfm, all done ...')
     print(time.strftime("%Y-%m-%d %H:%M:%S"),flush=True)
 
 ############################################################################
@@ -71,7 +72,7 @@ def gem2bfm_main(argv):
 def heatmap_usage():
     print("""
 Usage : GEM_toolkit.py heatmap  -c <conf.json> \\
-                                -o <output-prefix>  \\
+                                -o <output-folder>  \\
                                 -b [binsize (default 5)] \\
                                 -t [threads (default 8)]
 
@@ -111,7 +112,7 @@ def heatmap_main(argv:[]):
     print('handle slice(s)...')
     print(time.strftime("%Y-%m-%d %H:%M:%S"))
     heatmap_slices_one_by_one(slice_data,prefix,binsize,threads)
-    print('all done ...')
+    print('heatmap, all done ...')
     print(time.strftime("%Y-%m-%d %H:%M:%S"))
 
 ############################################################################
@@ -120,16 +121,54 @@ def heatmap_main(argv:[]):
 def affine_usage():
     print("""
 Usage : GEM_toolkit.py apply_affinematrix -c <affinematix.conf.json> \\
-                                          -i <input-tissue_positions.csv> \\
-                                          -s <scroll.conf.csv> \\
-                                          -o <output-tissue_positions.csv>
-
-Notice: input-tissue_positions.csv and scroll.conf.csv are output files of gem2bfm command.
+                                          -i <input-folder> \\
+                                          -b [binsize(default 5)]> \\
+                                          -t [threads(default 8)]
+Notice:
+        1. the input folder must be the output folder of gem2bfm action.
+        2. the binsize must be the binsize used in heatmap action.
 """)
 
 def affine_main():
     affine_usage()
-    #TODO
+    config = ''
+    input_folder = ''
+    binsize=5
+    threads=8
+    try:
+        opts, args = getopt.getopt(argv,"hc:i:b:t:",["help","iconf=","input=","bin=","threads="])
+    except getopt.GetoptError:
+        affine_usage()
+        sys.exit(2)
+    for opt, arg in opts:
+        if opt in ('-h' ,'--help'):
+            affine_usage()
+            sys.exit(0)
+        elif opt in ("-b", "--bin"):
+            binsize = int(arg)
+        elif opt in ("-c", "--iconf"):
+            config = arg
+        elif opt in ("-t", "--threads"):
+            threads= int(arg)
+        elif opt in ("-i", "--input"):
+            input_folder = arg
+    if config == "" or input_folder == "" or binsize<1 or threads <1:
+        affine_usage()
+        sys.exit(3)
+
+    print("config file is {}".format(config))
+    print("output prefix is {}".format( prefix))
+    print("binsize is {}".format(binsize))
+    print("threads is {}".format(threads))
+
+    print('start tissue(s) possitions...')
+    print(time.strftime("%Y-%m-%d %H:%M:%S"),flush=True)
+    slice_data = load_tissues_positions(config,input_folder)
+    print('apply affine matrix(s)...')
+    print(time.strftime("%Y-%m-%d %H:%M:%S"),flush=True)
+    affine_one_by_one(slice_data,input_folder,binsize,threads)
+    print('apply affine matix, all done ...')
+    print(time.strftime("%Y-%m-%d %H:%M:%S"),flush=True)
 
 ############################################################################
 # section 3 : main
@@ -141,13 +180,22 @@ def main_usage():
 Usage : GEM_toolkit.py action [options ]
 
 Action:
+
+    -----------------------------------------------------------------
+
     gem2bfm                 convert GEM into BFM.
     heatmap                 heatmap of expression counts.
-    apply_affinematrix      apply affinematrix to add 3D
+    apply_affinematrix      apply affinematrix to add 3D (x,y,z)
                             coordinates into tissue-position-list.csv
+    -----------------------------------------------------------------
+
+    gen3d_heatmap           join expression counts with (x,y,z) coord
+    get3d_cluster           join cluster results with (x,y,z) coord
+    -----------------------------------------------------------------
 
     -h                      show this short usage
     --help                  show detailed usage
+    -----------------------------------------------------------------
 """)
 
 # logic codes
@@ -155,11 +203,11 @@ if __name__ == "__main__":
     if len(sys.argv) == 2 and sys.argv[1] in ( "-h" , "--help" ):
         main_usage()
         if sys.argv[1] ==  "--help":
-            print('-----------------------')
+            print('')
             gem2bfm_usage()
-            print('-----------------------')
+            print('')
             heatmap_usage()
-            print('-----------------------')
+            print('')
             affine_usage()
             print('')
         exit(0)

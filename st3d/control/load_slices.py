@@ -12,4 +12,6 @@ def load_slices(config :str ):
     return slices
 
 
-
+def load_tissues_positions(config : str, prefix:str):
+    # TODO
+    print('')
