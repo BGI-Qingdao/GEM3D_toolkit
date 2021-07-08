@@ -145,3 +145,21 @@ def print_heatmap_tissue_positions_list(bos: bins_of_slice , prefix:str,slice_id
     sourceFile = open(filename, 'w')
     print_tp_bins_of_slice(bos,sourceFile)
     sourceFile.close()
+
+
+###########################################################
+# section4 :affine matrix 
+###########################################################
+
+def init_affine_folder(prefix:str):
+    create_a_folder(prefix)
+
+def init_affine_slice(prefix:str , slice_id :int):
+    create_a_folder('{}/slice_{}'.format(prefix,slice_id))
+
+def print_tp_after_affine(df :pd.DataFrame, prefix:{},slice_index:int):
+    df.to_csv("{}/slice_{}/tissue_positions_list.csv".format(prefix,slice_index),
+                     sep=',',
+                     header=False,index=False)
+
+

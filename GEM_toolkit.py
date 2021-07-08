@@ -7,7 +7,7 @@ import time
 from st3d.control.load_slices import *
 from st3d.control.gem2bfm import gem2bfm_slices_one_by_one
 from st3d.control.gem2heatmap import heatmap_slices_one_by_one
-
+from st3d.control.apply_affinematrix import affine_one_by_one
 ############################################################################
 # section 1 : gem2bfm
 #############################################################################
@@ -67,7 +67,7 @@ def gem2bfm_main(argv):
     print(time.strftime("%Y-%m-%d %H:%M:%S"),flush=True)
 
 ############################################################################
-# section 3 : heatmap
+# section 2 : heatmap
 #############################################################################
 def heatmap_usage():
     print("""
@@ -116,12 +116,13 @@ def heatmap_main(argv:[]):
     print(time.strftime("%Y-%m-%d %H:%M:%S"))
 
 ############################################################################
-# section 2 : apply_affinematrix
+# section 3 : apply_affinematrix
 #############################################################################
 def affine_usage():
     print("""
 Usage : GEM_toolkit.py apply_affinematrix -c <affinematix.conf.json> \\
                                           -i <input-folder> \\
+                                          -o <output-folder> \\
                                           -b [binsize(default 5)]> \\
                                           -t [threads(default 8)]
 Notice:
@@ -129,14 +130,14 @@ Notice:
         2. the binsize must be the binsize used in heatmap action.
 """)
 
-def affine_main():
-    affine_usage()
+def affine_main(argv:[]):
     config = ''
     input_folder = ''
+    prefix=''
     binsize=5
     threads=8
     try:
-        opts, args = getopt.getopt(argv,"hc:i:b:t:",["help","iconf=","input=","bin=","threads="])
+        opts, args = getopt.getopt(argv,"hc:i:o:b:t:",["help","iconf=","input=","output=","bin=","threads="])
     except getopt.GetoptError:
         affine_usage()
         sys.exit(2)
@@ -148,6 +149,8 @@ def affine_main():
             binsize = int(arg)
         elif opt in ("-c", "--iconf"):
             config = arg
+        elif opt in ("-o", "--output"):
+            prefix = arg
         elif opt in ("-t", "--threads"):
             threads= int(arg)
         elif opt in ("-i", "--input"):
@@ -157,16 +160,18 @@ def affine_main():
         sys.exit(3)
 
     print("config file is {}".format(config))
+    print("input prefix is {}".format( input_folder))
     print("output prefix is {}".format( prefix))
     print("binsize is {}".format(binsize))
     print("threads is {}".format(threads))
 
-    print('start tissue(s) possitions...')
+    print('loading datas...')
     print(time.strftime("%Y-%m-%d %H:%M:%S"),flush=True)
-    slice_data = load_tissues_positions(config,input_folder)
+    affines = load_affines(config)
+    slice_info , boss = load_tissues_positions(affines,input_folder)
     print('apply affine matrix(s)...')
     print(time.strftime("%Y-%m-%d %H:%M:%S"),flush=True)
-    affine_one_by_one(slice_data,input_folder,binsize,threads)
+    affine_one_by_one(affines,slice_info,boss,prefix,binsize,threads)
     print('apply affine matix, all done ...')
     print(time.strftime("%Y-%m-%d %H:%M:%S"),flush=True)
 
@@ -186,9 +191,11 @@ Action:
     gem2bfm                 convert GEM into BFM.
     heatmap                 heatmap of expression counts.
     apply_affinematrix      apply affinematrix to add 3D (x,y,z)
-                            coordinates into tissue-position-list.csv
-    gen3d_heatmap           join expression counts with (x,y,z) coord
+                            coordinates into tissue-position-list.csv.
+    gen3d_heatmap           join expression counts with (x,y,z) coord 
+                            and visualize by interactive html.
     get3d_cluster           join cluster results with (x,y,z) coord
+                            and visualize by interactive html.
     -----------------------------------------------------------------
 
     -h/--help               show this short usage

@@ -38,12 +38,11 @@ class muti_thread_helper(threading.Thread):
     def run(self):
         for i in range(self.thread_id ,len(self.slice_data.m_dataframe),self.threads):
             row=self.slice_data.m_dataframe.loc[i]
-            bin_x,bin_y,bin_index,_,_=self.slice_data.m_xyz.bin_coord_from_spot(
+            bin_x , bin_y =self.slice_data.m_xyz.bin_coord_from_spot(
                 row['x'],
                 row['y'],
-                self.slice_data.slice_info.binsize,
-                self.slice_data.slice_info.binwidth)
-
+                self.slice_data.slice_info.binsize)
+            bin_index = bin_x + bin_y*self.slice_data.slice_info.binwidth
             self.bos.set_valid(bin_index)
             bid = self.bos.get_bin(bin_index).bin_id + 1
             count=row['MIDCounts']
@@ -79,43 +78,44 @@ class slice_dataframe:
         draw_width , draw_height  = xyz.get_bin_wh(binsize)
         coords=np.zeros((draw_height,draw_width))
         for _,row in self.m_dataframe.iterrows():
-            _,_,_,bin_x , bin_y = self.m_xyz.bin_coord_from_spot(row['x'],row['y'],binsize,draw_width)
+            bin_x , bin_y = self.m_xyz.bin_coord_from_spot(row['x'],row['y'],binsize)
             coords[bin_y,bin_x]+= row['MIDCounts']
         return coords
 
-    def get_expression_count2d(self,binsize=50) -> np.ndarray:
-        """
-        Return :  (x,y,v) matrix for all valid spots. v represent total UMI number.
-        """
-        mask_value = self.get_expression_count(binsize)
-        #return mask_value;
-        mask_coord = self.m_xyz.model2D_coordinate_of_slice(binsize)
-        data_array = np.hstack( ( mask_coord,mask_value.reshape(-1,1) ) )
-        #np.savetxt("test.txt",data_array,"%d")
-        return data_array
+    #def get_expression_count2d(self,binsize=50) -> np.ndarray:
+    #    """
+    #    Return :  (x,y,v) matrix for all valid spots. v represent total UMI number.
+    #    """
+    #    mask_value = self.get_expression_count(binsize)
+    #    #return mask_value;
+    #    mask_coord = self.m_xyz.model2D_coordinate_of_slice(binsize)
+    #    data_array = np.hstack( ( mask_coord,mask_value.reshape(-1,1) ) )
+    #    #np.savetxt("test.txt",data_array,"%d")
+    #    return data_array
 
-    def get_expression_count3d(self,binsize=50) -> np.ndarray:
-        """
-        Return :  (x,y,z,v) matrix for all valid spots. v represent total UMI number.
-        """
-        mask_value = self.get_expression_count(binsize)
-        mask_value = mask_value.reshape(-1)
-        mask_value = preprocessing.normalize([mask_value])
-        mask_value *=1000
-        mask_value = mask_value.astype(int)
-        mask_coord = self.m_xyz.model3D_coordinate_of_slice(binsize)
+    #def get_expression_count3d(self,binsize=50) -> np.ndarray:
+    #    """
+    #    Return :  (x,y,z,v) matrix for all valid spots. v represent total UMI number.
+    #    """
+    #    mask_value = self.get_expression_count(binsize)
+    #    mask_value = mask_value.reshape(-1)
+    #    mask_value = preprocessing.normalize([mask_value])
+    #    mask_value *=1000
+    #    mask_value = mask_value.astype(int)
+    #    mask_coord = self.m_xyz.model3D_coordinate_of_slice(binsize)
 
-        data_array = np.hstack( ( mask_coord,mask_value.reshape(-1,1) ) )
-        return data_array[mask_value.reshape(-1)>0,:]
+    #    data_array = np.hstack( ( mask_coord,mask_value.reshape(-1,1) ) )
+    #    return data_array[mask_value.reshape(-1)>0,:]
+    #
+    #def get_xyz(self) -> slice_xyz:
+    #    return self.m_xyz
 
-    def get_xyz(self) -> slice_xyz:
-        return self.m_xyz
 
-    def get_gene(self,gene_name : str) -> np.ndarray :
-        """
-        Return : rectangar matrix with gene expression value
-        """
-        #TODO
+    #def get_factor(self,factor_item) -> np.ndarray :
+    #    """
+    #    Return : rectangar matrix with factor strength value
+    #    """
+    #    #TODO
 
     def get_gene_ids(self) -> []:
         """
@@ -126,13 +126,6 @@ class slice_dataframe:
         for index, name in enumerate(uniq_gene_names):
             gene_ids[name]=index
         return gene_ids
-
-
-    def get_factor(self,factor_item) -> np.ndarray :
-        """
-        Return : rectangar matrix with factor strength value
-        """
-        #TODO
 
     def get_bins_of_slice(self,  binsize=50):
         """
