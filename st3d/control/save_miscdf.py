@@ -163,3 +163,13 @@ def print_tp_after_affine(df :pd.DataFrame, prefix:{},slice_index:int):
                      header=False,index=False)
 
 
+###########################################################
+# section5 : model3d
+###########################################################
+def init_model3d(prefix:str):
+    create_a_folder(prefix)
+
+def print_model3d(df :pd.DataFrame, prefix:str):
+    df.to_csv("{}/model3d.csv".format(prefix),sep=',',header=True,index=False)
+
+

@@ -49,3 +49,21 @@ def load_tissues_positions(affine_datas:{}, input_folder:str):
         slices_infos[slice_index] = slice_info
         boss[slice_index] = bos
     return slices_infos,boss
+
+def load_clusters(filename:str)->pd.DataFrame:
+    cluster_df = pd.read_csv(filename,sep=',')
+    return cluster_df
+
+def load_tissues_positions_bycluster(cluster_df:pd.DataFrame, input_folder:str) -> {}:
+    header=['bin_name','masked','bin_x','bin_y','png_x','png_y','slice_id','3d_x','3d_y','3d_z']
+    slice_ids = pd.unique(cluster_df['slice'])
+    pds = {}
+    for sid in slice_ids:
+        cdata=cluster_df.loc[cluster_df['slice']==sid]
+        file2="{}/slice_{}/tissue_positions_list.csv".format(input_folder,sid)
+        bos_dataframe = pd.read_csv(file2,sep=',',header=None)
+        bos_dataframe.columns=header
+        pds[sid]=bos_dataframe
+    return pds
+
+

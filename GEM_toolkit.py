@@ -8,6 +8,7 @@ from st3d.control.load_slices import *
 from st3d.control.gem2bfm import gem2bfm_slices_one_by_one
 from st3d.control.gem2heatmap import heatmap_slices_one_by_one
 from st3d.control.apply_affinematrix import affine_one_by_one
+from st3d.control.model3d import build_model3d
 ############################################################################
 # section 1 : gem2bfm
 #############################################################################
@@ -176,7 +177,58 @@ def affine_main(argv:[]):
     print(time.strftime("%Y-%m-%d %H:%M:%S"),flush=True)
 
 ############################################################################
-# section 3 : main
+# section 4 : model3d
+#############################################################################
+
+def model3d_usage():
+    print("""
+Usage : GEM_toolkit.py model3d   -i <input-folder>  \\
+                                 -r <cluster.txt> \\
+                                 -o <output-folder>
+Notice:
+        1. the input folder must be the output folder of apply_affinematrix action.
+        2. the columns of cluster.txt should be \"bin_name,slice_id,cluster_id,sct_ncount\"
+""")
+
+def model3d_main(argv:[]):
+    input_folder = ''
+    c_result=''
+    prefix=''
+    try:
+        opts, args = getopt.getopt(argv,"hi:o:r:",["help","input=","output=","cluster_result="])
+    except getopt.GetoptError:
+        model3d_usage()
+        sys.exit(2)
+    for opt, arg in opts:
+        if opt in ('-h' ,'--help'):
+            model3d_usage()
+            sys.exit(0)
+        elif opt in ("-o", "--output"):
+            prefix = arg
+        elif opt in ("-i", "--input"):
+            input_folder = arg
+        elif opt in ("-r", "--cluster_result"):
+            c_result= arg
+    if  input_folder == "" or prefix=="" or c_result =="":
+        model3d_usage()
+        sys.exit(3)
+
+    print("input folder is {}".format( input_folder))
+    print("cluster result is {}".format(c_result))
+    print("output prefix is {}".format( prefix))
+
+    print('loading datas...')
+    print(time.strftime("%Y-%m-%d %H:%M:%S"),flush=True)
+    cluster_df = load_clusters(c_result)
+    bin_xyz = load_tissues_positions_bycluster(cluster_df,input_folder)
+    print('apply affine matrix(s)...')
+    print(time.strftime("%Y-%m-%d %H:%M:%S"),flush=True)
+    build_model3d(cluster_df,bin_xyz,prefix)
+    print('apply affine matix, all done ...')
+    print(time.strftime("%Y-%m-%d %H:%M:%S"),flush=True)
+
+############################################################################
+# section 5 : main
 #############################################################################
 
 # usage
@@ -192,9 +244,7 @@ Action:
     heatmap                 heatmap of expression counts.
     apply_affinematrix      apply affinematrix to add 3D (x,y,z)
                             coordinates into tissue-position-list.csv.
-    gen3d_heatmap           join expression counts with (x,y,z) coord 
-                            and visualize by interactive html.
-    get3d_cluster           join cluster results with (x,y,z) coord
+    model3d                 join cluster results with (x,y,z) coord
                             and visualize by interactive html.
     -----------------------------------------------------------------
 
@@ -207,7 +257,7 @@ if __name__ == "__main__":
     if len(sys.argv) == 2 and sys.argv[1] in ( "-h" , "--help" ):
         main_usage()
         exit(0)
-    elif len(sys.argv) < 2 or not sys.argv[1] in ("gem2bfm","heatmap","apply_affinematrix"):
+    elif len(sys.argv) < 2 or not sys.argv[1] in ("gem2bfm","heatmap","apply_affinematrix","model3d"):
         main_usage()
         exit(1)
     elif sys.argv[1] == "gem2bfm" :
@@ -219,3 +269,9 @@ if __name__ == "__main__":
     elif sys.argv[1] == "apply_affinematrix" :
         affine_main(sys.argv[2:])
         exit(0)
+    elif sys.argv[1] == "model3d":
+        model3d_main(sys.argv[2:])
+        exit(0)
+    else:
+        main_usage()
+        exit(1)

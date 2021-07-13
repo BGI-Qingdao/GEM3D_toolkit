@@ -5,6 +5,30 @@ import plotly.express as px
 import numpy as np
 import pandas as pd
 
+
+def html_model3d(df: pd.DataFrame,prefix:str):
+    color_discrete_map= {'cluster_0': px.colors.qualitative.Plotly[0],
+                     'cluster_1': px.colors.qualitative.Plotly[1],
+                     'cluster_2': px.colors.qualitative.Plotly[2],
+                     'cluster_3': px.colors.qualitative.Plotly[3],
+                     'cluster_4': px.colors.qualitative.Plotly[4],
+                     'cluster_5': px.colors.qualitative.Plotly[5],
+                     'cluster_6': px.colors.qualitative.Plotly[6],
+                     'cluster_7': px.colors.qualitative.Plotly[7],
+                     'cluster_8': px.colors.qualitative.Plotly[8],
+                     'others':    px.colors.qualitative.Plotly[9]
+                     }
+    cluster_names = []
+    for ids in df['cluster']:
+        if ids < 9 :
+            cluster_names.append("cluster_{}".format(ids))
+        else :
+            cluster_names.append("others")
+    df['cluster_name']=cluster_names
+    fig = px.scatter_3d(df,x='x',y='y',z='z',color='cluster_name',color_discrete_map=color_discrete_map)
+    fig.update_scenes(aspectmode='data')
+    fig.write_html("{}/model3d.html".format(prefix))
+
 def anim2D_and_saveas_html( model :  np.ndarray , fname : str):
     df = pd.DataFrame(model , columns = ['x','y','z','v'])
     fig = px.scatter(df,x='x',y='y',animation_frame='z',color='v',color_continuous_scale='hot')
@@ -15,3 +39,4 @@ def heat3D_and_saveas_html( model : np.ndarray , fname : str):
     fig = px.scatter_3d(df,x='x',y='y',z='z',color='v',color_continuous_scale='hot')
     fig.update_scenes(aspectmode='data')
     fig.write_html(fname)
+
