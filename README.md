@@ -19,6 +19,24 @@ It support below feathures:
 * matplotlib
 * plotly
 
+## example
+
+```
+cd example
+
+# test gem2bfm
+python3 ../GEM_toolkit.py  gem2bfm  -c test_gem2bfm.json -o test_g
+
+# test heatmap
+python3 ../GEM_toolkit.py  heatmap  -c test_gem2bfm.json -o test_h
+
+# test apply_affinematrix
+python3 ../GEM_toolkit.py  apply_affinematrix  -c test_affine.json -i example_bfm_5658 -o test_a
+# test model3d
+python3 ../GEM_toolkit.py model3d -i test_a -r cluster_56_58.txt -o test_m
+
+```
+
 ## Usage :
 
 ### Basic usage
@@ -35,8 +53,8 @@ Action:
     heatmap                 heatmap of expression counts.
     apply_affinematrix      apply affinematrix to add 3D (x,y,z)
                             coordinates into tissue-position-list.csv
-    gen3d_heatmap           join expression counts with (x,y,z) coord
-    gen3d_cluster           join cluster results with (x,y,z) coord
+    model3d                 join cluster results with (x,y,z) coord
+                            and visualize by interactive html.
     -----------------------------------------------------------------
 
     -h/--help               show this short usage
@@ -149,6 +167,18 @@ Notice: input-tissue_positions.csv and scroll.conf.csv are output files of gem2b
 ]
 ```
 
+### model3d usage
+
+```
+Usage : GEM_toolkit.py model3d   -i <input-folder>  \
+                                 -r <cluster.txt> \
+                                 -o <output-folder>
+Notice:
+        1. the input folder must be the output folder of apply_affinematrix action.
+        2. the columns of cluster.txt should be "bin_name,slice_id,cluster_id,sct_ncount"
+
+```
+
 ## outputs
 
 ### file tree of gem2bfm's output folder
@@ -182,6 +212,25 @@ test_h
     ... other slices if have...
 ```
 
+### file tree of apply_affinematrox output folder
+
+```
+test_a/
+├── slice_56
+│   ├── affined.scatter_xy.png
+│   └── tissue_positions_list.csv
+└── slice_58
+    ├── affined.scatter_xy.png
+    └── tissue_positions_list.csv
+```
+
+### file tree of model3d output folder
+
+```
+test_m/
+├── model3d.csv
+└── model3d.html
+```
 
 ## header of tissue_positions_list.csv
 
@@ -195,4 +244,18 @@ bin_name    masked  bin_x   bin_y   png_x   png_y   slice_id    3d_x    3d_y    
 * In the result of heatmap, only the last 3 columns are -1, png_x and png_y represent the pixel in heatmap.
 * The apply_affinematrix command will only change the last 3 columns.
 
+### head of  model3d.csv
 
+```
+bin_name,slice,x,y,z,cluster,sct_ncount
+bin-17,56,107.67536063307665,315.74575386450175,224.0,32,32
+bin-18,56,106.86436452193108,305.7786934730285,224.0,5,5
+bin-19,56,106.05336841078548,295.81163308155527,224.0,26,26
+bin-20,56,105.24237229963987,285.84457269008203,224.0,7,7
+bin-21,56,104.43137618849428,275.8775122986088,224.0,2,2
+bin-22,56,103.62038007734868,265.91045190713555,224.0,2,2
+bin-23,56,102.80938396620309,255.9433915156623,224.0,2,2
+bin-24,56,101.99838785505749,245.9763311241891,224.0,2,2
+bin-25,56,101.18739174391187,236.0092707327158,224.0,2,2
+
+```
