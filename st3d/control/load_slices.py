@@ -1,4 +1,6 @@
 """Interfaces for loading slices"""
+import os.path
+from pathlib import Path
 
 import numpy as np
 import pandas as pd
@@ -7,7 +9,9 @@ import json
 from st3d.model.slices_manager import slices_manager
 from st3d.model.slice_dataframe import slice_meta_data
 from st3d.model.rect_bin import bins_of_slice
-
+###########################################################
+# gem2bfm
+###########################################################
 def load_slices(config :str ) ->slices_manager:
     files=json.load(open(config))
     slices = slices_manager()
@@ -15,6 +19,9 @@ def load_slices(config :str ) ->slices_manager:
         slices.add_slice(one_file[0],one_file[1])
     return slices
 
+###########################################################
+# affine matrix
+###########################################################
 def load_slice_tp(input_folder:str, slice_index:int) -> (slice_meta_data,pd.DataFrame):
     file1="{}/slice_{}/slices.json".format(input_folder,slice_index)
     slice_info_json = json.load(open(file1))
@@ -50,6 +57,9 @@ def load_tissues_positions(affine_datas:{}, input_folder:str):
         boss[slice_index] = bos
     return slices_infos,boss
 
+###########################################################
+# model3d
+###########################################################
 def load_clusters(filename:str)->pd.DataFrame:
     cluster_df = pd.read_csv(filename,sep=',')
     return cluster_df
@@ -66,4 +76,11 @@ def load_tissues_positions_bycluster(cluster_df:pd.DataFrame, input_folder:str) 
         pds[sid]=bos_dataframe
     return pds
 
+def load_masks(folder:str ,cluster_df:pd.DataFrame, cache : {}):
+    slice_ids = pd.unique(cluster_df['slice'])
+    for sid in slice_ids:
+        filename="{}/slice_{}.txt".format(folder,sid)
+        my_file = Path(filename)
+        if my_file.is_file() and my_file.exists() :
+            cache[sid] = np.loadtxt(filename,dtype=int,delimiter='\t')
 

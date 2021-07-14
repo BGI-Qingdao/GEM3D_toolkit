@@ -184,7 +184,9 @@ def model3d_usage():
     print("""
 Usage : GEM_toolkit.py model3d   -i <input-folder>  \\
                                  -r <cluster.txt> \\
-                                 -o <output-folder>
+                                 -o <output-folder> \\
+                                 -m [mask-folder]
+
 Notice:
         1. the input folder must be the output folder of apply_affinematrix action.
         2. the columns of cluster.txt should be \"bin_name,slice_id,cluster_id,sct_ncount\"
@@ -193,9 +195,10 @@ Notice:
 def model3d_main(argv:[]):
     input_folder = ''
     c_result=''
+    masks=''
     prefix=''
     try:
-        opts, args = getopt.getopt(argv,"hi:o:r:",["help","input=","output=","cluster_result="])
+        opts, args = getopt.getopt(argv,"hi:o:r:m:",["help","input=","output=","cluster_result=","masks="])
     except getopt.GetoptError:
         model3d_usage()
         sys.exit(2)
@@ -205,6 +208,8 @@ def model3d_main(argv:[]):
             sys.exit(0)
         elif opt in ("-o", "--output"):
             prefix = arg
+        elif opt in ("-m", "--masks"):
+            masks= arg
         elif opt in ("-i", "--input"):
             input_folder = arg
         elif opt in ("-r", "--cluster_result"):
@@ -215,15 +220,20 @@ def model3d_main(argv:[]):
 
     print("input folder is {}".format( input_folder))
     print("cluster result is {}".format(c_result))
+    if masks != '' :
+        print("mask folder is {}".format(masks))
     print("output prefix is {}".format( prefix))
 
     print('loading datas...')
     print(time.strftime("%Y-%m-%d %H:%M:%S"),flush=True)
     cluster_df = load_clusters(c_result)
+    mask_matrixs={}
+    if masks != '' :
+        load_masks(masks,cluster_df,mask_matrixs)
     bin_xyz = load_tissues_positions_bycluster(cluster_df,input_folder)
     print('apply affine matrix(s)...')
     print(time.strftime("%Y-%m-%d %H:%M:%S"),flush=True)
-    build_model3d(cluster_df,bin_xyz,prefix)
+    build_model3d(cluster_df,bin_xyz,prefix,mask_matrixs)
     print('apply affine matix, all done ...')
     print(time.strftime("%Y-%m-%d %H:%M:%S"),flush=True)
 

@@ -26,6 +26,8 @@ def html_model3d(df: pd.DataFrame,prefix:str):
             cluster_names.append("others")
     df['cluster_name']=cluster_names
     fig = px.scatter_3d(df,x='x',y='y',z='z',color='cluster_name',color_discrete_map=color_discrete_map)
+    for i in range(0,len(fig.data)):
+        fig.data[i].update(marker_size=1)
     fig.update_scenes(aspectmode='data')
     fig.write_html("{}/model3d.html".format(prefix))
 
