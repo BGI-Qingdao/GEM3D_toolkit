@@ -241,10 +241,10 @@ def model3d_main(argv:[]):
     if masks != '' :
         load_masks(masks,cluster_df,mask_matrixs)
     bin_xyz = load_tissues_positions_bycluster(cluster_df,input_folder)
-    print('apply affine matrix(s)...')
+    print('gen model3d (s)...')
     print(time.strftime("%Y-%m-%d %H:%M:%S"),flush=True)
     build_model3d(cluster_df,bin_xyz,prefix,mask_matrixs,downsize)
-    print('apply affine matix, all done ...')
+    print('gen model3d, all done ...')
     print(time.strftime("%Y-%m-%d %H:%M:%S"),flush=True)
 
 ############################################################################
