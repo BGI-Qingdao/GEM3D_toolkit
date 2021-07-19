@@ -4,7 +4,7 @@ from st3d.control.save_miscdf import print_model3d,init_model3d
 from st3d.view.model3d import html_model3d
 from st3d.model.slice_xyz import slice_xyz
 
-def update_masks(bos : pd.DataFrame, masks : np.ndarray, downsize = 10) ->np.ndarray:
+def update_masks(bos : pd.DataFrame, mask : np.ndarray, downsize = 10) ->np.ndarray:
     # downsize mask from bin5 to bin50
     xyz = slice_xyz(mask.shape[0],mask.shape[1] ,0,0)
     new_shape_x,new_shape_y = xyz.get_bin_wh(downsize)
