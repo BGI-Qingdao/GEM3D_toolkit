@@ -9,8 +9,12 @@ It support below feathures:
 * convert a single GEM file into 10X format barcode feature matix (BFM)  file.
 * generate expression counts heatmap from GEM file
 * apply affine matrix to add 3d (x,y,z0 into tissue-position-list.csv
-* visualize 3D expression count scatter 
 * visualize 3D cluster results
+
+overview of this workflow :
+
+![flowchart1](https://user-images.githubusercontent.com/8720584/125709201-3795269f-dfe2-4259-91a2-9be139ff0bd1.png)
+
 
 ## Dependencies
 
