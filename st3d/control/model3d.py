@@ -20,7 +20,7 @@ def update_masks(bos : pd.DataFrame, masks : np.ndarray, downsize = 10) ->np.nda
                 small_mask1[i][j] = 1
     return small_mask1
 
-def build_model3d(cluster_df : pd.DataFrame,boss:{},prefix:str,mask_matrixs:{}):
+def build_model3d(cluster_df : pd.DataFrame,boss:{},prefix:str,mask_matrixs:{},downsize):
     init_model3d(prefix)
     slice_ids = pd.unique(cluster_df['slice'])
     datas=[]
@@ -28,7 +28,7 @@ def build_model3d(cluster_df : pd.DataFrame,boss:{},prefix:str,mask_matrixs:{}):
         bos_dataframe = boss[sid]
         cdata=cluster_df.loc[cluster_df['slice']==sid]
         if sid in mask_matrixs:
-            small_mask=update_masks(bos_dataframe,mask_matrixs[sid])
+            small_mask=update_masks(bos_dataframe,mask_matrixs[sid],downsize)
             bos_dataframe['masked']=small_mask.reshape(-1)
         for _, row in cdata.iterrows():
             tp=bos_dataframe.loc[bos_dataframe['bin_name']==row['bin_name']]

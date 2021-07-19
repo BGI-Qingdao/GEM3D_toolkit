@@ -1,4 +1,4 @@
-#!usr/bin/env python3
+#!/usr/bin/env python3
 
 import sys
 import getopt
@@ -185,11 +185,13 @@ def model3d_usage():
 Usage : GEM_toolkit.py model3d   -i <input-folder>  \\
                                  -r <cluster.txt> \\
                                  -o <output-folder> \\
-                                 -m [mask-folder]
+                                 -m [mask-folder] \\
+                                 -d [downsize]
 
 Notice:
         1. the input folder must be the output folder of apply_affinematrix action.
         2. the columns of cluster.txt should be \"bin_name,slice_id,cluster_id,sct_ncount\"
+        3. downsize = bin size of cluster / bin size of mask
 """)
 
 def model3d_main(argv:[]):
@@ -197,8 +199,9 @@ def model3d_main(argv:[]):
     c_result=''
     masks=''
     prefix=''
+    downsize=0
     try:
-        opts, args = getopt.getopt(argv,"hi:o:r:m:",["help","input=","output=","cluster_result=","masks="])
+        opts, args = getopt.getopt(argv,"hi:o:r:m:d:",["help","input=","output=","cluster_result=","masks=","downsize="])
     except getopt.GetoptError:
         model3d_usage()
         sys.exit(2)
@@ -214,15 +217,22 @@ def model3d_main(argv:[]):
             input_folder = arg
         elif opt in ("-r", "--cluster_result"):
             c_result= arg
+        elif opt in ("-d", "--downsize"):
+            downsize=int(arg)
     if  input_folder == "" or prefix=="" or c_result =="":
         model3d_usage()
+        sys.exit(3)
+    if masks != "" and downsize == 0 :
+        print(" please set -d with -m ! exit ...")
         sys.exit(3)
 
     print("input folder is {}".format( input_folder))
     print("cluster result is {}".format(c_result))
+    print("output prefix is {}".format( prefix))
     if masks != '' :
         print("mask folder is {}".format(masks))
-    print("output prefix is {}".format( prefix))
+        print("downsize is {}".format(downsize))
+
 
     print('loading datas...')
     print(time.strftime("%Y-%m-%d %H:%M:%S"),flush=True)
@@ -233,7 +243,7 @@ def model3d_main(argv:[]):
     bin_xyz = load_tissues_positions_bycluster(cluster_df,input_folder)
     print('apply affine matrix(s)...')
     print(time.strftime("%Y-%m-%d %H:%M:%S"),flush=True)
-    build_model3d(cluster_df,bin_xyz,prefix,mask_matrixs)
+    build_model3d(cluster_df,bin_xyz,prefix,mask_matrixs,downsize)
     print('apply affine matix, all done ...')
     print(time.strftime("%Y-%m-%d %H:%M:%S"),flush=True)
 
