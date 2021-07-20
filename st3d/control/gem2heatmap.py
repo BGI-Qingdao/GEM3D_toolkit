@@ -32,6 +32,8 @@ def heatmap_slice_one(data:[]):
     print_slices_heatmap_json(slice_info,prefix,slice_index)
     assign_graph_xy(bos,slice_info.binwidth)
     print_heatmap_tissue_positions_list(bos,prefix,slice_index)
+    np.savetxt('{}/slice_{}/heatmatrix.txt'.format(prefix,slice_index)
+             , heatmap_matrix, fmt='%d')
     heatmap2D_png(heatmap_matrix,
                   '{}/slice_{}/heatmap.png'.format(prefix,slice_index),
                   slice_info.binwidth,
