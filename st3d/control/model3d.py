@@ -24,6 +24,7 @@ def build_model3d(cluster_df : pd.DataFrame,boss:{},prefix:str,mask_matrixs:{},d
     init_model3d(prefix)
     slice_ids = pd.unique(cluster_df['slice_id'])
     datas=[]
+    #borders=[]
     for sid in slice_ids:
         bos_dataframe = boss[sid]
         cdata=cluster_df.loc[cluster_df['slice_id']==sid]

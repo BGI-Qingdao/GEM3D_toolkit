@@ -40,5 +40,5 @@ def gem2bfm_slices_one_by_one(slices,prefix,binsize=50,tasks=8):
         one_slice = slices.slices[slice_id]
         args.append([one_slice,prefix,binsize])
     with Pool(tasks) as p:
-        print(p.map(gem2bfm_one_slice, args))
+        p.map(gem2bfm_one_slice, args)
 

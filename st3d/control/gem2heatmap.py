@@ -1,5 +1,6 @@
 import time
 from multiprocessing import Pool
+import numpy as np
 
 from st3d.control.save_miscdf import *
 from st3d.model.slice_dataframe import slice_dataframe
@@ -47,5 +48,5 @@ def heatmap_slices_one_by_one(slices,prefix,binsize,tasks) :
         one_slice = slices.slices[slice_id]
         args.append([one_slice,prefix,binsize])
     with Pool(tasks) as p:
-        print(p.map(heatmap_slice_one, args))
+        p.map(heatmap_slice_one, args)
 

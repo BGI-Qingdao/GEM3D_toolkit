@@ -44,7 +44,7 @@ def affine_one_by_one(affines:{},slice_info:{},boss:{},
             slice_info[slice_id]
             ])
     with Pool(tasks) as p:
-        print(p.map(affine_one, args))
+        p.map(affine_one, args)
 
     #print_affine_scatter_3d(bos_dataframe,prefix,slice_index)
     #print_affine_anim_2d(bos_dataframe,prefix,slice_index)
