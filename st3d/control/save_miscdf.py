@@ -162,6 +162,11 @@ def print_tp_after_affine(df :pd.DataFrame, prefix:{},slice_index:int):
                      sep=',',
                      header=False,index=False)
 
+def print_affine_slices_json(slices_info : {} , prefix: str,slice_id):
+    filename="{}/slice_{}/slices.json".format(prefix,slice_id)
+    sourceFile = open(filename, 'w')
+    sourceFile.writelines(json.dumps(slices_info, sort_keys=False, indent=4, separators=(',', ':'),cls=General_Encoder))
+    sourceFile.close()
 
 ###########################################################
 # section5 : model3d

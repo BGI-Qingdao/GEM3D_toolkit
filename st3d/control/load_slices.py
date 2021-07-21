@@ -64,17 +64,29 @@ def load_clusters(filename:str)->pd.DataFrame:
     cluster_df = pd.read_csv(filename,sep=',')
     return cluster_df
 
-def load_tissues_positions_bycluster(cluster_df:pd.DataFrame, input_folder:str) -> {}:
+def load_tissues_positions_bycluster(cluster_df:pd.DataFrame, input_folder:str):
     header=['bin_name','masked','bin_x','bin_y','png_x','png_y','slice_id','3d_x','3d_y','3d_z']
     slice_ids = pd.unique(cluster_df['slice'])
     pds = {}
+    sinfos={}
     for sid in slice_ids:
         cdata=cluster_df.loc[cluster_df['slice']==sid]
+        file1="{}/slice_{}/slices.json".format(input_folder,sid)
+        slice_info_json = json.load(open(file1))
+        slice_info = slice_meta_data(slice_info_json['slice_id'],
+                                     slice_info_json['slice_min_x'],
+                                     slice_info_json['slice_min_y'],
+                                     slice_info_json['slice_width'],
+                                     slice_info_json['slice_height'])
+        slice_info.assign_bininfo(slice_info_json['binsize'],
+                                  slice_info_json['binwidth'],
+                                  slice_info_json['binheight'])
+        sinfos[sid]=slice_info
         file2="{}/slice_{}/tissue_positions_list.csv".format(input_folder,sid)
         bos_dataframe = pd.read_csv(file2,sep=',',header=None)
         bos_dataframe.columns=header
         pds[sid]=bos_dataframe
-    return pds
+    return pds,sinfos
 
 def load_masks(folder:str ,cluster_df:pd.DataFrame, cache : {}):
     slice_ids = pd.unique(cluster_df['slice'])

@@ -240,10 +240,10 @@ def model3d_main(argv:[]):
     mask_matrixs={}
     if masks != '' :
         load_masks(masks,cluster_df,mask_matrixs)
-    bin_xyz = load_tissues_positions_bycluster(cluster_df,input_folder)
+    bin_xyz, sinfos = load_tissues_positions_bycluster(cluster_df,input_folder)
     print('gen model3d (s)...')
     print(time.strftime("%Y-%m-%d %H:%M:%S"),flush=True)
-    build_model3d(cluster_df,bin_xyz,prefix,mask_matrixs,downsize)
+    build_model3d(cluster_df,bin_xyz,sinfos,prefix,mask_matrixs,downsize)
     print('gen model3d, all done ...')
     print(time.strftime("%Y-%m-%d %H:%M:%S"),flush=True)
 
