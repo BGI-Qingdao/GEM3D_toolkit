@@ -3,7 +3,7 @@ from multiprocessing import Pool
 
 from st3d.control.save_miscdf import *
 from st3d.model.slice_xyz import slice_xyz
-from st3d.view.slice2d import print_affined_scatter_2d, print_affine_slices_json
+from st3d.view.slice2d import print_affined_scatter_2d
 
 
 def affine_one( data : [] ):
