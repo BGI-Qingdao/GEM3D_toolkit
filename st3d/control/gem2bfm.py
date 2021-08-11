@@ -5,10 +5,13 @@ from st3d.control.save_miscdf import *
 from st3d.model.slice_dataframe import slice_dataframe
 
 def gem2bfm_one_slice(data:[]):
-    one_slice   = data[0]
-    prefix      = data[1]
-    binsize     = data[2]
+    gem_file_name  = data[0]
+    z_index     = data[1]
+    #one_slice   = data[0]
+    prefix      = data[2]
+    binsize     = data[3]
 
+    one_slice = slice_dataframe(gem_file_name,z_index)
     slice_index = one_slice.slice_index
     init_gem2bfm_slice(prefix,slice_index)
 
@@ -36,9 +39,11 @@ def gem2bfm_one_slice(data:[]):
 def gem2bfm_slices_one_by_one(slices,prefix,binsize=50,tasks=8):
     init_gem2bfm_output(prefix)
     args=[]
-    for slice_id in range(0,slices.slices_num):
-        one_slice = slices.slices[slice_id]
-        args.append([one_slice,prefix,binsize])
+    #for slice_id in range(0,slices.slices_num):
+    for slice_name in slices:
+        z_index = slices[slice_name]
+        #one_slice = slices.slices[slice_id]
+        args.append([slice_name,z_index,prefix,binsize])
     with Pool(tasks) as p:
         p.map(gem2bfm_one_slice, args)
 

@@ -6,7 +6,6 @@ import pandas as pd
 from subprocess import check_call
 
 from st3d.model.rect_bin import bins_of_slice, bins_of_slices
-from st3d.model.slices_manager import slices_manager
 from st3d.model.slice_dataframe import slice_dataframe
 
 ###########################################################

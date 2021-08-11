@@ -6,17 +6,16 @@ import numpy as np
 import pandas as pd
 import json
 
-from st3d.model.slices_manager import slices_manager
 from st3d.model.slice_dataframe import slice_meta_data
 from st3d.model.rect_bin import bins_of_slice
 ###########################################################
 # gem2bfm
 ###########################################################
-def load_slices(config :str ) ->slices_manager:
+def load_slices(config :str) ->{}:
     files=json.load(open(config))
-    slices = slices_manager()
+    slices = {}
     for one_file in files:
-        slices.add_slice(one_file[0],one_file[1])
+        slices[one_file[0]]=one_file[1]
     return slices
 
 ###########################################################

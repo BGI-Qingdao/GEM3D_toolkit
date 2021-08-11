@@ -14,11 +14,15 @@ def assign_graph_xy(bos : bins_of_slice,binwidth:int):
         ids[i,1]= i//binwidth
     bos.assign_graph_xy_matrix(ids)
 
-
 def heatmap_slice_one(data:[]):
-    one_slice = data[0]
-    prefix    = data[1]
-    binsize   = data[2]
+    gem_file_name  = data[0]
+    print('---------------------')
+    print(gem_file_name)
+    print('---------------------')
+    z_index     = data[1]
+    prefix      = data[2]
+    binsize     = data[3]
+    one_slice = slice_dataframe(gem_file_name,z_index)
 
     slice_index = one_slice.slice_index
     init_heatmap_slice(prefix,slice_index)
@@ -44,9 +48,10 @@ def heatmap_slice_one(data:[]):
 def heatmap_slices_one_by_one(slices,prefix,binsize,tasks) :
     init_heatmap_output(prefix)
     args=[]
-    for slice_id in range(0,slices.slices_num):
-        one_slice = slices.slices[slice_id]
-        args.append([one_slice,prefix,binsize])
+    #for slice_id in range(0,slices.slices_num):
+    for slice_name in slices:
+        z_index = slices[slice_name]
+        args.append([slice_name,z_index,prefix,binsize])
     with Pool(tasks) as p:
-        p.map(heatmap_slice_one, args)
+        print(p.map(heatmap_slice_one, args))
 
