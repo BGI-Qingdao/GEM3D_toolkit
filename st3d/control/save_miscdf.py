@@ -70,6 +70,9 @@ def print_tp_bins_of_slice(bos: bins_of_slice ,file_hander):
                         abin.d3_z
                         ))
 
+def cp_file( fromf :str , tof :str ) :
+    check_call('cp {} {}'.format(fromf,tof),shell=True)
+
 ###########################################################
 # section2 : gem2bfm
 ###########################################################

@@ -4,11 +4,12 @@ import sys
 import getopt
 import time
 
-from st3d.control.load_slices import *
+from st3d.control.load_miscdf import *
 from st3d.control.gem2bfm import gem2bfm_slices_one_by_one
 from st3d.control.gem2heatmap import heatmap_slices_one_by_one
 from st3d.control.apply_affinematrix import affine_one_by_one
 from st3d.control.model3d import build_model3d
+from st3d.control.maskbgm import mask_bfms
 ############################################################################
 # section 1 : gem2bfm
 #############################################################################
@@ -169,7 +170,7 @@ def affine_main(argv:[]):
     print('loading datas...')
     print(time.strftime("%Y-%m-%d %H:%M:%S"),flush=True)
     affines = load_affines(config)
-    slice_info , boss = load_tissues_positions(affines,input_folder)
+    slice_info , boss = load_tissues_positions_byaffines(affines,input_folder)
     print('apply affine matrix(s)...')
     print(time.strftime("%Y-%m-%d %H:%M:%S"),flush=True)
     affine_one_by_one(affines,slice_info,boss,prefix,binsize,threads)
@@ -239,7 +240,7 @@ def model3d_main(argv:[]):
     cluster_df = load_clusters(c_result)
     mask_matrixs={}
     if masks != '' :
-        load_masks(masks,cluster_df,mask_matrixs)
+        load_masks_byclusters(masks,cluster_df,mask_matrixs)
     bin_xyz, sinfos = load_tissues_positions_bycluster(cluster_df,input_folder)
     print('gen model3d (s)...')
     print(time.strftime("%Y-%m-%d %H:%M:%S"),flush=True)
@@ -268,8 +269,9 @@ def maskbfm_main(argv:[]):
     masks=''
     prefix=''
     downsize=0
+    threads=4
     try:
-        opts, args = getopt.getopt(argv,"hi:o:m:d:",["help","input=","output=","mask_cfg=","downsize="])
+        opts, args = getopt.getopt(argv,"hi:o:m:d:t:",["help","input=","output=","mask_cfg=","downsize=","threads="])
     except getopt.GetoptError:
         maskbfm_usage()
         sys.exit(2)
@@ -285,7 +287,10 @@ def maskbfm_main(argv:[]):
             input_folder = arg
         elif opt in ("-d", "--downsize"):
             downsize=int(arg)
-    if  input_folder == "" or prefix=="" or downsize < 1 or masks == "" :
+        elif opt in ("-t", "--threads"):
+            threads= int(arg)
+
+    if  input_folder == "" or prefix=="" or downsize < 1 or masks == "" or threads < 1 :
         maskbfm_usage()
         sys.exit(3)
 
@@ -293,6 +298,7 @@ def maskbfm_main(argv:[]):
     print("output prefix is {}".format( prefix))
     print("mask conf.json is {}".format(masks))
     print("downsize is {}".format(downsize))
+    print("working threads is {}".format(threads))
 
     print('loading masks...')
     print(time.strftime("%Y-%m-%d %H:%M:%S"),flush=True)
@@ -300,12 +306,12 @@ def maskbfm_main(argv:[]):
     masks_map  = load_slices(masks)
     print('gen masked bfm (s)...')
     print(time.strftime("%Y-%m-%d %H:%M:%S"),flush=True)
-    mask_bfms(masks_map,input_folder,prefix,downsize)
+    mask_bfms(masks_map,input_folder,prefix,downsize,threads)
     print('gen masked bfm (s) all done')
     print(time.strftime("%Y-%m-%d %H:%M:%S"),flush=True)
 
 ############################################################################
-# section 5 : main
+# section 6 : main
 #############################################################################
 
 # usage

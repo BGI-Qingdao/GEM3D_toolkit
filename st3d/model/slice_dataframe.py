@@ -58,8 +58,9 @@ class slice_dataframe:
         most of the time we only want to see one aspect of the slice at one time.
     """
 
-    def __init__(self,gem_file_name:str, slice_index ):
+    def __init__(self,gem_file_name:str, slice_index ) :
         self.m_dataframe=pd.read_csv(gem_file_name,sep='\t')
+        self.m_dataframe.columns = ['geneID','x','y','MIDCounts']
         #print("{} size of self.m_dataframe".format(len(self.m_dataframe)))
         min_x=np.min(self.m_dataframe.x)
         max_x=np.max(self.m_dataframe.x)
