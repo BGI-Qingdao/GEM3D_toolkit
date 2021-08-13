@@ -98,3 +98,10 @@ def load_masks_byclusters(folder:str ,cluster_df:pd.DataFrame, cache : {}):
         if my_file.is_file() and my_file.exists() :
             cache[sid] = np.loadtxt(filename,dtype=int,delimiter='\t')
 
+###########################################################
+# maskbfm
+###########################################################
+
+def load_sparse_matrix(filename:str) ->pd.DataFrame :
+    df =  pd.read_csv(filename, compression='gzip', header=2, sep=' ',  error_bad_lines=False)
+    return df

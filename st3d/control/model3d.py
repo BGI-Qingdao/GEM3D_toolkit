@@ -16,7 +16,7 @@ def update_masks(bos : pd.DataFrame, mask : np.ndarray, downsize = 10) ->np.ndar
 
     for i in range( new_shape_x):
         for j in range(new_shape_y):
-            if small_mask[i][j] > downsize*downsize*0.5:
+            if small_mask[i][j] >= downsize*downsize*0.5:
                 small_mask1[i][j] = 1
     return small_mask1
 

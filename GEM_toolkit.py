@@ -9,7 +9,7 @@ from st3d.control.gem2bfm import gem2bfm_slices_one_by_one
 from st3d.control.gem2heatmap import heatmap_slices_one_by_one
 from st3d.control.apply_affinematrix import affine_one_by_one
 from st3d.control.model3d import build_model3d
-from st3d.control.maskbgm import mask_bfms
+from st3d.control.maskbfm import mask_bfms
 ############################################################################
 # section 1 : gem2bfm
 #############################################################################

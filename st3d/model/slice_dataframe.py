@@ -83,41 +83,6 @@ class slice_dataframe:
             coords[bin_y,bin_x]+= row['MIDCounts']
         return coords
 
-    #def get_expression_count2d(self,binsize=50) -> np.ndarray:
-    #    """
-    #    Return :  (x,y,v) matrix for all valid spots. v represent total UMI number.
-    #    """
-    #    mask_value = self.get_expression_count(binsize)
-    #    #return mask_value;
-    #    mask_coord = self.m_xyz.model2D_coordinate_of_slice(binsize)
-    #    data_array = np.hstack( ( mask_coord,mask_value.reshape(-1,1) ) )
-    #    #np.savetxt("test.txt",data_array,"%d")
-    #    return data_array
-
-    #def get_expression_count3d(self,binsize=50) -> np.ndarray:
-    #    """
-    #    Return :  (x,y,z,v) matrix for all valid spots. v represent total UMI number.
-    #    """
-    #    mask_value = self.get_expression_count(binsize)
-    #    mask_value = mask_value.reshape(-1)
-    #    mask_value = preprocessing.normalize([mask_value])
-    #    mask_value *=1000
-    #    mask_value = mask_value.astype(int)
-    #    mask_coord = self.m_xyz.model3D_coordinate_of_slice(binsize)
-
-    #    data_array = np.hstack( ( mask_coord,mask_value.reshape(-1,1) ) )
-    #    return data_array[mask_value.reshape(-1)>0,:]
-    #
-    #def get_xyz(self) -> slice_xyz:
-    #    return self.m_xyz
-
-
-    #def get_factor(self,factor_item) -> np.ndarray :
-    #    """
-    #    Return : rectangar matrix with factor strength value
-    #    """
-    #    #TODO
-
     def get_gene_ids(self) -> []:
         """
         Return : dict {gene_name : gene_id, ...}

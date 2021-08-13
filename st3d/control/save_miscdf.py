@@ -179,4 +179,10 @@ def init_model3d(prefix:str):
 def print_model3d(df :pd.DataFrame, prefix:str):
     df.to_csv("{}/model3d.csv".format(prefix),sep=',',header=True,index=False)
 
+###########################################################
+# section6 : model3d
+###########################################################
 
+def print_maskbfm_tissue_positions_list(df: pd.DataFrame, prefix:str,slice_id):
+    filename="{}/slice_{}/spatial/tissue_positions_list.csv".format(prefix,slice_id)
+    df.to_csv(filename,sep=',',header=False,index=False)
