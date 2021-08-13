@@ -113,24 +113,49 @@ class slice_dataframe:
         #print(len(bos.bins))
         return slice_meta , bos
 
-    def get_mtx( self, gen_map:{}, bos:bins_of_slice ,threads=4) :
+    def get_mtx_1( self , mtx , gen_map , bos ):
+        cache={}
+        for _ , row in self.m_dataframe.iterrows():
+            bin_x , bin_y =self.m_xyz.bin_coord_from_spot(row['x'],row['y'],self.slice_info.binsize)
+            bin_index = bin_x + bin_y*self.slice_info.binwidth
+            bos.set_valid(bin_index)
+            bid = bos.get_bin(bin_index).bin_id + 1
+            count=row['MIDCounts']
+            gid= gen_map[row['geneID']] +1
+            if not bid in cache:
+                cache[bid]={}
+            b_cache = cache[bid]
+            if gid in b_cache:
+                b_cache[gid] += count
+            else:
+                b_cache[gid] = count
+
+        index=0
+        for bid in cache:
+            for gid in cache[bid]:
+                mtx.loc[index]=[bid,gid,cache[bid][gid]]
+                index+=1
+
+
+
+    def get_mtx( self, gen_map:{}, bos:bins_of_slice ) :
         mtx=pd.DataFrame(columns=('gid','bid','count'),index=range(0,len(self.m_dataframe)))
-        print("hanle a gem : foreach {} threads, slice {}".format(threads,self.slice_index))
         print('#line in gem: {}, slice {}'.format(len(mtx),self.slice_index))
         print(time.strftime("%Y-%m-%d %H:%M:%S"),flush=True)
-        works=[]
-        for i in range(0,threads):
-            t=muti_thread_helper(self,gen_map,bos,mtx,i,threads)
-            t.start()
-            works.append(t)
-        for x in works:
-            x.join()
+        #works=[]
+        #for i in range(0,threads):
+        #    t=muti_thread_helper(self,gen_map,bos,mtx,i,threads)
+        #    t.start()
+        #    works.append(t)
+        #for x in works:
+        #    x.join()
 
-        print("hanle a gem : groupby, slice {}".format(self.slice_index))
-        print(time.strftime("%Y-%m-%d %H:%M:%S"),flush=True)
-        mtx=mtx.groupby(['gid','bid']).agg({'count': ['sum']}).reset_index()
-        print('#line in mtx: {}, slice_id {}'.format(len(mtx),self.slice_index))
-        mtx.columns=['gid','bid','count']
+        #print("hanle a gem : groupby, slice {}".format(self.slice_index))
+        #print(time.strftime("%Y-%m-%d %H:%M:%S"),flush=True)
+        #mtx=mtx.groupby(['gid','bid']).agg({'count': ['sum']}).reset_index()
+        #print('#line in mtx: {}, slice_id {}'.format(len(mtx),self.slice_index))
+        #mtx.columns=['gid','bid','count']
+        self.get_mtx_1(mtx,gen_map,bos)
         print("hanle a gem : done slice {}".format(self.slice_info))
         print(time.strftime("%Y-%m-%d %H:%M:%S"),flush=True)
         return mtx
