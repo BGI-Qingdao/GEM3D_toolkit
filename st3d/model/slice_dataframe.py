@@ -133,13 +133,13 @@ class slice_dataframe:
         index=0
         for bid in cache:
             for gid in cache[bid]:
-                mtx.loc[index]=[bid,gid,cache[bid][gid]]
+                mtx.loc[index]=[gid,bid,cache[bid][gid]]
                 index+=1
 
 
 
     def get_mtx( self, gen_map:{}, bos:bins_of_slice ) :
-        mtx=pd.DataFrame(columns=('gid','bid','count'),index=range(0,len(self.m_dataframe)))
+        mtx=pd.DataFrame(columns=('gid','bid','count'))
         print('#line in gem: {}, slice {}'.format(len(mtx),self.slice_index))
         print(time.strftime("%Y-%m-%d %H:%M:%S"),flush=True)
         #works=[]

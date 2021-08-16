@@ -34,6 +34,7 @@ def gem2bfm_one_slice(data:[]):
     print_tissue_positions_list(bos,prefix,slice_index)
     print_gem2bfm_slices_json(slices_info,prefix,slice_index)
     print_matrix_mtx(mtx,prefix,slice_index,len(gene_maps),bos.bin_num())
+    print('gem2bfm done for {}'.format(slice_index))
 
 # multi-processing run all slices
 def gem2bfm_slices_one_by_one(slices,prefix,binsize=50,tasks=8):

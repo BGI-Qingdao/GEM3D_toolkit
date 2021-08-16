@@ -1,10 +1,13 @@
 import time
+import math
 from multiprocessing import Pool
 
 import numpy as np
 
 from st3d.control.save_miscdf import *
+from st3d.control.load_miscdf import *
 from st3d.model.slice_dataframe import slice_dataframe
+from st3d.model.slice_xyz import slice_xyz
 
 def update_masks( mask : np.ndarray, downsize = 10) ->np.ndarray:
     # downsize mask from bin5 to bin50
@@ -67,10 +70,13 @@ def gen_one_masked_bfm(args : []):
     sparse_matrix.columns = ['gid','bid','count']
 
     new_matrix = pd.DataFrame(columns = sparse_matrix.columns)
-    index = 0 
+    index = 0
     for _ , row in sparse_matrix.iterrows() :
-        tp_index =  row['bid']
-        if tp_data.loc['tp_index','masked'] == 1 :
+        tp_index = row['bid']
+        if math.isnan(tp_index) :
+            break
+        tp_index = int(tp_index -1)
+        if tp_data.loc[tp_index,'masked'] == 1 :
             new_matrix.loc[index]=[ row['gid'],row['bid'],row['count'] ]
             index+=1
     print_matrix_mtx(new_matrix,prefix,slice_index,g_num,b_num)
