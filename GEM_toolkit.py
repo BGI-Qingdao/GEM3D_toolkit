@@ -10,6 +10,7 @@ from st3d.control.gem2heatmap import heatmap_slices_one_by_one
 from st3d.control.apply_affinematrix import affine_one_by_one
 from st3d.control.model3d import build_model3d
 from st3d.control.maskbfm import mask_bfms
+from st3d.control.maskheatmap import mask_heatmap
 ############################################################################
 # section 1 : gem2bfm
 #############################################################################
@@ -257,7 +258,8 @@ def maskbfm_usage():
 Usage : GEM_toolkit.py maskbfm   -i <input-folder>  \\
                                  -o <output-folder> \\
                                  -m <mask.json> \\
-                                 -d <downsize>
+                                 -d <downsize> \\
+                                 -t <threads>
 
 Notice:
         1. the input folder is output folder of gem2bfm action.
@@ -311,7 +313,64 @@ def maskbfm_main(argv:[]):
     print(time.strftime("%Y-%m-%d %H:%M:%S"),flush=True)
 
 ############################################################################
-# section 6 : main
+# section 5 : maskheatmap
+#############################################################################
+
+def maskheatmap_usage():
+    print("""
+Usage : GEM_toolkit.py maskheatmap  -i <input-folder>  \\
+                                    -o <output-folder> \\
+                                    -m <mask.json> \\
+                                    -t <threads>
+
+Notice:
+        1. the input folder is output folder of heatmap action.
+""")
+
+def maskheatmap_main(argv:[]):
+    input_folder = ''
+    masks=''
+    prefix=''
+    threads=4
+    try:
+        opts, args = getopt.getopt(argv,"hi:o:m:t:",["help","input=","output=","mask_cfg=","threads="])
+    except getopt.GetoptError:
+        maskheatmap_usage()
+        sys.exit(2)
+    for opt, arg in opts:
+        if opt in ('-h' ,'--help'):
+            maskheatmap_usage()
+            sys.exit(0)
+        elif opt in ("-o", "--output"):
+            prefix = arg
+        elif opt in ("-m", "--mask_cfg"):
+            masks= arg
+        elif opt in ("-i", "--input"):
+            input_folder = arg
+        elif opt in ("-t", "--threads"):
+            threads= int(arg)
+
+    if  input_folder == "" or prefix=="" or masks == "" or threads < 1 :
+        maskheatmap_usage()
+        sys.exit(3)
+
+    print("input folder is {}".format( input_folder))
+    print("output prefix is {}".format( prefix))
+    print("mask conf.json is {}".format(masks))
+    print("working threads is {}".format(threads))
+
+    print('loading masks...')
+    print(time.strftime("%Y-%m-%d %H:%M:%S"),flush=True)
+    # masks_map
+    masks_map  = load_slices(masks)
+    print('gen masked heatmap (s)...')
+    print(time.strftime("%Y-%m-%d %H:%M:%S"),flush=True)
+    mask_heatmap(masks_map,input_folder,prefix,threads)
+    print('gen masked heatmap (s) all done')
+    print(time.strftime("%Y-%m-%d %H:%M:%S"),flush=True)
+
+############################################################################
+# section 7 : main
 #############################################################################
 
 # usage
@@ -326,7 +385,8 @@ Action:
     gem2bfm                 convert GEM into BFM.
     maskbfm                 mask bins by mask matrixs.
     heatmap                 heatmap of expression counts.
-    apply_affinematrix      apply affinematrix to add 3D (x,y,z)
+    maskheatmap             mask heatmaps by mask matrixs.
+    apply_affinematrix      apply affinematrix to add 3D (x,y,z).
                             coordinates into tissue-position-list.csv.
     model3d                 join cluster results with (x,y,z) coord
                             and visualize by interactive html.
@@ -341,7 +401,7 @@ if __name__ == "__main__":
     if len(sys.argv) == 2 and sys.argv[1] in ( "-h" , "--help" ):
         main_usage()
         exit(0)
-    elif len(sys.argv) < 2 or not sys.argv[1] in ("gem2bfm","maskbfm","heatmap","apply_affinematrix","model3d"):
+    elif len(sys.argv) < 2 or not sys.argv[1] in ("gem2bfm","maskbfm","heatmap","maskheatmap","apply_affinematrix","model3d"):
         main_usage()
         exit(1)
     elif sys.argv[1] == "gem2bfm" :
@@ -349,6 +409,9 @@ if __name__ == "__main__":
         exit(0)
     elif sys.argv[1] == "maskbfm" :
         maskbfm_main(sys.argv[2:])
+        exit(0)
+    elif sys.argv[1] == "maskheatmap" :
+        maskheatmap_main(sys.argv[2:])
         exit(0)
     elif sys.argv[1] == "heatmap" :
         heatmap_main(sys.argv[2:])

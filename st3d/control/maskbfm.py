@@ -58,6 +58,7 @@ def gen_one_masked_bfm(args : []):
     # step3 : sanity check
     if slice_info.binwidth != new_masks.shape[1] or slice_info.binheight != new_masks.shape[0] :
         print("Error : mask != bin_rect for slice {}".format(slice_index))
+        print("please check downsize parameter")
         return
 
     # step4 : modify masks in tissue_possitions
@@ -68,18 +69,17 @@ def gen_one_masked_bfm(args : []):
     g_num = sparse_matrix.columns[0]
     b_num = sparse_matrix.columns[1]
     sparse_matrix.columns = ['gid','bid','count']
-
-    new_matrix = pd.DataFrame(columns = sparse_matrix.columns)
-    index = 0
-    for _ , row in sparse_matrix.iterrows() :
-        tp_index = row['bid']
-        if math.isnan(tp_index) :
-            break
-        tp_index = int(tp_index -1)
-        if tp_data.loc[tp_index,'masked'] == 1 :
-            new_matrix.loc[index]=[ row['gid'],row['bid'],row['count'] ]
-            index+=1
+    tp_data['binid']=np.arange(1,int(b_num)+1)
+    valid_bids=tp_data[tp_data['masked']==1]['binid']
+    print("begin filter matrix{} ...".format(slice_index))
+    print(time.strftime("%Y-%m-%d %H:%M:%S"),flush=True)
+    new_matrix = sparse_matrix[sparse_matrix['bid'].isin(valid_bids)]
+    print("end filter matrix{} ...".format(slice_index))
+    print(time.strftime("%Y-%m-%d %H:%M:%S"),flush=True)
+    new_matrix.index = range(len(new_matrix.index))
     print_matrix_mtx(new_matrix,prefix,slice_index,g_num,b_num)
+    print("end mask bfm for slice {} ...".format(slice_index))
+    print(time.strftime("%Y-%m-%d %H:%M:%S"),flush=True)
 
     # all done
 
