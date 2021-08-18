@@ -19,8 +19,8 @@ def gen_one_masked_heatmap(args : []):
     init_heatmap_slice(prefix,slice_index)
 
     # step1 : cp unchanged files
-    fromf="{}/slice_{}/slices.json".format(input_folder ,slice_index)
-    to_f ="{}/slice_{}/slices.json".format(prefix ,slice_index)
+    fromf="{}/slice_{}/slice.json".format(input_folder ,slice_index)
+    to_f ="{}/slice_{}/slice.json".format(prefix ,slice_index)
     cp_file(fromf,to_f)
 
     # step2 : load datas
@@ -38,16 +38,16 @@ def gen_one_masked_heatmap(args : []):
     print_tp_after_affine(tp_data,prefix,slice_index)
     # step5 : filter heatmap
     for i in range(masks.shape[0]):
-        for j in range(mask.shape[1]):
-            if mask[i][j] == 0 :
+        for j in range(masks.shape[1]):
+            if masks[i][j] == 0 :
                 heatmap[i][j]=0
 
     np.savetxt('{}/slice_{}/heatmatrix.txt'.format(prefix,slice_index)
              , heatmap, fmt='%d')
     heatmap2D_png(heatmap,
                   '{}/slice_{}/heatmap.png'.format(prefix,slice_index),
-                  masks.shape[0],
-                  masks.shape[1])
+                  masks.shape[1],
+                  masks.shape[0])
 
     print("mask heatmap done for slice {}...".format(slice_index))
     print(time.strftime("%Y-%m-%d %H:%M:%S"),flush=True)

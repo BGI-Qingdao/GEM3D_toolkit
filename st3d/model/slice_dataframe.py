@@ -139,7 +139,7 @@ class slice_dataframe:
 
 
     def get_mtx( self, gen_map:{}, bos:bins_of_slice ) :
-        mtx=pd.DataFrame(columns=('gid','bid','count'))
+        mtx=pd.DataFrame(columns=('gid','bid','count'),index=range(0,len(self.m_dataframe)))
         print('#line in gem: {}, slice {}'.format(len(mtx),self.slice_index))
         print(time.strftime("%Y-%m-%d %H:%M:%S"),flush=True)
         #works=[]
@@ -156,6 +156,7 @@ class slice_dataframe:
         #print('#line in mtx: {}, slice_id {}'.format(len(mtx),self.slice_index))
         #mtx.columns=['gid','bid','count']
         self.get_mtx_1(mtx,gen_map,bos)
+        mtx.dropna(inplace=True)
         print("hanle a gem : done slice {}".format(self.slice_info))
         print(time.strftime("%Y-%m-%d %H:%M:%S"),flush=True)
         return mtx
