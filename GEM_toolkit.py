@@ -11,6 +11,7 @@ from st3d.control.apply_affinematrix import affine_one_by_one
 from st3d.control.model3d import build_model3d
 from st3d.control.maskbfm import mask_bfms
 from st3d.control.maskheatmap import mask_heatmap
+from st3d.control.build_scatter3d import build_scatter3d
 ############################################################################
 # section 1 : gem2bfm
 #############################################################################
@@ -129,7 +130,7 @@ Usage : GEM_toolkit.py apply_affinematrix -c <affinematix.conf.json> \\
                                           -b [binsize(default 5)]> \\
                                           -t [threads(default 8)]
 Notice:
-        1. the input folder must be the output folder of gem2bfm action.
+        1. the input folder must be the output folder of gem2bfm or maskbfm action.
         2. the binsize must be the binsize used in heatmap action.
 """)
 
@@ -313,7 +314,7 @@ def maskbfm_main(argv:[]):
     print(time.strftime("%Y-%m-%d %H:%M:%S"),flush=True)
 
 ############################################################################
-# section 5 : maskheatmap
+# section 6 : maskheatmap
 #############################################################################
 
 def maskheatmap_usage():
@@ -370,7 +371,57 @@ def maskheatmap_main(argv:[]):
     print(time.strftime("%Y-%m-%d %H:%M:%S"),flush=True)
 
 ############################################################################
-# section 7 : main
+# section 7 : 
+#############################################################################
+
+def scatter3d_usage():
+    print("""
+Usage : GEM_toolkit.py scatter3d    -i <input-folder>  \\
+                                    -o <output-folder> \\
+                                    -c <conf.json> \
+
+Notice:
+        1. the input folder is output folder of heatmap action.
+""")
+
+def scatter3d_main(argv:[]):
+    input_folder = ''
+    prefix=''
+    conf=''
+    try:
+        opts, args = getopt.getopt(argv,"hi:o:c:",["help","input=","output=","conf="])
+    except getopt.GetoptError:
+        scatter3d_usage()
+        sys.exit(2)
+    for opt, arg in opts:
+        if opt in ('-h' ,'--help'):
+            scatter3d_usage()
+            sys.exit(0)
+        elif opt in ("-o", "--output"):
+            prefix = arg
+        elif opt in ("-i", "--input"):
+            input_folder = arg
+        elif opt in ("-c", "--conf"):
+            conf = arg
+
+    if  input_folder == "" or prefix=="" or conf == "" :
+        scatter3d_usage()
+        sys.exit(3)
+
+    print("input folder is {}".format( input_folder))
+    print("output prefix is {}".format( prefix))
+    print("conf file is {}".format(conf))
+    print('loading confs...')
+    print(time.strftime("%Y-%m-%d %H:%M:%S"),flush=True)
+    slices = load_slices(conf)
+    print('build scatter3d...')
+    print(time.strftime("%Y-%m-%d %H:%M:%S"),flush=True)
+    build_scatter3d(slices,input_folder,prefix)
+    print('build_scatter3d all done')
+    print(time.strftime("%Y-%m-%d %H:%M:%S"),flush=True)
+
+############################################################################
+# section 8 : main
 #############################################################################
 
 # usage
@@ -388,6 +439,7 @@ Action:
     maskheatmap             mask heatmaps by mask matrixs.
     apply_affinematrix      apply affinematrix to add 3D (x,y,z).
                             coordinates into tissue-position-list.csv.
+    scatter3d               intergrate slices into 3d.
     model3d                 join cluster results with (x,y,z) coord
                             and visualize by interactive html.
     -----------------------------------------------------------------
@@ -401,7 +453,7 @@ if __name__ == "__main__":
     if len(sys.argv) == 2 and sys.argv[1] in ( "-h" , "--help" ):
         main_usage()
         exit(0)
-    elif len(sys.argv) < 2 or not sys.argv[1] in ("gem2bfm","maskbfm","heatmap","maskheatmap","apply_affinematrix","model3d"):
+    elif len(sys.argv) < 2 or not sys.argv[1] in ("gem2bfm","maskbfm","heatmap","maskheatmap","apply_affinematrix","scatter3d","model3d"):
         main_usage()
         exit(1)
     elif sys.argv[1] == "gem2bfm" :
@@ -418,6 +470,9 @@ if __name__ == "__main__":
         exit(0)
     elif sys.argv[1] == "apply_affinematrix" :
         affine_main(sys.argv[2:])
+        exit(0)
+    elif sys.argv[1] == "scatter3d":
+        scatter3d_main(sys.argv[2:])
         exit(0)
     elif sys.argv[1] == "model3d":
         model3d_main(sys.argv[2:])

@@ -42,3 +42,9 @@ def heat3D_and_saveas_html( model : np.ndarray , fname : str):
     fig.update_scenes(aspectmode='data')
     fig.write_html(fname)
 
+def scatter_3d_html(all_points: pd.DataFrame, fname :str):
+    fig = px.scatter_3d(df,x='3d_x',y='3d_y',z='3d_z')
+    fig.data[0].update(marker_size=1)
+    fig.update_scenes(aspectmode='data')
+    fig.write_html(fname)
+
