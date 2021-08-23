@@ -43,7 +43,10 @@ def heat3D_and_saveas_html( model : np.ndarray , fname : str):
     fig.write_html(fname)
 
 def scatter_3d_html(all_points: pd.DataFrame, fname :str):
-    fig = px.scatter_3d(df,x='3d_x',y='3d_y',z='3d_z')
+    if len(all_points) > 10000:
+        frac=10000/len(all_points)
+        all_points=all_points.sample(frac=frac, replace=True, random_state=1)
+    fig = px.scatter_3d(all_points,x='3d_x',y='3d_y',z='3d_z')
     fig.data[0].update(marker_size=1)
     fig.update_scenes(aspectmode='data')
     fig.write_html(fname)
