@@ -5,7 +5,6 @@ from st3d.control.save_miscdf import *
 from st3d.model.slice_xyz import slice_xyz
 from st3d.view.slice2d import print_affined_scatter_2d
 
-
 def affine_one( data : [] ):
     bos_dataframe = data[0]
     affine_matrix = data[1]

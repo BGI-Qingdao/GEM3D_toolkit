@@ -12,6 +12,7 @@ from st3d.control.model3d import build_model3d
 from st3d.control.maskbfm import mask_bfms
 from st3d.control.maskheatmap import mask_heatmap
 from st3d.control.build_scatter3d import build_scatter3d
+from st3d.control.segmentbfm import segmentbfm
 ############################################################################
 # section 1 : gem2bfm
 #############################################################################
@@ -371,17 +372,17 @@ def maskheatmap_main(argv:[]):
     print(time.strftime("%Y-%m-%d %H:%M:%S"),flush=True)
 
 ############################################################################
-# section 7 : 
+# section 7 :
 #############################################################################
 
 def scatter3d_usage():
     print("""
 Usage : GEM_toolkit.py scatter3d    -i <input-folder>  \\
                                     -o <output-folder> \\
-                                    -c <conf.json> \
+                                    -c <conf.json>
 
 Notice:
-        1. the input folder is output folder of heatmap action.
+        1. the input folder is output folder of apply_affinematrix action.
 """)
 
 def scatter3d_main(argv:[]):
@@ -421,9 +422,113 @@ def scatter3d_main(argv:[]):
     print(time.strftime("%Y-%m-%d %H:%M:%S"),flush=True)
 
 ############################################################################
-# section 8 : main
+# section 8 : segmentbfm
 #############################################################################
+# usage
+def segmentbfm_usage():
+    print("""
+Usage : GEM_toolkit.py segmentbfm   -i <bfm-folder>  \\
+                                    -a <affine-folder> \\
+                                    -c <conf.json> \\
+                                    -s <segmentations.csv> \\
+                                    -o <output-folder>
+""")
 
+def segmentbfm_main(argv:[]) :
+    bfm_folder = ''
+    affine_folder = ''
+    prefix=''
+    conf=''
+    segconf=''
+    try:
+        opts, args = getopt.getopt(argv,"hi:a:o:c:s:",["help","bfm=","affine=","output=","conf=","segs="])
+    except getopt.GetoptError:
+        segmentbfm_usage()
+        sys.exit(2)
+    for opt, arg in opts:
+        if opt in ('-h' ,'--help'):
+            segmentbfm_usage()
+            sys.exit(0)
+        elif opt in ("-o", "--output"):
+            prefix = arg
+        elif opt in ("-a", "--affine"):
+            affine_folder = arg
+        elif opt in ("-i", "--bfm"):
+            bfm_folder = arg
+        elif opt in ("-c", "--conf"):
+            conf = arg
+        elif opt in ("-s", "--segs"):
+            segconf = arg
+
+    if  affine_folder == "" or bfm_folder == "" or prefix=="" or conf == "" or segconf == "" :
+        segmentbfm_usage()
+        sys.exit(3)
+
+    print("bfm folder is {}".format( bfm_folder))
+    print("affine folder is {}".format( affine_folder))
+    print("output prefix is {}".format( prefix))
+    print("conf file is {}".format(conf))
+    print('loading confs...')
+    print(time.strftime("%Y-%m-%d %H:%M:%S"),flush=True)
+    slices = load_slices(conf)
+    segs = load_segmentations(segconf)
+    print('segment bfm...')
+    print(time.strftime("%Y-%m-%d %H:%M:%S"),flush=True)
+    segmentbfm(slices,segs,bfm_folder,affine_folder,prefix)
+    print('segment bfm all done')
+    print(time.strftime("%Y-%m-%d %H:%M:%S"),flush=True)
+
+############################################################################
+# section 9 : segmentmode3d
+#############################################################################
+# usage
+def segmentmodel3d_usage():
+    print("""
+Usage : GEM_toolkit.py segmentmodel3d  -i <input-folder>  \\
+                                       -s <segmentations.csv> \\
+                                       -o <output-folder>
+""")
+
+def segmentmodel3d_main(argv:[]) :
+    input_folder = ''
+    prefix=''
+    segconf=''
+    try:
+        opts, args = getopt.getopt(argv,"hi:o:s:",["help","input=","output=","segs="])
+    except getopt.GetoptError:
+        segmentmodel3d_usage()
+        sys.exit(2)
+    for opt, arg in opts:
+        if opt in ('-h' ,'--help'):
+            segmentmodel3d_usage()
+            sys.exit(0)
+        elif opt in ("-o", "--output"):
+            prefix = arg
+        elif opt in ("-i", "--bfm"):
+            bfm_folder = arg
+        elif opt in ("-s", "--segs"):
+            segconf = arg
+
+    if  input_folder == "" or prefix== "" or segconf == "" :
+        segmentmodel3d_usage()
+        sys.exit(3)
+
+    print("bfm folder is {}".format( bfm_folder))
+    print("affine folder is {}".format( affine_folder))
+    print("output prefix is {}".format( prefix))
+    print("conf file is {}".format(conf))
+    print('loading confs...')
+    print(time.strftime("%Y-%m-%d %H:%M:%S"),flush=True)
+    segs = load_segmentations(segconf)
+    print('segment model3d ...')
+    print(time.strftime("%Y-%m-%d %H:%M:%S"),flush=True)
+    segmentmodel3d(segs,input_folder,prefix)
+    print('segment model3d all done')
+    print(time.strftime("%Y-%m-%d %H:%M:%S"),flush=True)
+
+############################################################################
+# section 10 : main
+#############################################################################
 # usage
 def main_usage():
     print("""
@@ -433,17 +538,29 @@ Action:
 
     -----------------------------------------------------------------
 
+ actions work on GEM :
+
     gem2bfm                 convert GEM into BFM.
-    maskbfm                 mask bins by mask matrixs.
     heatmap                 heatmap of expression counts.
+
+ actions work on bin5 coordinate space :
+
+    maskbfm                 mask bins by mask matrixs.
     maskheatmap             mask heatmaps by mask matrixs.
     apply_affinematrix      apply affinematrix to add 3D (x,y,z).
                             coordinates into tissue-position-list.csv.
-    scatter3d               intergrate slices into 3d.
-    model3d                 join cluster results with (x,y,z) coord
-                            and visualize by interactive html.
-    -----------------------------------------------------------------
 
+ actions work on uniform 3D space :
+
+    scatter3d               intergrate slices into 3d.
+    segmentbfm              segment slice(s) into multiply samples.
+    model3d                 join cluster results with (x,y,z) coord.
+                            and visualize by interactive html.
+    segmentmodel3d          segment model3d into multiply samples.
+
+ other tools :
+
+    tightbfm                remove pure zero rows and columns.
     -h/--help               show this short usage
     -----------------------------------------------------------------
 """)
@@ -453,7 +570,15 @@ if __name__ == "__main__":
     if len(sys.argv) == 2 and sys.argv[1] in ( "-h" , "--help" ):
         main_usage()
         exit(0)
-    elif len(sys.argv) < 2 or not sys.argv[1] in ("gem2bfm","maskbfm","heatmap","maskheatmap","apply_affinematrix","scatter3d","model3d"):
+    elif len(sys.argv) < 2 or not sys.argv[1] in ("gem2bfm",
+                                                   "maskbfm",
+                                                   "heatmap",
+                                                   "maskheatmap",
+                                                   "apply_affinematrix",
+                                                   "scatter3d",
+                                                   "segmentbfm",
+                                                   "segmentmodel3d",
+                                                   "model3d"):
         main_usage()
         exit(1)
     elif sys.argv[1] == "gem2bfm" :
@@ -476,6 +601,12 @@ if __name__ == "__main__":
         exit(0)
     elif sys.argv[1] == "model3d":
         model3d_main(sys.argv[2:])
+        exit(0)
+    elif  sys.argv[1] == "segmentbfm" :
+        segmentbfm_main(sys.argv[2:])
+        exit(0)
+    elif  sys.argv[1] == "segmentmodel3d" :
+        segmentmodel3d_main(sys.argv[2:])
         exit(0)
     else:
         main_usage()

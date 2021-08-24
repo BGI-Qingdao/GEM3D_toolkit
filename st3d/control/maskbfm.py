@@ -8,6 +8,7 @@ from st3d.control.save_miscdf import *
 from st3d.control.load_miscdf import *
 from st3d.model.slice_dataframe import slice_dataframe
 from st3d.model.slice_xyz import slice_xyz
+from st3d.view.slice2d import *
 
 def update_masks( mask : np.ndarray, downsize = 10) ->np.ndarray:
     # downsize mask from bin5 to bin50

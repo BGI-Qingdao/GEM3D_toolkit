@@ -105,3 +105,11 @@ def load_masks_byclusters(folder:str ,cluster_df:pd.DataFrame, cache : {}):
 def load_sparse_matrix(filename:str) ->pd.DataFrame :
     df =  pd.read_csv(filename, compression='gzip', header=2, sep=' ',  error_bad_lines=False)
     return df
+
+###########################################################
+# segmentxxx
+###########################################################
+def load_segmentations(filename:str) ->pd.DataFrame : 
+    df = pd.read_csv(filename,sep='\t',index_col=0)
+    return df
+
