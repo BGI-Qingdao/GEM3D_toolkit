@@ -121,28 +121,3 @@ class slice_xyz:
                 coords[index][0],coords[index][1]= bin_mid_x , bin_mid_y
         return coords
 
-    #def model2D_coordinate_of_slice(self,binsize=50) ->np.ndarray :
-    #    """
-    #    Return the 2D spot index coordiante of all spot in this slice
-    #    """
-    #    coords= self.get_bins(binsize)
-    #    return self.graph_pixels_from_spots(coords)
-
-    #def model3D_coordinate_of_slice(self,binsize=50) -> np.ndarray :
-    #    """
-    #    Return the 3D coordiante of all spot in this slice
-    #    """
-    #    coords = self.get_bins(binsize)
-    #    return self.model3D_coordinates_from_spots(coords)
-
-    #def border3D_coordinate_of_slice(self) -> np.ndarray :
-    #    """
-    #    Return the 3D coordiante of 4 border spot in this slice
-    #    """
-    #    coords=np.zeros((5,2))
-    #    coords[0][0],coords[0][1] = self.spot_min_x,self.spot_min_y
-    #    coords[1][0],coords[1][1] = self.spot_min_x+self.spot_width-1,self.spot_min_y
-    #    coords[2][0],coords[2][1] = self.spot_min_x+self.spot_width-1,self.spot_min_y+self.spot_height-1
-    #    coords[3][0],coords[3][1] = self.spot_min_x,self.spot_min_y+self.spot_height-1
-    #    coords[4][0],coords[4][1] = self.spot_min_x,self.spot_min_y
-    #    return self.model3D_coordinates_from_spots(coords)

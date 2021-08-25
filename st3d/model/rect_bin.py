@@ -2,7 +2,7 @@ import numpy as np
 
 class rect_bin:
     def __init__(self,bin_id:int , slice_id : int, spot_x: int ,spot_y:int):
-        self.bin_name = "slice{}bin-{}".format(slice_id,bin_id)
+        self.bin_name = "s{}b{}".format(slice_id,bin_id)
         self.bin_id   = bin_id
         self.slice_id = slice_id
         self.spot_x   = spot_x

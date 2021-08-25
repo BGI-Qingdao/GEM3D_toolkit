@@ -7,6 +7,33 @@ import pandas as pd
 
 
 def html_model3d(df: pd.DataFrame,prefix:str):
+    color25={
+        'cluster_0' : '#1C86EE' ,
+        'cluster_1' : '#E31A1C' ,
+        'cluster_2' : '#008B00' ,
+        'cluster_3' : '#6A3D9A' ,
+        'cluster_4' : '#FF7F00' ,
+        'cluster_5' : '#000000' ,
+        'cluster_6' : '#FFD700' ,
+        'cluster_7' : '#7EC0EE' ,
+        'cluster_8' : '#FB9A99' ,
+        'cluster_9' : '#90EE90' ,
+        'cluster_10' : '#CAB2D6',
+        'cluster_11' : '#FDBF6F',
+        'cluster_12' : '#B3B3B3',
+        'cluster_13' : '#EEE685',
+        'cluster_14' : '#B03060',
+        'cluster_15' : '#FF83FA',
+        'cluster_16' : '#FF1493',
+        'cluster_17' : '#0000FF',
+        'cluster_18' : '#36648B',
+        'cluster_19' : '#00CED1',
+        'cluster_20' : '#00FF00',
+        'cluster_21' : '#8B8B00',
+        'cluster_22' : '#CDCD00',
+        'cluster_23' : '#8B4500',
+        'others' : '#A52A2A'
+    }
     color18={ 'cluster_0':'#c51b7d',
            'cluster_1':'#de77ae',
            'cluster_2':'#f1b6da',
@@ -38,12 +65,12 @@ def html_model3d(df: pd.DataFrame,prefix:str):
                      }
     cluster_names = []
     for ids in df['cluster']:
-        if ids < 17 :
+        if ids < 24 :
             cluster_names.append("cluster_{}".format(ids))
         else :
             cluster_names.append("others")
     df['cluster_name']=cluster_names
-    fig = px.scatter_3d(df,x='x',y='y',z='z',color='cluster_name',color_discrete_map=color18)#color_discrete_map)
+    fig = px.scatter_3d(df,x='x',y='y',z='z',color='cluster_name',color_discrete_map=color25)#color_discrete_map)
     for i in range(0,len(fig.data)):
         fig.data[i].update(marker_size=1)
     fig.update_scenes(aspectmode='data')

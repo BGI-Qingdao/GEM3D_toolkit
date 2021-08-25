@@ -432,7 +432,8 @@ Usage : GEM_toolkit.py segmentbfm   -i <bfm-folder>  \\
                                     -a <affine-folder> \\
                                     -c <conf.json> \\
                                     -s <segmentations.csv> \\
-                                    -o <output-folder>
+                                    -o <output-folder> \\
+                                    -t <threads>
 """)
 
 def segmentbfm_main(argv:[]) :
@@ -441,8 +442,15 @@ def segmentbfm_main(argv:[]) :
     prefix=''
     conf=''
     segconf=''
+    threads=0
     try:
-        opts, args = getopt.getopt(argv,"hi:a:o:c:s:",["help","bfm=","affine=","output=","conf=","segs="])
+        opts, args = getopt.getopt(argv,"hi:a:o:c:s:t:",["help",
+                                                         "bfm=",
+                                                         "affine=",
+                                                         "output=",
+                                                         "conf=",
+                                                         "tasks=",
+                                                         "segs="])
     except getopt.GetoptError:
         segmentbfm_usage()
         sys.exit(2)
@@ -460,8 +468,16 @@ def segmentbfm_main(argv:[]) :
             conf = arg
         elif opt in ("-s", "--segs"):
             segconf = arg
+        elif opt in ("-t", "--tasks"):
+            threads = int(arg)
 
-    if  affine_folder == "" or bfm_folder == "" or prefix=="" or conf == "" or segconf == "" :
+    if  (affine_folder == "" or
+        bfm_folder == "" or 
+        prefix=="" or
+        conf == "" or
+        threads < 1 or
+        segconf == "" ):
+
         segmentbfm_usage()
         sys.exit(3)
 
@@ -469,13 +485,14 @@ def segmentbfm_main(argv:[]) :
     print("affine folder is {}".format( affine_folder))
     print("output prefix is {}".format( prefix))
     print("conf file is {}".format(conf))
+    print("threads is {}".format(threads))
     print('loading confs...')
     print(time.strftime("%Y-%m-%d %H:%M:%S"),flush=True)
     slices = load_slices(conf)
     segs = load_segmentations(segconf)
     print('segment bfm...')
     print(time.strftime("%Y-%m-%d %H:%M:%S"),flush=True)
-    segmentbfm(slices,segs,bfm_folder,affine_folder,prefix)
+    segmentbfm(slices,segs,bfm_folder,affine_folder,prefix,threads)
     print('segment bfm all done')
     print(time.strftime("%Y-%m-%d %H:%M:%S"),flush=True)
 
