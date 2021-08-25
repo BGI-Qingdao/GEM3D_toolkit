@@ -13,6 +13,7 @@ from st3d.control.maskbfm import mask_bfms
 from st3d.control.maskheatmap import mask_heatmap
 from st3d.control.build_scatter3d import build_scatter3d
 from st3d.control.segmentbfm import segmentbfm
+from st3d.control.segmentmodel3d import segmentmodel3d
 ############################################################################
 # section 1 : gem2bfm
 #############################################################################
@@ -504,8 +505,8 @@ def segmentmodel3d_main(argv:[]) :
             sys.exit(0)
         elif opt in ("-o", "--output"):
             prefix = arg
-        elif opt in ("-i", "--bfm"):
-            bfm_folder = arg
+        elif opt in ("-i", "--input"):
+            input_folder = arg
         elif opt in ("-s", "--segs"):
             segconf = arg
 
@@ -513,10 +514,9 @@ def segmentmodel3d_main(argv:[]) :
         segmentmodel3d_usage()
         sys.exit(3)
 
-    print("bfm folder is {}".format( bfm_folder))
-    print("affine folder is {}".format( affine_folder))
+    print("input folder is {}".format( input_folder))
     print("output prefix is {}".format( prefix))
-    print("conf file is {}".format(conf))
+    print("segmetation conf is {}".format( segconf))
     print('loading confs...')
     print(time.strftime("%Y-%m-%d %H:%M:%S"),flush=True)
     segs = load_segmentations(segconf)
