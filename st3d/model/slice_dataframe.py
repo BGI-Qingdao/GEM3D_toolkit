@@ -60,6 +60,31 @@ class slice_dataframe:
             coords[bin_y,bin_x]+= row['MIDCounts']
         return coords
 
+    def get_expression_count_vector(self,binsize=50) -> np.ndarray:
+        """
+        Return : rectangar matrix with UMI counts
+
+        Notice : this function will modify the orignial GEM dataframe
+        """
+        xyz = self.m_xyz
+        draw_width , draw_height  = xyz.get_bin_wh(binsize)
+        coords=np.zeros((draw_height,draw_width))
+
+        df = self.m_dataframe
+        df['x'] = df['x'] - df['x'].min()
+        df['y'] = df['y'] - df['y'].min()
+        df['x'] = (df['x'] / binsize).astype(int)
+        df['y'] = (df['y'] / binsize).astype(int)
+
+
+        if df['x'].max() +1 != draw_width or df['y'].max() +1 != draw_height :
+            print("ERROR : heatmap wh error ")
+            exit(1001)
+
+        coords[df['y'], df['x']] = df['UMI_sum']
+
+        return coords
+
     def get_gene_ids(self) -> []:
         """
         Return : dict {gene_name : gene_id, ...}

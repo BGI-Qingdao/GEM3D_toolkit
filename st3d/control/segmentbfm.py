@@ -6,6 +6,7 @@ import numpy as np
 import pandas as pd
 
 from  st3d.control.save_miscdf import *
+from  st3d.control.load_miscdf import *
 
 def segment_one_bfm(argv :[]):
     segmentations = argv[0]
@@ -35,7 +36,7 @@ def segment_one_bfm(argv :[]):
         to_f ="{}/slice_{}/raw_feature_bc_matrix/barcodes.tsv.gz".format(prefix_n,slice_index)
         cp_file(fromf,to_f)
 
-        fromf="{}/slice_{}/raw_feature_bc_matrix/features.tsv.gz".format(input_folder ,slice_index)
+        fromf="{}/slice_{}/raw_feature_bc_matrix/features.tsv.gz".format(bfm_folder ,slice_index)
         to_f ="{}/slice_{}/raw_feature_bc_matrix/features.tsv.gz".format(prefix_n,slice_index)
         cp_file(fromf,to_f)
 
@@ -69,6 +70,7 @@ def segmentbfm( slices : {} ,
     create_a_folder(prefix)
     for name in names:
         create_a_folder('{}/{}'.format(prefix,name))
+    args=[]
     for slice_name in slices:
         slice_index = slices[slice_name]
         args.append([segmentations,bfm_folder,affine_folder,prefix,slice_index])

@@ -33,10 +33,10 @@ def heatmap_slice_one(data:[]):
     #print(len(bos.bins))
     print("get mtx of slice {}...".format(slice_index))
     print(time.strftime("%Y-%m-%d %H:%M:%S"),flush=True)
-    heatmap_matrix = one_slice.get_expression_count(binsize)
     print_slices_heatmap_json(slice_info,prefix,slice_index)
     assign_graph_xy(bos,slice_info.binwidth)
     print_heatmap_tissue_positions_list(bos,prefix,slice_index)
+    heatmap_matrix = one_slice.get_expression_count_vector(binsize)
     np.savetxt('{}/slice_{}/heatmatrix.txt'.format(prefix,slice_index)
              , heatmap_matrix, fmt='%d')
     heatmap2D_png(heatmap_matrix,
