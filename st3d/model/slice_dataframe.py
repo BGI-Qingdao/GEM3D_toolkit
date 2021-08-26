@@ -36,7 +36,7 @@ class slice_dataframe:
     """
 
     def __init__(self,gem_file_name:str, slice_index ) :
-        self.m_dataframe=pd.read_csv(gem_file_name,sep='\t')
+        self.m_dataframe=pd.read_csv(gem_file_name, sep='\t', header=0, compression='infer', comment='#')
         self.m_dataframe.columns = ['geneID','x','y','MIDCounts']
         #print("{} size of self.m_dataframe".format(len(self.m_dataframe)))
         min_x=np.min(self.m_dataframe.x)
@@ -75,7 +75,7 @@ class slice_dataframe:
         df['y'] = df['y'] - df['y'].min()
         df['x'] = (df['x'] / binsize).astype(int)
         df['y'] = (df['y'] / binsize).astype(int)
-
+        df = df.groupby(['x', 'y']).agg(UMI_sum=('MIDCounts', 'sum')).reset_index()
 
         if df['x'].max() +1 != draw_width or df['y'].max() +1 != draw_height :
             print("ERROR : heatmap wh error ")
