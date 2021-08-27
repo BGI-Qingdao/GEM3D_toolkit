@@ -50,4 +50,4 @@ def build_model3d(cluster_df : pd.DataFrame,boss:{},sinfos:{} , prefix:str,mask_
                           bin_y])
     df = pd.DataFrame(datas, columns=['bin_name','slice','x','y','z','cluster','sct_ncount','bx','by'])
     print_model3d(df,prefix)
-    html_model3d(df,prefix)
+    html_model3d(df,prefix,downsize)

@@ -6,7 +6,8 @@ import numpy as np
 import pandas as pd
 
 
-def html_model3d(df: pd.DataFrame,prefix:str):
+def html_model3d(df: pd.DataFrame,prefix:str, downsize=4):
+    # discrete color map
     color25={
         'cluster_0' : '#1C86EE' ,
         'cluster_1' : '#E31A1C' ,
@@ -34,35 +35,7 @@ def html_model3d(df: pd.DataFrame,prefix:str):
         'cluster_23' : '#8B4500',
         'others' : '#A52A2A'
     }
-    color18={ 'cluster_0':'#c51b7d',
-           'cluster_1':'#de77ae',
-           'cluster_2':'#f1b6da',
-           'cluster_3':'#fde0ef',
-           'cluster_4':'#f7f7f7',
-           'cluster_5':'#e6f5d0',
-           'cluster_6':'#b8e186',
-           'cluster_7':'#7fbc41',
-           'cluster_8':'#4d9221',
-           'cluster_9':'#d53e4f',
-           'cluster_10':'#f46d43',
-           'cluster_11':'#fdae61',
-           'cluster_12':'#fee08b',
-           'cluster_13':'#ffffbf',
-           'cluster_14':'#e6f598',
-           'cluster_15':'#abdda4',
-           'cluster_16':'#66c2a5',
-           'others':'#3288bd'}
-    color_discrete_map= {'cluster_0': px.colors.qualitative.Plotly[0],
-                     'cluster_1': px.colors.qualitative.Plotly[1],
-                     'cluster_2': px.colors.qualitative.Plotly[2],
-                     'cluster_3': px.colors.qualitative.Plotly[3],
-                     'cluster_4': px.colors.qualitative.Plotly[4],
-                     'cluster_5': px.colors.qualitative.Plotly[5],
-                     'cluster_6': px.colors.qualitative.Plotly[6],
-                     'cluster_7': px.colors.qualitative.Plotly[7],
-                     'cluster_8': px.colors.qualitative.Plotly[8],
-                     'others':    px.colors.qualitative.Plotly[9]
-                     }
+    # create labels
     cluster_names = []
     for ids in df['cluster']:
         if ids < 24 :
@@ -70,9 +43,47 @@ def html_model3d(df: pd.DataFrame,prefix:str):
         else :
             cluster_names.append("others")
     df['cluster_name']=cluster_names
-    fig = px.scatter_3d(df,x='x',y='y',z='z',color='cluster_name',color_discrete_map=color25)#color_discrete_map)
+
+    # draw cells as scatters in 3D space
+    fig = px.scatter_3d(df,x='x',y='y',z='z',color='cluster_name',color_discrete_map=color25)
+    marker_size=int(downsize/2)
+    if marker_size < 1 :
+        marker_size = 1
     for i in range(0,len(fig.data)):
-        fig.data[i].update(marker_size=1)
+        fig.data[i].update(marker_size=marker_size)
+
+
+    # prepare volumn
+    x1 = np.linspace( int(df['x'].min()),
+                      int(df['x'].max()),
+                     (int(df['x'].max())-int(df['x'].min()))//downsize+1)
+    y1 = np.linspace( int(df['y'].min()),
+                      int(df['y'].max()),
+                     (int(df['y'].max())-int(df['y'].min()))//downsize+1)
+    z1 = np.linspace( int(df['z'].min()),
+                      int(df['z'].max()),
+                     (int(df['z'].max())-int(df['z'].min()))//downsize+1)
+    X, Y, Z = np.meshgrid(x1, y1, z1)
+    # mask valid points
+    values= np.zeros(X.shape)
+    print(values.shape)
+    for _ , row in df.iterrows():
+        values[int(row['y']//downsize),int(row['x']//downsize),int(row['z']//downsize)] = 0.5
+
+    # draw a surface
+    fig.add_trace(go.Isosurface(
+        x=X.flatten(),
+        y=Y.flatten(),
+        z=Z.flatten(),
+        value=values.flatten(),
+        opacity=0.1,
+        colorscale='Greys',
+        isomin=0.45,
+        isomax=0.55,
+        surface_count=3,
+        showscale=False, # remove colorbar
+    ))
+
     fig.update_scenes(aspectmode='data')
     fig.write_html("{}/model3d.html".format(prefix))
 

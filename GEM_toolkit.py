@@ -504,15 +504,17 @@ def segmentmodel3d_usage():
     print("""
 Usage : GEM_toolkit.py segmentmodel3d  -i <input-folder>  \\
                                        -s <segmentations.csv> \\
-                                       -o <output-folder>
+                                       -o <output-folder> \\
+                                       -d <downsize>
 """)
 
 def segmentmodel3d_main(argv:[]) :
     input_folder = ''
     prefix=''
     segconf=''
+    downsize=0
     try:
-        opts, args = getopt.getopt(argv,"hi:o:s:",["help","input=","output=","segs="])
+        opts, args = getopt.getopt(argv,"hi:o:s:d:",["help","input=","output=","segs=","downsize="])
     except getopt.GetoptError:
         segmentmodel3d_usage()
         sys.exit(2)
@@ -520,6 +522,8 @@ def segmentmodel3d_main(argv:[]) :
         if opt in ('-h' ,'--help'):
             segmentmodel3d_usage()
             sys.exit(0)
+        elif opt in ("-d", "--downsize"):
+            downsize = int(arg)
         elif opt in ("-o", "--output"):
             prefix = arg
         elif opt in ("-i", "--input"):
@@ -527,19 +531,20 @@ def segmentmodel3d_main(argv:[]) :
         elif opt in ("-s", "--segs"):
             segconf = arg
 
-    if  input_folder == "" or prefix== "" or segconf == "" :
+    if  input_folder == "" or prefix== "" or segconf == "" or downsize <1 :
         segmentmodel3d_usage()
         sys.exit(3)
 
     print("input folder is {}".format( input_folder))
     print("output prefix is {}".format( prefix))
     print("segmetation conf is {}".format( segconf))
+    print("downsize is {}".format( downsize))
     print('loading confs...')
     print(time.strftime("%Y-%m-%d %H:%M:%S"),flush=True)
     segs = load_segmentations(segconf)
     print('segment model3d ...')
     print(time.strftime("%Y-%m-%d %H:%M:%S"),flush=True)
-    segmentmodel3d(segs,input_folder,prefix)
+    segmentmodel3d(segs,input_folder,prefix,downsize)
     print('segment model3d all done')
     print(time.strftime("%Y-%m-%d %H:%M:%S"),flush=True)
 

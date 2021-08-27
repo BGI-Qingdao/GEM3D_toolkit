@@ -3,7 +3,7 @@ import pandas as pd
 from st3d.control.save_miscdf import print_model3d,init_model3d,create_a_folder
 from st3d.view.model3d import html_model3d
 
-def segmentmodel3d(  segmentations : pd.DataFrame, input_folder : str ,  prefix : str ):
+def segmentmodel3d(  segmentations : pd.DataFrame, input_folder : str ,  prefix : str, downsize=4 ):
     model3d = pd.read_csv( '{}/model3d.csv'.format(input_folder), sep=',' )
     names = segmentations.columns
     names = names.tolist()
@@ -18,4 +18,4 @@ def segmentmodel3d(  segmentations : pd.DataFrame, input_folder : str ,  prefix 
         prefix_new = '{}/{}'.format(prefix,name)
         create_a_folder(prefix_new)
         print_model3d(model3d_new,prefix_new)
-        html_model3d(model3d_new,prefix_new)
+        html_model3d(model3d_new,prefix_new,downsize)
