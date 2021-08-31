@@ -7,6 +7,10 @@ import pandas as pd
 
 
 def html_model3d(df: pd.DataFrame,prefix:str, downsize=4):
+    if len(df) > 100000:
+        frac=100000/len(df)
+        df=df.sample(frac=frac, replace=True, random_state=1)
+
     # discrete color map
     color25={
         'cluster_0' : '#1C86EE' ,
@@ -67,9 +71,11 @@ def html_model3d(df: pd.DataFrame,prefix:str, downsize=4):
     # mask valid points
     values= np.zeros(X.shape)
     print(values.shape)
+    x_min = df['x'].min()
+    y_min = df['y'].min()
+    z_min = df['z'].min()
     for _ , row in df.iterrows():
-        values[int(row['y']//downsize),int(row['x']//downsize),int(row['z']//downsize)] = 0.5
-
+        values[int((row['y']-y_min)//downsize),int((row['x']-x_min)//downsize),int((row['z']-z_min)//downsize)] = 0.5
     # draw a surface
     fig.add_trace(go.Isosurface(
         x=X.flatten(),

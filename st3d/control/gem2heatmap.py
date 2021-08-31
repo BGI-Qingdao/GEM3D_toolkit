@@ -40,7 +40,7 @@ def heatmap_slice_one(data:[]):
     np.savetxt('{}/slice_{}/heatmatrix.txt'.format(prefix,slice_index)
              , heatmap_matrix, fmt='%d')
     heatmap2D_png(heatmap_matrix,
-                  '{}/slice_{}/heatmap.png'.format(prefix,slice_index),
+                  '{}/slice_{}/slice_{}.png'.format(prefix,slice_index,slice_index),
                   slice_info.binwidth,
                   slice_info.binheight)
 

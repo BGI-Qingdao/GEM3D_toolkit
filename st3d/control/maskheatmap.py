@@ -46,7 +46,7 @@ def gen_one_masked_heatmap(args : []):
     np.savetxt('{}/slice_{}/heatmatrix.txt'.format(prefix,slice_index)
              , heatmap, fmt='%d')
     heatmap2D_png(heatmap,
-                  '{}/slice_{}/heatmap.png'.format(prefix,slice_index),
+                  '{}/slice_{}/slice_{}.png'.format(prefix,slice_index,slice_index),
                   masks.shape[1],
                   masks.shape[0])
 
