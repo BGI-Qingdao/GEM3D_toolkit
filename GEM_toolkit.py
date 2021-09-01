@@ -14,6 +14,7 @@ from st3d.control.maskheatmap import mask_heatmap
 from st3d.control.build_scatter3d import build_scatter3d
 from st3d.control.segmentbfm import segmentbfm
 from st3d.control.segmentmodel3d import segmentmodel3d
+from st3d.control.handlemasks import handlemasks
 ############################################################################
 # section 1 : gem2bfm
 #############################################################################
@@ -548,8 +549,52 @@ def segmentmodel3d_main(argv:[]) :
     print('segment model3d all done')
     print(time.strftime("%Y-%m-%d %H:%M:%S"),flush=True)
 
+
 ############################################################################
-# section 10 : main
+# section 10 : handlemasks
+#############################################################################
+# usage
+def handlemasks_usage():
+    print("""
+Usage : GEM_toolkit.py handlemasks     -i masks.json  \\
+                                       -o <output-folder>
+""")
+
+def handlemasks_main(argv:[]) :
+    prefix=''
+    maskconf=''
+    try:
+        opts, args = getopt.getopt(argv,"hi:o:",["help","input=","output="])
+    except getopt.GetoptError:
+        handlemasks_usage()
+        sys.exit(2)
+    for opt, arg in opts:
+        if opt in ('-h' ,'--help'):
+            handlemasks_usage()
+            sys.exit(0)
+        elif opt in ("-o", "--output"):
+            prefix = arg
+        elif opt in ("-i", "--input"):
+            maskconf = arg
+
+    if  maskconf == "" or prefix== "" :
+        handlemasks_usage()
+        sys.exit(3)
+
+    print("mask conf is {}".format(maskconf))
+    print("output prefix is {}".format( prefix))
+    print('loading confs...')
+    print(time.strftime("%Y-%m-%d %H:%M:%S"),flush=True)
+    masks = load_slices(maskconf)
+    print('handle masks ...')
+    print(time.strftime("%Y-%m-%d %H:%M:%S"),flush=True)
+    handlemasks(masks,prefix)
+    print('handle masks all done')
+    print(time.strftime("%Y-%m-%d %H:%M:%S"),flush=True)
+
+
+############################################################################
+# section 11 : main
 #############################################################################
 # usage
 def main_usage():
@@ -581,7 +626,7 @@ Action:
     segmentmodel3d          segment model3d into multiply samples.
 
  other tools :
-
+    handlemasks             convert mask matrixs to (x,y) and binary graph
     tightbfm                remove pure zero rows and columns.
     -h/--help               show this short usage
     -----------------------------------------------------------------
@@ -600,6 +645,7 @@ if __name__ == "__main__":
                                                    "scatter3d",
                                                    "segmentbfm",
                                                    "segmentmodel3d",
+                                                   "handlemasks",
                                                    "model3d"):
         main_usage()
         exit(1)
@@ -629,6 +675,9 @@ if __name__ == "__main__":
         exit(0)
     elif  sys.argv[1] == "segmentmodel3d" :
         segmentmodel3d_main(sys.argv[2:])
+        exit(0)
+    elif  sys.argv[1] == "handlemasks" :
+        handlemasks_main(sys.argv[2:])
         exit(0)
     else:
         main_usage()
