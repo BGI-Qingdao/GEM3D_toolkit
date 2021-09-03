@@ -83,11 +83,15 @@ def load_tissues_positions_bycluster(cluster_df:pd.DataFrame, input_folder:str):
     for sid in slice_ids:
         cdata=cluster_df.loc[cluster_df['slice']==sid]
         file1="{}/slice_{}/slices.json".format(input_folder,sid)
-        slice_info = load_slice_info(file1)
-        sinfos[sid]=slice_info
-        file2="{}/slice_{}/tissue_positions_list.csv".format(input_folder,sid)
-        bos_dataframe = load_slice_tissues_positions(file2)
-        pds[sid]=bos_dataframe
+        my_file = Path(file1)
+        if my_file.is_file() and my_file.exists() :
+            slice_info = load_slice_info(file1)
+            sinfos[sid]=slice_info
+            file2="{}/slice_{}/tissue_positions_list.csv".format(input_folder,sid)
+            bos_dataframe = load_slice_tissues_positions(file2)
+            pds[sid]=bos_dataframe
+        else :
+            print('file \"{}\" is not valid'.format(file1),flush=True)
     return pds,sinfos
 
 def load_masks_byclusters(folder:str ,cluster_df:pd.DataFrame, cache : {}):
@@ -97,6 +101,8 @@ def load_masks_byclusters(folder:str ,cluster_df:pd.DataFrame, cache : {}):
         my_file = Path(filename)
         if my_file.is_file() and my_file.exists() :
             cache[sid] = np.loadtxt(filename,dtype=int,delimiter='\t')
+        else :
+            print('file \"{}\" is not valid'.format(filename),flush=True)
 
 ###########################################################
 # maskbfm
