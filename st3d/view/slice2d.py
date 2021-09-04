@@ -20,6 +20,7 @@ def print_affined_scatter_2d(bos_dataframe,prefix,slice_index):
 def draw_slice_cluster(filename,d2d:np.ndarray):
     height , width = d2d.shape
     plt.figure(figsize=(width/10,height/10))
-    imshow(d2d, interpolation='nearest', cmap='tab20',vmin=1,vmax=20)
+    plt.imshow(d2d, interpolation='nearest', cmap='tab20',vmin=1,vmax=20)
+    plt.subplots_adjust(left=0, bottom=0, right=1, top=1,hspace=0,wspace=0)
     plt.savefig(filename,dpi=10)
     plt.close()
