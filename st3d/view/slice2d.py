@@ -2,6 +2,8 @@ import matplotlib as mpl
 import numpy as np
 mpl.use('Agg')
 import matplotlib.pyplot as plt
+import plotly.graph_objects as go
+import plotly.express as px
 
 def heatmap2D_png(values,out_f,spot_width,spot_height):
     plt.figure(figsize=(spot_width/10,spot_height/10))
@@ -24,3 +26,14 @@ def draw_slice_cluster(filename,d2d:np.ndarray):
     plt.subplots_adjust(left=0, bottom=0, right=1, top=1,hspace=0,wspace=0)
     plt.savefig(filename,dpi=10)
     plt.close()
+
+
+def anim2D_and_saveas_html( df , fname : str ):
+    xmin = df['x'].min() // 100 * 100
+    xmax = df['x'].max() // 100 * 100 + 100
+    ymin = df['y'].min() // 100 * 100
+    ymax = df['y'].max() // 100 * 100 + 100
+    fig = px.scatter(df,x='x',y='y',animation_frame='z',range_x=(xmin,xmax),range_y=(ymin,ymax))
+    fig.write_html(fname)
+
+

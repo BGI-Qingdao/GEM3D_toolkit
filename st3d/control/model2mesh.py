@@ -1,10 +1,9 @@
-#!/usr/bin/env python3
-import sys
 import pandas as pd
 import numpy as np
 
-import plotly.graph_objects as go
-import plotly.express as px
+from st3d.view.slice2d import *
+from st3d.control.save_miscdf import create_a_folder
+from vedo import *
 
 ### get border of one slice
 def get_border(one_slice : pd.DataFrame )->pd.DataFrame :
@@ -52,46 +51,49 @@ def get_border(one_slice : pd.DataFrame )->pd.DataFrame :
             borders=borders.append(row, ignore_index=True)
     return borders
 
-### get all borders
-def get_borders(model :pd.DataFrame)-> pd.DataFrame :
-    slice_ids = np.unique(model['slice'])
-    borders=pd.DataFrame(columns=model.columns)
-    for x in slice_ids :
-        one_slice = model[model['slice'] == x]
-        borders=borders.append(get_border(one_slice),ignore_index=True)
-    return borders
-
-### load model3d
-def load_model3d(filename : str) -> pd.DataFrame :
-    df = pd.read_csv(filename,sep=",")
+def prepare_xyz(df:pd.DataFrame,downsize:int) -> pd.DataFrame :
+    df['x'] = df['x'] //downsize
     df['x'] = df['x'].astype(int)
-    df['x'] = df['x'] //10 
+    df['y'] = df['y'] //downsize
     df['y'] = df['y'].astype(int)
-    df['y'] = df['y'] //10
-    df['slice']=df['slice'].astype(int)
+    df['z'] = df['z'].astype(int)
     return df
 
-def anim2D_and_saveas_html( df , fname : str):
-    fig = px.scatter(df,x='x',y='y',animation_frame='slice',range_x=(0,100),range_y=(0,100))
-    fig.write_html(fname)
+### get all borders
+def get_borders(model :pd.DataFrame,downsize:int)-> pd.DataFrame :
+    model=prepare_xyz(model,downsize)
+    slice_ids = np.unique(model['z'])
+    borders=pd.DataFrame(columns=model.columns)
+    min_z = np.min(slice_ids)
+    max_z = np.max(slice_ids)
+    for x in slice_ids :
+        one_slice = model[model['z'] == x]
+        if x == min_z or x == max_z :
+            borders=borders.append(one_slice,ignore_index=True)
+        else :
+            borders=borders.append(get_border(one_slice),ignore_index=True)
+    borders['x'] = borders['x']*downsize
+    borders['y'] = borders['y']*downsize
+    return borders
 
-def heat3D_and_saveas_html(df  , fname : str):
-    fig = px.scatter_3d(df,x='x',y='y',z='z')
-    fig.update_scenes(aspectmode='data')
-    fig.write_html(fname)
-def mesh(df, fname):
-    fig = go.Figure(data=[go.Mesh3d(x=df['x'], y=df['y'], z=df['z'])])
-    fig.write_html(fname)
 
-### main
-def main(argv:[]):
-    df = load_model3d(argv[0])
-    borders = get_borders(df)
-    print(borders.head())
-    borders.to_csv('mesh.csv',index=False)
-    anim2D_and_saveas_html(borders,'test01.html')
-    heat3D_and_saveas_html(borders,'test02.html')
-    mesh(borders,'mesh.html')
+def model2mesh(xyz : pd.DataFrame , prefix :str , downsize :int, radius=35 , visual = False , factor='0.1'):
+    create_a_folder(prefix)
+    borders = get_borders(xyz,downsize)
+    borders.to_csv('{}/borders.xyz'.format(prefix),index=False)
+    anim2D_and_saveas_html(borders,'{}/borders.html'.format(prefix))
 
-if __name__ == "__main__":
-    main(sys.argv[1:])
+    pts0= Points(borders.to_numpy())
+    pts0 = pts0.clone().smoothMLS2D(f=1.5)
+    reco = recoSurface(pts0,radius=radius)
+    reco = reco.extractLargestRegion()
+    reco = reco.clone().fillHoles()
+    reco = reco.clone().smoothLaplacian()
+    reco = reco.clone().smoothLaplacian()
+    reco = reco.clone().smoothLaplacian()
+    reco = reco.clone().decimate(fraction=factor)
+    io.write(reco,'{}/surface.ply'.format(prefix),binary=False)
+    if  visual == True :
+        plt = Plotter(N=1, axes=0)
+        plt.show(reco, at=0, axes=7, interactive=1).close()
+

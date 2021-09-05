@@ -15,6 +15,8 @@ from st3d.control.build_scatter3d import build_scatter3d
 from st3d.control.segmentbfm import segmentbfm
 from st3d.control.segmentmodel3d import segmentmodel3d
 from st3d.control.handlemasks import handlemasks
+from st3d.control.model2mesh import model2mesh
+
 ############################################################################
 # section 1 : gem2bfm
 #############################################################################
@@ -578,9 +580,74 @@ def handlemasks_main(argv:[]) :
     print('handle masks all done')
     print(time.strftime("%Y-%m-%d %H:%M:%S"),flush=True)
 
+############################################################################
+# section 11 : model2mesh
+#############################################################################
+# usage
+def model2mesh_usage():
+    print("""
+Usage : GEM_toolkit.py model2mesh   -i <model3d.csv>  \\
+                                    -d <downsize> \\
+                                    -o <output-folder> \\
+                                    -r [radius (default 35)] \\
+                                    -c [cluster_id (default -1 for all)] \\
+                                    -s [sample factor(default 0.1)] \\
+                                    -v (show mesh by GUI (default not set))
+
+Notice : model3d.csv must contain x,y,z columns
+""")
+
+def model2mesh_main(argv:[]) :
+    prefix=''
+    model3d=''
+    downsize=0
+    cluster=-1
+    radius=35
+    sample_fac=0.1
+    visual=False
+    try:
+        opts, args = getopt.getopt(argv,"hi:o:d:r:c:s:v",["help","model=","output=","downsize=","radius=","cluster=","sample_fac=","visual"])
+    except getopt.GetoptError:
+        handlemasks_usage()
+        sys.exit(2)
+    for opt, arg in opts:
+        if opt in ('-h' ,'--help'):
+            handlemasks_usage()
+            sys.exit(0)
+        elif opt in ("-o", "--output"):
+            prefix = arg
+        elif opt in ("-i", "--input"):
+            model3d = arg
+        elif opt in ("-d", "--downsize"):
+            downsize = int(arg)
+        elif opt in ("-r", "--radius"):
+            radius = int(arg)
+        elif opt in ("-c", "--cluster"):
+            cluster = int(arg)
+        elif opt in ("-s", "--sample_fac"):
+            sample_fac = float(arg)
+        elif opt in ("-v", "--visual"):
+            visual = True
+
+
+    if  model3d == "" or prefix== "" or downsize < 1 :
+        model2mesh_usage()
+        sys.exit(3)
+
+    print("model3d is {}".format(model3d))
+    print("output prefix is {}".format( prefix))
+    print("downsize is {}".format(downsize))
+    print('get xyz now...')
+    print(time.strftime("%Y-%m-%d %H:%M:%S"),flush=True)
+    xyz=get_xyz(model3d,cluster)
+    print('model2mesh now...')
+    print(time.strftime("%Y-%m-%d %H:%M:%S"),flush=True)
+    model2mesh(xyz,prefix,downsize,radius,visual,sample_fac)
+    print('handle masks all done')
+    print(time.strftime("%Y-%m-%d %H:%M:%S"),flush=True)
 
 ############################################################################
-# section 11 : main
+# section 12 : main
 #############################################################################
 # usage
 def main_usage():
@@ -603,13 +670,18 @@ Action:
     apply_affinematrix      apply affinematrix to add 3D (x,y,z).
                             coordinates into tissue-position-list.csv.
 
- actions work on uniform 3D space :
+ actions work on affined slices :
 
-    scatter3d               intergrate slices into 3d.
-    segmentbfm              segment slice(s) into multiply samples.
+    scatter3d               intergrate affined slices into 3d.
     model3d                 join cluster results with (x,y,z) coord.
                             and visualize by interactive html.
+
     segmentmodel3d          segment model3d into multiply samples.
+    segmentbfm              segment slice(s) into multiply samples.
+
+ actions work on intergrated 3d model:
+
+    model2mesh            generate mesh from (x,y,z) model
 
  other tools :
     handlemasks             convert mask matrixs to (x,y) and binary graph
@@ -632,6 +704,7 @@ if __name__ == "__main__":
                                                    "segmentbfm",
                                                    "segmentmodel3d",
                                                    "handlemasks",
+                                                   "model2mesh",
                                                    "model3d"):
         main_usage()
         exit(1)
@@ -664,6 +737,9 @@ if __name__ == "__main__":
         exit(0)
     elif  sys.argv[1] == "handlemasks" :
         handlemasks_main(sys.argv[2:])
+        exit(0)
+    elif  sys.argv[1] == "model2mesh" :
+        model2mesh_main(sys.argv[2:])
         exit(0)
     else:
         main_usage()

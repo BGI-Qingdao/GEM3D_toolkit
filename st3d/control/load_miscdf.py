@@ -119,3 +119,14 @@ def load_segmentations(filename:str) ->pd.DataFrame :
     df = pd.read_csv(filename,sep='\t',index_col=0)
     return df
 
+
+###########################################################
+# model2mesh
+###########################################################
+def get_xyz(filename : str,cluster:int) -> pd.DataFrame:
+    df = pd.read_csv(filename,sep=',')
+    if cluster == -1 :
+        return df[['x','y','z']].copy()
+    else :
+        data = df[df['cluster']==cluster]
+        return data[['x','y','z']].copy()
