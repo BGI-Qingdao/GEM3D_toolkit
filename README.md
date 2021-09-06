@@ -13,8 +13,7 @@ It support below feathures:
 
 overview of this workflow :
 
-![flowchart1](https://user-images.githubusercontent.com/8720584/125709201-3795269f-dfe2-4259-91a2-9be139ff0bd1.png)
-
+![flowchart](https://user-images.githubusercontent.com/8720584/132150105-71ef3826-6769-4178-8fa2-72b432e52e1d.png)
 
 ## Dependencies
 
@@ -53,16 +52,37 @@ Action:
 
     -----------------------------------------------------------------
 
+ actions work on GEM :
+
     gem2bfm                 convert GEM into BFM.
     heatmap                 heatmap of expression counts.
-    apply_affinematrix      apply affinematrix to add 3D (x,y,z)
-                            coordinates into tissue-position-list.csv
-    model3d                 join cluster results with (x,y,z) coord
-                            and visualize by interactive html.
-    -----------------------------------------------------------------
 
+ actions work on bin5 coordinate space :
+
+    maskbfm                 mask bins by mask matrixs.
+    maskheatmap             mask heatmaps by mask matrixs.
+    apply_affinematrix      apply affinematrix to add 3D (x,y,z).
+                            coordinates into tissue-position-list.csv.
+
+ actions work on affined slices :
+
+    scatter3d               intergrate affined slices into 3d.
+    model3d                 join cluster results with (x,y,z) coord.
+                            and visualize by interactive html.
+
+    segmentmodel3d          segment model3d into multiply samples.
+    segmentbfm              segment slice(s) into multiply samples.
+
+ actions work on intergrated 3d model:
+
+    model2mesh            generate mesh from (x,y,z) model
+
+ other tools :
+    handlemasks             convert mask matrixs to (x,y) and binary graph
+    tightbfm                remove pure zero rows and columns.
     -h/--help               show this short usage
     -----------------------------------------------------------------
+
 
 ```
 
