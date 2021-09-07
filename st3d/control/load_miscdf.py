@@ -119,7 +119,6 @@ def load_segmentations(filename:str) ->pd.DataFrame :
     df = pd.read_csv(filename,sep='\t',index_col=0)
     return df
 
-
 ###########################################################
 # model2mesh
 ###########################################################
@@ -130,3 +129,18 @@ def get_xyz(filename : str,cluster:int) -> pd.DataFrame:
     else :
         data = df[df['cluster']==cluster]
         return data[['x','y','z']].copy()
+
+###########################################################
+# mask-xy-affine
+###########################################################
+def load_mask_xy_by_affines(input_folder:str , affines :{},downsize:int) -> {} :
+    masks={}
+    for slice_id in affines :
+        filename = "{}/slice_{}.csv".format(prefix,slice_id)
+        mask_xy = pd.read_csv(filename,sep=',',index_col=0)
+        mask_xy['x'] = mask_xy['x'].astype(int)
+        mask_xy['y'] = mask_xy['y'].astype(int)
+        mask_xy['z']=np.ones(len(mask_xy),dtype=int)*downsize*slice_id
+        masks[slice_id]=mask_xy
+
+    return masks

@@ -16,6 +16,7 @@ from st3d.control.segmentbfm import segmentbfm
 from st3d.control.segmentmodel3d import segmentmodel3d
 from st3d.control.handlemasks import handlemasks
 from st3d.control.model2mesh import model2mesh
+from st3d.control.mask_xy_affine import mask_xy_affine
 
 ############################################################################
 # section 1 : gem2bfm
@@ -616,7 +617,7 @@ def model2mesh_main(argv:[]) :
             sys.exit(0)
         elif opt in ("-o", "--output"):
             prefix = arg
-        elif opt in ("-i", "--input"):
+        elif opt in ("-i", "--model"):
             model3d = arg
         elif opt in ("-d", "--downsize"):
             downsize = int(arg)
@@ -647,7 +648,59 @@ def model2mesh_main(argv:[]) :
     print(time.strftime("%Y-%m-%d %H:%M:%S"),flush=True)
 
 ############################################################################
-# section 12 : main
+# section 12 : mask_xy_affine
+#############################################################################
+# usage
+def mask_xy_affine_usage():
+    print("""
+Usage : GEM_toolkit.py mask_xy_affine -i <input_folder>  \\
+                                      -d <downsize> \\
+                                      -o <output-folder> \\
+                                      -a affine.json 
+""")
+
+def mask_xy_affine_main(argv:[]):
+    prefix=''
+    downsize=0
+    input_folder=''
+    affine_json=''
+    try:
+        opts, args = getopt.getopt(argv,"hi:o:d:a:",["help","input=","output=","downsize=","affine="])
+    except getopt.GetoptError:
+        mask_xy_affine_usage()
+        sys.exit(2)
+    for opt, arg in opts:
+        if opt in ('-h' ,'--help'):
+            mask_xy_affine_usage()
+            sys.exit(0)
+        elif opt in ("-o", "--output"):
+            prefix = arg
+        elif opt in ("-i", "--input"):
+            model3d = arg
+        elif opt in ("-d", "--downsize"):
+            downsize = int(arg)
+        elif opt in ("-a", "--affine"):
+            affine_json= arg
+
+    if  input_folder == "" or prefix== "" or downsize < 1 or affine_json == '':
+        mask_xy_affine_usage()
+        sys.exit(3)
+
+    print("affine_json is {}".format(affine_json))
+    print("output prefix is {}".format( prefix))
+    print("downsize is {}".format(downsize))
+    print('load datas now...')
+    print(time.strftime("%Y-%m-%d %H:%M:%S"),flush=True)
+    affines=load_affines(affine_json)
+    mask_xy_map=load_mask_xy_by_affines(input_folder,affines,downsize)
+    print('mask xy affine now...')
+    print(time.strftime("%Y-%m-%d %H:%M:%S"),flush=True)
+    mask_xy_affine(affines,mask_xy_map,prefix)
+    print('mask xy affine done')
+    print(time.strftime("%Y-%m-%d %H:%M:%S"),flush=True)
+
+############################################################################
+# section 12 : 
 #############################################################################
 # usage
 def main_usage():
@@ -685,6 +738,7 @@ Action:
 
  other tools :
     handlemasks             convert mask matrixs to (x,y) and binary graph
+    mask_xy_affine          apply affine matrixs to masks and genrate xyz
     tightbfm                remove pure zero rows and columns.
     -h/--help               show this short usage
     -----------------------------------------------------------------
@@ -705,7 +759,8 @@ if __name__ == "__main__":
                                                    "segmentmodel3d",
                                                    "handlemasks",
                                                    "model2mesh",
-                                                   "model3d"):
+                                                   "mask_xy_affine",
+                                                   "model3d") :
         main_usage()
         exit(1)
     elif sys.argv[1] == "gem2bfm" :
@@ -740,6 +795,9 @@ if __name__ == "__main__":
         exit(0)
     elif  sys.argv[1] == "model2mesh" :
         model2mesh_main(sys.argv[2:])
+        exit(0)
+    elif  sys.argv[1] == "mask_xy_affine" :
+        mask_xy_affine_main(sys.argv[2:])
         exit(0)
     else:
         main_usage()
