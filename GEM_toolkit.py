@@ -594,6 +594,7 @@ Usage : GEM_toolkit.py model2mesh   -i <model3d.csv>  \\
                                     -c [cluster_id (default -1 for all)] \\
                                     -s [sample factor(default 0.1)] \\
                                     -v (show mesh by GUI (default not set))
+                                    -m (smooth (default not set))
 
 Notice : model3d.csv must contain x,y,z columns
 """)
@@ -606,8 +607,9 @@ def model2mesh_main(argv:[]) :
     radius=35
     sample_fac=0.1
     visual=False
+    smooth=False
     try:
-        opts, args = getopt.getopt(argv,"hi:o:d:r:c:s:v",["help","model=","output=","downsize=","radius=","cluster=","sample_fac=","visual"])
+        opts, args = getopt.getopt(argv,"hi:o:d:r:c:s:vm",["help","model=","output=","downsize=","radius=","cluster=","sample_fac=","visual","smooth"])
     except getopt.GetoptError:
         handlemasks_usage()
         sys.exit(2)
@@ -629,7 +631,8 @@ def model2mesh_main(argv:[]) :
             sample_fac = float(arg)
         elif opt in ("-v", "--visual"):
             visual = True
-
+        elif opt in ("-m", "--smooth"):
+            smooth= True
 
     if  model3d == "" or prefix== "" or downsize < 1 :
         model2mesh_usage()
@@ -643,7 +646,7 @@ def model2mesh_main(argv:[]) :
     xyz=get_xyz(model3d,cluster)
     print('model2mesh now...')
     print(time.strftime("%Y-%m-%d %H:%M:%S"),flush=True)
-    model2mesh(xyz,prefix,downsize,radius,visual,sample_fac)
+    model2mesh(xyz,prefix,downsize,radius,visual,sample_fac,smooth)
     print('handle masks all done')
     print(time.strftime("%Y-%m-%d %H:%M:%S"),flush=True)
 
@@ -656,7 +659,7 @@ def mask_xy_affine_usage():
 Usage : GEM_toolkit.py mask_xy_affine -i <input_folder>  \\
                                       -d <downsize> \\
                                       -o <output-folder> \\
-                                      -a affine.json 
+                                      -a <affine.json>
 """)
 
 def mask_xy_affine_main(argv:[]):
@@ -676,7 +679,7 @@ def mask_xy_affine_main(argv:[]):
         elif opt in ("-o", "--output"):
             prefix = arg
         elif opt in ("-i", "--input"):
-            model3d = arg
+            input_folder = arg
         elif opt in ("-d", "--downsize"):
             downsize = int(arg)
         elif opt in ("-a", "--affine"):

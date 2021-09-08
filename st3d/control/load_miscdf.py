@@ -136,8 +136,8 @@ def get_xyz(filename : str,cluster:int) -> pd.DataFrame:
 def load_mask_xy_by_affines(input_folder:str , affines :{},downsize:int) -> {} :
     masks={}
     for slice_id in affines :
-        filename = "{}/slice_{}.csv".format(prefix,slice_id)
-        mask_xy = pd.read_csv(filename,sep=',',index_col=0)
+        filename = "{}/slice_{}.csv".format(input_folder,slice_id)
+        mask_xy = pd.read_csv(filename,sep=',')
         mask_xy['x'] = mask_xy['x'].astype(int)
         mask_xy['y'] = mask_xy['y'].astype(int)
         mask_xy['z']=np.ones(len(mask_xy),dtype=int)*downsize*slice_id
