@@ -17,7 +17,7 @@ def build_model3d(cluster_df : pd.DataFrame, boss:{},sinfos:{},prefix, downsize:
     ymax=None
 
     for x in boss :
-        bos =  boss[sid]
+        bos =  boss[x]
         df  = bos[bos['masked']==1]
         df_xmin = np.min(df['3d_x'])
         df_ymin = np.min(df['3d_y'])

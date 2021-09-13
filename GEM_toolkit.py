@@ -17,6 +17,7 @@ from st3d.control.segmentmodel3d import segmentmodel3d
 from st3d.control.handlemasks import handlemasks
 from st3d.control.model2mesh import model2mesh
 from st3d.control.mask_xy_affine import mask_xy_affine
+from st3d.control.model2slices import model2slices
 
 ############################################################################
 # section 1 : gem2bfm
@@ -611,11 +612,11 @@ def model2mesh_main(argv:[]) :
     try:
         opts, args = getopt.getopt(argv,"hi:o:d:r:c:s:vm",["help","model=","output=","downsize=","radius=","cluster=","sample_fac=","visual","smooth"])
     except getopt.GetoptError:
-        handlemasks_usage()
+        model2mesh_usage()
         sys.exit(2)
     for opt, arg in opts:
         if opt in ('-h' ,'--help'):
-            handlemasks_usage()
+            model2mesh_usage()
             sys.exit(0)
         elif opt in ("-o", "--output"):
             prefix = arg
@@ -647,7 +648,7 @@ def model2mesh_main(argv:[]) :
     print('model2mesh now...')
     print(time.strftime("%Y-%m-%d %H:%M:%S"),flush=True)
     model2mesh(xyz,prefix,downsize,radius,visual,sample_fac,smooth)
-    print('handle masks all done')
+    print('handle model2mesh all done')
     print(time.strftime("%Y-%m-%d %H:%M:%S"),flush=True)
 
 ############################################################################
@@ -703,7 +704,60 @@ def mask_xy_affine_main(argv:[]):
     print(time.strftime("%Y-%m-%d %H:%M:%S"),flush=True)
 
 ############################################################################
-# section 12 : 
+# section 13 : model2slices
+#############################################################################
+# usage
+def model2slices_usage():
+    print("""
+Usage : GEM_toolkit.py model2slices -i <model3d.csv>  \\
+                                    -d <downsize> \\
+                                    -o <output-folder> \\
+                                    -c [cluster_id (default -1 for all)]
+
+Notice : model3d.csv must contain x,y,z columns, need cluster column if -c is not -1.
+""")
+
+def model2slices_main(argv:[]) :
+    prefix=''
+    model3d=''
+    downsize=0
+    cluster=-1
+    try:
+        opts, args = getopt.getopt(argv,"hi:o:d:c:",["help","model=","output=","downsize=","cluster="])
+    except getopt.GetoptError:
+        model2slices_usage()
+        sys.exit(2)
+    for opt, arg in opts:
+        if opt in ('-h' ,'--help'):
+            model2slices_usage()
+            sys.exit(0)
+        elif opt in ("-o", "--output"):
+            prefix = arg
+        elif opt in ("-i", "--model"):
+            model3d = arg
+        elif opt in ("-d", "--downsize"):
+            downsize = int(arg)
+        elif opt in ("-c", "--cluster"):
+            cluster = int(arg)
+
+    if  model3d == "" or prefix== "" or downsize < 1 :
+        model2slices_usage()
+        sys.exit(3)
+
+    print("model3d is {}".format(model3d))
+    print("output prefix is {}".format( prefix))
+    print("downsize is {}".format(downsize))
+    print('get xyz now...')
+    print(time.strftime("%Y-%m-%d %H:%M:%S"),flush=True)
+    xyz=get_xyz(model3d,cluster)
+    print('model2slices now...')
+    print(time.strftime("%Y-%m-%d %H:%M:%S"),flush=True)
+    model2slices(xyz,prefix,downsize)
+    print('handle model2slices all done')
+    print(time.strftime("%Y-%m-%d %H:%M:%S"),flush=True)
+
+############################################################################
+# section 14 : 
 #############################################################################
 # usage
 def main_usage():
@@ -737,7 +791,8 @@ Action:
 
  actions work on intergrated 3d model:
 
-    model2mesh            generate mesh from (x,y,z) model
+    model2mesh              generate mesh from (x,y,z) model
+    model2slices            generate aligned 2D slices from model
 
  other tools :
     handlemasks             convert mask matrixs to (x,y) and binary graph
@@ -762,6 +817,7 @@ if __name__ == "__main__":
                                                    "segmentmodel3d",
                                                    "handlemasks",
                                                    "model2mesh",
+                                                   "model2slices",
                                                    "mask_xy_affine",
                                                    "model3d") :
         main_usage()
@@ -796,11 +852,14 @@ if __name__ == "__main__":
     elif  sys.argv[1] == "handlemasks" :
         handlemasks_main(sys.argv[2:])
         exit(0)
-    elif  sys.argv[1] == "model2mesh" :
+    elif  sys.argv[1] == "model2mesh":
         model2mesh_main(sys.argv[2:])
         exit(0)
     elif  sys.argv[1] == "mask_xy_affine" :
         mask_xy_affine_main(sys.argv[2:])
+        exit(0)
+    elif  sys.argv[1] == "model2slices" :
+        model2slices_main(sys.argv[2:])
         exit(0)
     else:
         main_usage()

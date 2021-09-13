@@ -94,7 +94,10 @@ class slice_xyz:
         #print(self.slice_z_index)
         new_xyz1 =  np.matmul(self.affines.I, in_xyz.T)
         new_xyz = new_xyz1[0:3: ,:]
-        return new_xyz.T
+        new_xyzT = new_xyz.T
+        if new_xyzT[0,2] < 0:
+            new_xyzT[:,2] = new_xyzT[:,2] * -1 ;
+        return new_xyzT
 
 
     ###########################################################################
