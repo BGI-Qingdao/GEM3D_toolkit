@@ -122,13 +122,24 @@ def load_segmentations(filename:str) ->pd.DataFrame :
 ###########################################################
 # model2mesh
 ###########################################################
-def get_xyz(filename : str,cluster:int) -> pd.DataFrame:
+def get_xyz(filename : str,cluster:int) -> (pd.DataFrame,float,float,float,float):
     df = pd.read_csv(filename,sep=',')
+    xmax=df['x'].max()
+    xmin=df['x'].min()
+    ymax=df['y'].max()
+    ymin=df['y'].min()
+
     if cluster == -1 :
-        return df[['x','y','z']].copy()
+        if 'cluster' in df.columns :
+            return df[['x','y','z','cluster']].copy() , xmax , xmin ,ymax, ymin
+        else:
+            return df[['x','y','z']].copy() , xmax , xmin ,ymax, ymin
     else :
         data = df[df['cluster']==cluster]
-        return data[['x','y','z']].copy()
+        if 'cluster' in df.columns :
+            return data[['x','y','z','cluster']].copy() , xmax , xmin ,ymax, ymin
+        else:
+            return data[['x','y','z']].copy() , xmax , xmin ,ymax, ymin
 
 ###########################################################
 # mask-xy-affine
