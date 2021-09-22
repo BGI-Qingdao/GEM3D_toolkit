@@ -19,6 +19,8 @@ from st3d.control.model2mesh import model2mesh
 from st3d.control.mask_xy_affine import mask_xy_affine
 from st3d.control.model2slices import model2slices
 from st3d.control.chopimages import chopimages
+from st3d.control.chopgems import chopgems
+
 ############################################################################
 # section 1 : gem2bfm
 #############################################################################
@@ -795,11 +797,54 @@ def chopimages_main(argv:[]) :
     print('chopimages now...')
     print(time.strftime("%Y-%m-%d %H:%M:%S"),flush=True)
     chopimages(roi_json,prefix)
-    print('chopimage  all done')
+    print('chopimages  all done')
     print(time.strftime("%Y-%m-%d %H:%M:%S"),flush=True)
 
 ############################################################################
-# section 15 : 
+# section 15 : chopgems
+#############################################################################
+# usage
+def chopgems_usage():
+    print("""
+Usage : GEM_toolkit.py chopgems     -i <roi.json>  \\
+                                    -o <output-folder>
+""")
+
+def chopgems_main(argv:[]) :
+    prefix=''
+    ijson=''
+    try:
+        opts, args = getopt.getopt(argv,"hi:o:",["help","input=","output="])
+    except getopt.GetoptError:
+        chopimages_usage()
+        sys.exit(2)
+    for opt, arg in opts:
+        if opt in ('-h' ,'--help'):
+            chopimages_usage()
+            sys.exit(0)
+        elif opt in ("-o", "--output"):
+            prefix = arg
+        elif opt in ("-i", "--input"):
+            ijson = arg
+
+    if  ijson == "" or prefix== "" :
+        chopgems_usage()
+        sys.exit(3)
+
+    print("roi.json is {}".format(ijson))
+    print("output prefix is {}".format( prefix))
+    print('get roi.json now...')
+    print(time.strftime("%Y-%m-%d %H:%M:%S"),flush=True)
+    roi_json=load_json(ijson)
+    print('chopgems now...')
+    print(time.strftime("%Y-%m-%d %H:%M:%S"),flush=True)
+    chopgems(roi_json,prefix)
+    print('chopgems  all done')
+    print(time.strftime("%Y-%m-%d %H:%M:%S"),flush=True)
+
+
+############################################################################
+# section 16 : 
 #############################################################################
 # usage
 def main_usage():
@@ -841,6 +886,7 @@ Action:
     mask_xy_affine          apply affine matrixs to masks and genrate xyz
     tightbfm                remove pure zero rows and columns.
     chopimages              chop region of interests from whole images.
+    chopgems                chop region of interests from GEMs.
     -h/--help               show this short usage
     -----------------------------------------------------------------
 """)
@@ -863,6 +909,7 @@ if __name__ == "__main__":
                                                    "model2slices",
                                                    "mask_xy_affine",
                                                    "chopimages",
+                                                   "chopgems",
                                                    "model3d") :
         main_usage()
         exit(1)
@@ -907,6 +954,9 @@ if __name__ == "__main__":
         exit(0)
     elif  sys.argv[1] == "chopimages" :
         chopimages_main(sys.argv[2:])
+        exit(0)
+    elif  sys.argv[1] == "chopgems" :
+        chopgems_main(sys.argv[2:])
         exit(0)
     else:
         main_usage()

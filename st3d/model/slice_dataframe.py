@@ -36,29 +36,45 @@ class slice_dataframe:
     """
 
     def __init__(self,gem_file_name:str, slice_index ) :
-        self.m_dataframe=pd.read_csv(gem_file_name, sep='\t', header=0, compression='infer', comment='#')
+        self.m_dataframe=None
+        self.m_xyz=None
+        self.slice_index=-1
+        #self.m_dataframe=pd.read_csv(gem_file_name, sep='\t', header=0, compression='infer', comment='#')
+
+    def init_from_file(self,gem_file_name:str, slice_index):
+        df = pd.read_csv(gem_file_name, sep='\t', header=0, compression='infer', comment='#')
+        self.init(df,slice_index)
+
+    def init(self, df , slice_index ):
+        self.m_dataframe = df
         self.m_dataframe.columns = ['geneID','x','y','MIDCounts']
-        #print("{} size of self.m_dataframe".format(len(self.m_dataframe)))
         min_x=np.min(self.m_dataframe.x)
         max_x=np.max(self.m_dataframe.x)
         min_y=np.min(self.m_dataframe.y)
         max_y=np.max(self.m_dataframe.y)
-        # init slice_xyz
         self.m_xyz=slice_xyz(max_x-min_x+1,max_y-min_y+1, min_x,min_y)
-        #self.m_xyz.set_alignment_info(slice_index,aff_mat)
         self.slice_index = slice_index
 
-    def get_expression_count(self,binsize=50) -> np.ndarray:
-        """
-        Return : rectangar matrix with UMI counts
-        """
-        xyz = self.m_xyz
-        draw_width , draw_height  = xyz.get_bin_wh(binsize)
-        coords=np.zeros((draw_height,draw_width))
-        for _,row in self.m_dataframe.iterrows():
-            bin_x , bin_y = self.m_xyz.bin_coord_from_spot(row['x'],row['y'],binsize)
-            coords[bin_y,bin_x]+= row['MIDCounts']
-        return coords
+    def chop(self, x1 , y1, width,height) :
+        new_df = slice_dataframe()
+        choped_df = self.m_dataframe[ ( self.m_dataframe['x'] >= x1 &  self.m_dataframe['x'] < x1+width -1 & self.m_dataframe['y'] >= y1 & self.m_dataframe['y'] < y1 + height +1 ) ]
+        new_df.init(choped_df.copy(),self.slice_index)
+        return new_df
+
+    def printGEM(self,out_f):
+        self.m_dataframe.to_csv(out_f,sep='\t',header=True,index=False)
+
+    #def get_expression_count(self,binsize=50) -> np.ndarray:
+    #    """
+    #    Return : rectangar matrix with UMI counts
+    #    """
+    #    xyz = self.m_xyz
+    #    draw_width , draw_height  = xyz.get_bin_wh(binsize)
+    #    coords=np.zeros((draw_height,draw_width))
+    #    for _,row in self.m_dataframe.iterrows():
+    #        bin_x , bin_y = self.m_xyz.bin_coord_from_spot(row['x'],row['y'],binsize)
+    #        coords[bin_y,bin_x]+= row['MIDCounts']
+    #    return coords
 
     def get_expression_count_vector(self,binsize=50) -> np.ndarray:
         """

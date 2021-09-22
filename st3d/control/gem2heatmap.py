@@ -22,7 +22,8 @@ def heatmap_slice_one(data:[]):
     z_index     = data[1]
     prefix      = data[2]
     binsize     = data[3]
-    one_slice = slice_dataframe(gem_file_name,z_index)
+    one_slice = slice_dataframe()
+    one_slice.init_from_file(gem_file_name,z_index)
 
     slice_index = one_slice.slice_index
     init_heatmap_slice(prefix,slice_index)
