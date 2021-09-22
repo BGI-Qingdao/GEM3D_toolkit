@@ -11,6 +11,12 @@ def heatmap2D_png(values,out_f,spot_width,spot_height):
     plt.subplots_adjust(left=0, bottom=0, right=1, top=1,hspace=0,wspace=0)
     plt.savefig(out_f,dpi=10)
     plt.close()
+    # also draw a colorful one
+    plt.figure(figsize=(spot_width/10,spot_height/10))
+    plt.imshow(values, cmap='Spectral_r')
+    plt.subplots_adjust(left=0, bottom=0, right=1, top=1,hspace=0,wspace=0)
+    plt.savefig("{}_color.png".format(out_f),dpi=10)
+    plt.close()
 
 
 def print_affined_scatter_2d(bos_dataframe,prefix,slice_index):
