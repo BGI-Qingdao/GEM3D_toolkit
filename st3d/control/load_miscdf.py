@@ -155,3 +155,9 @@ def load_mask_xy_by_affines(input_folder:str , affines :{},downsize:int) -> {} :
         masks[slice_id]=mask_xy
 
     return masks
+###########################################################
+# chopimages
+###########################################################
+def load_json(config :str):
+    data=json.load(open(config))
+    return data
