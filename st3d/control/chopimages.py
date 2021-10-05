@@ -1,3 +1,7 @@
+import sys
+import time
+import getopt
+from st3d.control.load_miscdf import *
 from PIL import Image
 from st3d.control.save_miscdf import create_a_folder
 
@@ -19,3 +23,44 @@ def chopimages(roi_json,prefix):
             cropped.save("{}/{}-{}.tif".format(prefix,item_name,slice_name))
         print("{} done".format(slice_name),flush=True)
 
+############################################################################
+# section 14 : chopimages
+#############################################################################
+# usage
+def chopimages_usage():
+    print("""
+Usage : GEM_toolkit.py chopimages   -i <roi.json>  \\
+                                    -o <output-folder>
+""")
+
+def chopimages_main(argv:[]) :
+    prefix=''
+    ijson=''
+    try:
+        opts, args = getopt.getopt(argv,"hi:o:",["help","input=","output="])
+    except getopt.GetoptError:
+        chopimages_usage()
+        sys.exit(2)
+    for opt, arg in opts:
+        if opt in ('-h' ,'--help'):
+            chopimages_usage()
+            sys.exit(0)
+        elif opt in ("-o", "--output"):
+            prefix = arg
+        elif opt in ("-i", "--input"):
+            ijson = arg
+
+    if  ijson == "" or prefix== "" :
+        chopimages_usage()
+        sys.exit(3)
+
+    print("roi.json is {}".format(ijson))
+    print("output prefix is {}".format( prefix))
+    print('get roi.json now...')
+    print(time.strftime("%Y-%m-%d %H:%M:%S"),flush=True)
+    roi_json=load_json(ijson)
+    print('chopimages now...')
+    print(time.strftime("%Y-%m-%d %H:%M:%S"),flush=True)
+    chopimages(roi_json,prefix)
+    print('chopimages  all done')
+    print(time.strftime("%Y-%m-%d %H:%M:%S"),flush=True)

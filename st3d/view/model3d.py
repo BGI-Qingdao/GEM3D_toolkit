@@ -93,10 +93,10 @@ def html_model3d(df: pd.DataFrame,prefix:str, downsize=4):
     fig.update_scenes(aspectmode='data')
     fig.write_html("{}/model3d.html".format(prefix))
 
-def anim2D_and_saveas_html( model :  np.ndarray , fname : str):
-    df = pd.DataFrame(model , columns = ['x','y','z','v'])
-    fig = px.scatter(df,x='x',y='y',animation_frame='z',color='v',color_continuous_scale='hot')
-    fig.write_html(fname)
+#def anim2D_and_saveas_html( model :  np.ndarray , fname : str):
+#    df = pd.DataFrame(model , columns = ['x','y','z','v'])
+#    fig = px.scatter(df,x='x',y='y',animation_frame='z',color='v',color_continuous_scale='hot')
+#    fig.write_html(fname)
 
 def heat3D_and_saveas_html( model : np.ndarray , fname : str):
     df = pd.DataFrame(model , columns = ['x','y','z','v'])
@@ -113,3 +113,10 @@ def scatter_3d_html(all_points: pd.DataFrame, fname :str):
     fig.update_scenes(aspectmode='data')
     fig.write_html(fname)
 
+def anim2D_and_saveas_html( df , fname : str ):
+    xmin = df['x'].min() // 100 * 100
+    xmax = df['x'].max() // 100 * 100 + 100
+    ymin = df['y'].min() // 100 * 100
+    ymax = df['y'].max() // 100 * 100 + 100
+    fig = px.scatter(df,x='x',y='y',animation_frame='z',range_x=(xmin,xmax),range_y=(ymin,ymax))
+    fig.write_html(fname)

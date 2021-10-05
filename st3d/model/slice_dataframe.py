@@ -35,7 +35,7 @@ class slice_dataframe:
         most of the time we only want to see one aspect of the slice at one time.
     """
 
-    def __init__(self,gem_file_name:str, slice_index ) :
+    def __init__(self): #,gem_file_name:str, slice_index ) :
         self.m_dataframe=None
         self.m_xyz=None
         self.slice_index=-1
@@ -48,16 +48,22 @@ class slice_dataframe:
     def init(self, df , slice_index ):
         self.m_dataframe = df
         self.m_dataframe.columns = ['geneID','x','y','MIDCounts']
-        min_x=np.min(self.m_dataframe.x)
+        self.min_x=np.min(self.m_dataframe.x)
         max_x=np.max(self.m_dataframe.x)
-        min_y=np.min(self.m_dataframe.y)
+        self.min_y=np.min(self.m_dataframe.y)
         max_y=np.max(self.m_dataframe.y)
-        self.m_xyz=slice_xyz(max_x-min_x+1,max_y-min_y+1, min_x,min_y)
+        self.m_xyz=slice_xyz(max_x-self.min_x+1,max_y-self.min_y+1, self.min_x,self.min_y)
         self.slice_index = slice_index
 
     def chop(self, x1 , y1, width,height) :
         new_df = slice_dataframe()
-        choped_df = self.m_dataframe[ ( self.m_dataframe['x'] >= x1 &  self.m_dataframe['x'] < x1+width -1 & self.m_dataframe['y'] >= y1 & self.m_dataframe['y'] < y1 + height +1 ) ]
+        x_coords = self.m_dataframe['x'] - self.min_x
+        x_coords = x_coords // 5
+        y_coords = self.m_dataframe['y'] - self.min_y
+        y_coords = y_coords // 5
+        coords=pd.DataFrame(x_coords,columns=['x'])
+        coords['y']=y_coords
+        choped_df = self.m_dataframe[ (( coords['x'] >= x1) & ( coords['x']  < x1+width -1 ) & (coords['y'] >= y1) & (coords['y']< y1 + height +1 ) )]
         new_df.init(choped_df.copy(),self.slice_index)
         return new_df
 

@@ -1,5 +1,10 @@
-import numpy as np
+import sys
+import time
+import getopt
+from st3d.control.load_miscdf import *
+
 import pandas as pd
+import numpy as np
 
 from st3d.control.save_miscdf import create_a_folder
 from st3d.view.slice2d import heatmap2D_png
@@ -27,3 +32,46 @@ def handlemasks(masks : {} ,prefix : str) :
         mask = np.loadtxt(mask_file,dtype=int,delimiter='\t')
         handle_one_mask(mask,prefix,slice_index)
 
+
+
+############################################################################
+# section 10 : handlemasks
+#############################################################################
+# usage
+def handlemasks_usage():
+    print("""
+Usage : GEM_toolkit.py handlemasks     -i masks.json  \\
+                                       -o <output-folder>
+""")
+
+def handlemasks_main(argv:[]) :
+    prefix=''
+    maskconf=''
+    try:
+        opts, args = getopt.getopt(argv,"hi:o:",["help","input=","output="])
+    except getopt.GetoptError:
+        handlemasks_usage()
+        sys.exit(2)
+    for opt, arg in opts:
+        if opt in ('-h' ,'--help'):
+            handlemasks_usage()
+            sys.exit(0)
+        elif opt in ("-o", "--output"):
+            prefix = arg
+        elif opt in ("-i", "--input"):
+            maskconf = arg
+
+    if  maskconf == "" or prefix== "" :
+        handlemasks_usage()
+        sys.exit(3)
+
+    print("mask conf is {}".format(maskconf))
+    print("output prefix is {}".format( prefix))
+    print('loading confs...')
+    print(time.strftime("%Y-%m-%d %H:%M:%S"),flush=True)
+    masks = load_slices(maskconf)
+    print('handle masks ...')
+    print(time.strftime("%Y-%m-%d %H:%M:%S"),flush=True)
+    handlemasks(masks,prefix)
+    print('handle masks all done')
+    print(time.strftime("%Y-%m-%d %H:%M:%S"),flush=True)

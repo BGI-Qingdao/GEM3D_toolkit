@@ -1,8 +1,16 @@
+import sys
 import time
+import getopt
+from st3d.control.load_miscdf import *
+
 from multiprocessing import Pool
 
 from st3d.control.save_miscdf import *
 from st3d.model.slice_dataframe import slice_dataframe
+
+############################################################################
+# logic codes
+#############################################################################
 
 def gem2bfm_one_slice(data:[]):
     gem_file_name  = data[0]
@@ -48,4 +56,63 @@ def gem2bfm_slices_one_by_one(slices,prefix,binsize=50,tasks=8):
         args.append([slice_name,z_index,prefix,binsize])
     with Pool(tasks) as p:
         p.map(gem2bfm_one_slice, args)
+
+
+############################################################################
+# section 1 : gem2bfm
+#############################################################################
+
+# usage of gem2bfm
+def gem2bfm_usage():
+    print("""
+Usage : GEM_toolkit.py gem2bfm -c <config.json> \\
+                               -o <output-folder>  \\
+                               -b [bin-size (default 50)] \\
+                               -t [threads (default 8)]
+
+Notice : Since one gem file will be handled only in one thread,
+         there is no need to set -t greater than slice number.
+""")
+
+# main of gem2bfm
+def gem2bfm_main(argv):
+    config = ''
+    prefix = ''
+    binsize= 50
+    threads=8
+    try:
+        opts, args = getopt.getopt(argv,"hc:o:b:t:",["help","iconf=","ofile=","bin=","threads="])
+    except getopt.GetoptError:
+        gem2bfm_usage()
+        sys.exit(2)
+    for opt, arg in opts:
+        if opt in ('-h' ,'--help'):
+            gem2bfm_usage()
+            sys.exit(0)
+        elif opt in ("-b", "--bin"):
+            binsize = int(arg)
+        elif opt in ("-c", "--iconf"):
+            config = arg
+        elif opt in ("-t", "--threads"):
+            threads= int(arg)
+        elif opt in ("-o", "--ofile"):
+            prefix = arg
+
+    if config == "" or prefix == "" or binsize<1 or threads <1:
+        gem2bfm_usage()
+        sys.exit(3)
+
+    print("config file is {}".format(config))
+    print("output prefix is {}".format( prefix))
+    print("binsize is {}".format(binsize))
+    print("threads is {}".format(threads))
+
+    print('start loading slice(s)...')
+    print(time.strftime("%Y-%m-%d %H:%M:%S"),flush=True)
+    slice_data = load_slices(config)
+    print('handle slice(s)...')
+    print(time.strftime("%Y-%m-%d %H:%M:%S"),flush=True)
+    gem2bfm_slices_one_by_one(slice_data,prefix,binsize,threads)
+    print('gem2bfm, all done ...')
+    print(time.strftime("%Y-%m-%d %H:%M:%S"),flush=True)
 

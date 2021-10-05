@@ -1,5 +1,7 @@
+import sys
 import time
 import math
+import getopt
 from multiprocessing import Pool
 
 import numpy as np
@@ -63,4 +65,61 @@ def mask_heatmap(masks_map,input_folder,prefix,tasks):
         args.append([mask_file,slice_index,input_folder,prefix])
     with Pool(tasks) as p:
         p.map(gen_one_masked_heatmap, args)
+
+############################################################################
+# section 6 : maskheatmap
+#############################################################################
+
+def maskheatmap_usage():
+    print("""
+Usage : GEM_toolkit.py maskheatmap  -i <input-folder>  \\
+                                    -o <output-folder> \\
+                                    -m <mask.json> \\
+                                    -t <threads>
+
+Notice:
+        1. the input folder is output folder of heatmap action.
+""")
+
+def maskheatmap_main(argv:[]):
+    input_folder = ''
+    masks=''
+    prefix=''
+    threads=4
+    try:
+        opts, args = getopt.getopt(argv,"hi:o:m:t:",["help","input=","output=","mask_cfg=","threads="])
+    except getopt.GetoptError:
+        maskheatmap_usage()
+        sys.exit(2)
+    for opt, arg in opts:
+        if opt in ('-h' ,'--help'):
+            maskheatmap_usage()
+            sys.exit(0)
+        elif opt in ("-o", "--output"):
+            prefix = arg
+        elif opt in ("-m", "--mask_cfg"):
+            masks= arg
+        elif opt in ("-i", "--input"):
+            input_folder = arg
+        elif opt in ("-t", "--threads"):
+            threads= int(arg)
+
+    if  input_folder == "" or prefix=="" or masks == "" or threads < 1 :
+        maskheatmap_usage()
+        sys.exit(3)
+
+    print("input folder is {}".format( input_folder))
+    print("output prefix is {}".format( prefix))
+    print("mask conf.json is {}".format(masks))
+    print("working threads is {}".format(threads))
+
+    print('loading masks...')
+    print(time.strftime("%Y-%m-%d %H:%M:%S"),flush=True)
+    # masks_map
+    masks_map  = load_slices(masks)
+    print('gen masked heatmap (s)...')
+    print(time.strftime("%Y-%m-%d %H:%M:%S"),flush=True)
+    mask_heatmap(masks_map,input_folder,prefix,threads)
+    print('gen masked heatmap (s) all done')
+    print(time.strftime("%Y-%m-%d %H:%M:%S"),flush=True)
 

@@ -1,5 +1,7 @@
+import sys
 import time
 import math
+import getopt
 from multiprocessing import Pool
 
 import numpy as np
@@ -76,3 +78,78 @@ def segmentbfm( slices : {} ,
         args.append([segmentations,bfm_folder,affine_folder,prefix,slice_index])
     with Pool(tasks) as p:
         p.map(segment_one_bfm, args)
+
+
+############################################################################
+# section 8 : segmentbfm
+#############################################################################
+# usage
+def segmentbfm_usage():
+    print("""
+Usage : GEM_toolkit.py segmentbfm   -i <bfm-folder>  \\
+                                    -a <affine-folder> \\
+                                    -c <conf.json> \\
+                                    -s <segmentations.csv> \\
+                                    -o <output-folder> \\
+                                    -t <threads>
+""")
+
+def segmentbfm_main(argv:[]) :
+    bfm_folder = ''
+    affine_folder = ''
+    prefix=''
+    conf=''
+    segconf=''
+    threads=0
+    try:
+        opts, args = getopt.getopt(argv,"hi:a:o:c:s:t:",["help",
+                                                         "bfm=",
+                                                         "affine=",
+                                                         "output=",
+                                                         "conf=",
+                                                         "tasks=",
+                                                         "segs="])
+    except getopt.GetoptError:
+        segmentbfm_usage()
+        sys.exit(2)
+    for opt, arg in opts:
+        if opt in ('-h' ,'--help'):
+            segmentbfm_usage()
+            sys.exit(0)
+        elif opt in ("-o", "--output"):
+            prefix = arg
+        elif opt in ("-a", "--affine"):
+            affine_folder = arg
+        elif opt in ("-i", "--bfm"):
+            bfm_folder = arg
+        elif opt in ("-c", "--conf"):
+            conf = arg
+        elif opt in ("-s", "--segs"):
+            segconf = arg
+        elif opt in ("-t", "--tasks"):
+            threads = int(arg)
+
+    if  (affine_folder == "" or
+        bfm_folder == "" or 
+        prefix=="" or
+        conf == "" or
+        threads < 1 or
+        segconf == "" ):
+
+        segmentbfm_usage()
+        sys.exit(3)
+
+    print("bfm folder is {}".format( bfm_folder))
+    print("affine folder is {}".format( affine_folder))
+    print("output prefix is {}".format( prefix))
+    print("conf file is {}".format(conf))
+    print("threads is {}".format(threads))
+    print('loading confs...')
+    print(time.strftime("%Y-%m-%d %H:%M:%S"),flush=True)
+    slices = load_slices(conf)
+    segs = load_segmentations(segconf)
+    print('segment bfm...')
+    print(time.strftime("%Y-%m-%d %H:%M:%S"),flush=True)
+    segmentbfm(slices,segs,bfm_folder,affine_folder,prefix,threads)
+    print('segment bfm all done')
+    print(time.strftime("%Y-%m-%d %H:%M:%S"),flush=True)

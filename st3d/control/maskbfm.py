@@ -1,4 +1,6 @@
+import sys
 import time
+import getopt
 import math
 from multiprocessing import Pool
 
@@ -93,4 +95,67 @@ def mask_bfms(masks_map,input_folder,prefix,downsize,tasks):
         args.append([mask_file,slice_index,input_folder,prefix,downsize])
     with Pool(tasks) as p:
         p.map(gen_one_masked_bfm, args)
+
+############################################################################
+# section 5 : maskbfm
+#############################################################################
+
+def maskbfm_usage():
+    print("""
+Usage : GEM_toolkit.py maskbfm   -i <input-folder>  \\
+                                 -o <output-folder> \\
+                                 -m <mask.json> \\
+                                 -d <downsize> \\
+                                 -t <threads>
+
+Notice:
+        1. the input folder is output folder of gem2bfm action.
+        2. downsize = bin size of cluster / bin size of mask
+""")
+
+def maskbfm_main(argv:[]):
+    input_folder = ''
+    masks=''
+    prefix=''
+    downsize=0
+    threads=4
+    try:
+        opts, args = getopt.getopt(argv,"hi:o:m:d:t:",["help","input=","output=","mask_cfg=","downsize=","threads="])
+    except getopt.GetoptError:
+        maskbfm_usage()
+        sys.exit(2)
+    for opt, arg in opts:
+        if opt in ('-h' ,'--help'):
+            maskbfm_usage()
+            sys.exit(0)
+        elif opt in ("-o", "--output"):
+            prefix = arg
+        elif opt in ("-m", "--mask_cfg"):
+            masks= arg
+        elif opt in ("-i", "--input"):
+            input_folder = arg
+        elif opt in ("-d", "--downsize"):
+            downsize=int(arg)
+        elif opt in ("-t", "--threads"):
+            threads= int(arg)
+
+    if  input_folder == "" or prefix=="" or downsize < 1 or masks == "" or threads < 1 :
+        maskbfm_usage()
+        sys.exit(3)
+
+    print("input folder is {}".format( input_folder))
+    print("output prefix is {}".format( prefix))
+    print("mask conf.json is {}".format(masks))
+    print("downsize is {}".format(downsize))
+    print("working threads is {}".format(threads))
+
+    print('loading masks...')
+    print(time.strftime("%Y-%m-%d %H:%M:%S"),flush=True)
+    # masks_map
+    masks_map  = load_slices(masks)
+    print('gen masked bfm (s)...')
+    print(time.strftime("%Y-%m-%d %H:%M:%S"),flush=True)
+    mask_bfms(masks_map,input_folder,prefix,downsize,threads)
+    print('gen masked bfm (s) all done')
+    print(time.strftime("%Y-%m-%d %H:%M:%S"),flush=True)
 

@@ -1,7 +1,12 @@
+import sys
+import time
+import getopt
+
 import pandas as pd
 import numpy as np
 
-from st3d.view.slice2d import *
+from st3d.view.model3d import *
+from st3d.control.load_miscdf import *
 from st3d.control.save_miscdf import create_a_folder
 from vedo import *
 
@@ -128,3 +133,73 @@ def model2mesh(xyz : pd.DataFrame , prefix :str , downsize :int, radius=35 , vis
     if  visual:
         plt = Plotter(N=1, axes=0)
         plt.show(reco, at=0, axes=7, interactive=1).close()
+
+
+############################################################################
+# section 11 : model2mesh
+#############################################################################
+# usage
+def model2mesh_usage():
+    print("""
+Usage : GEM_toolkit.py model2mesh   -i <model3d.csv>  \\
+                                    -d <downsize> \\
+                                    -o <output-folder> \\
+                                    -r [radius (default 35)] \\
+                                    -c [cluster_id (default -1 for all)] \\
+                                    -s [sample factor(default 0.1)] \\
+                                    -v (show mesh by GUI (default not set))
+                                    -m (smooth (default not set))
+
+Notice : model3d.csv must contain x,y,z columns
+""")
+
+def model2mesh_main(argv:[]) :
+    prefix=''
+    model3d=''
+    downsize=0
+    cluster=-1
+    radius=35
+    sample_fac=0.1
+    visual=False
+    smooth=False
+    try:
+        opts, args = getopt.getopt(argv,"hi:o:d:r:c:s:vm",["help","model=","output=","downsize=","radius=","cluster=","sample_fac=","visual","smooth"])
+    except getopt.GetoptError:
+        model2mesh_usage()
+        sys.exit(2)
+    for opt, arg in opts:
+        if opt in ('-h' ,'--help'):
+            model2mesh_usage()
+            sys.exit(0)
+        elif opt in ("-o", "--output"):
+            prefix = arg
+        elif opt in ("-i", "--model"):
+            model3d = arg
+        elif opt in ("-d", "--downsize"):
+            downsize = int(arg)
+        elif opt in ("-r", "--radius"):
+            radius = int(arg)
+        elif opt in ("-c", "--cluster"):
+            cluster = int(arg)
+        elif opt in ("-s", "--sample_fac"):
+            sample_fac = float(arg)
+        elif opt in ("-v", "--visual"):
+            visual = True
+        elif opt in ("-m", "--smooth"):
+            smooth= True
+
+    if  model3d == "" or prefix== "" or downsize < 1 :
+        model2mesh_usage()
+        sys.exit(3)
+
+    print("model3d is {}".format(model3d))
+    print("output prefix is {}".format( prefix))
+    print("downsize is {}".format(downsize))
+    print('get xyz now...')
+    print(time.strftime("%Y-%m-%d %H:%M:%S"),flush=True)
+    xyz,_,_,_,_=get_xyz(model3d,cluster)
+    print('model2mesh now...')
+    print(time.strftime("%Y-%m-%d %H:%M:%S"),flush=True)
+    model2mesh(xyz,prefix,downsize,radius,visual,sample_fac,smooth)
+    print('handle model2mesh all done')
+    print(time.strftime("%Y-%m-%d %H:%M:%S"),flush=True)

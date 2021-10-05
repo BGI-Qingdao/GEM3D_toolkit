@@ -1,8 +1,12 @@
+import sys
 import time
-from multiprocessing import Pool
+import getopt
 import numpy as np
+from multiprocessing import Pool
 
+from st3d.control.load_miscdf import *
 from st3d.control.save_miscdf import *
+
 from st3d.model.slice_dataframe import slice_dataframe
 from st3d.model.rect_bin import *
 from st3d.view.slice2d import *
@@ -56,3 +60,51 @@ def heatmap_slices_one_by_one(slices,prefix,binsize,tasks) :
     with Pool(tasks) as p:
         print(p.map(heatmap_slice_one, args))
 
+############################################################################
+# section 2 : heatmap
+#############################################################################
+def heatmap_usage():
+    print("""
+Usage : GEM_toolkit.py heatmap  -c <conf.json> \\
+                                -o <output-folder>  \\
+                                -b [binsize (default 5)] \\
+                                -t [threads (default 8)]
+
+Notice : Since one gem file will be handled only in one thread,
+         ther is no need to set -t greater than slice number.
+""")
+
+def heatmap_main(argv:[]):
+    config = ''
+    prefix = ''
+    binsize= 5
+    threads=8
+    try:
+        opts, args = getopt.getopt(argv,"hc:o:b:t:",["help","iconf=","ofile=","bin=","threads="])
+    except getopt.GetoptError:
+        heatmap_usage()
+        sys.exit(2)
+    for opt, arg in opts:
+        if opt in ('-h' ,'--help'):
+            heatmap_usage()
+            sys.exit(0)
+        elif opt in ("-b", "--bin"):
+            binsize = int(arg)
+        elif opt in ("-c", "--iconf"):
+            config = arg
+        elif opt in ("-t", "--threads"):
+            threads= int(arg)
+        elif opt in ("-o", "--ofile"):
+            prefix = arg
+    if config == "" or prefix == "" or binsize<1 or threads <1:
+        heatmap_usage()
+        sys.exit(3)
+
+    print('start loading slice(s)...')
+    print(time.strftime("%Y-%m-%d %H:%M:%S"))
+    slice_data = load_slices(config)
+    print('handle slice(s)...')
+    print(time.strftime("%Y-%m-%d %H:%M:%S"))
+    heatmap_slices_one_by_one(slice_data,prefix,binsize,threads)
+    print('heatmap, all done ...')
+    print(time.strftime("%Y-%m-%d %H:%M:%S"))
