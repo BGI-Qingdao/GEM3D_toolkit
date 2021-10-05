@@ -2,8 +2,6 @@ import matplotlib as mpl
 import numpy as np
 mpl.use('Agg')
 import matplotlib.pyplot as plt
-import plotly.graph_objects as go
-import plotly.express as px
 
 def heatmap2D_png(values,out_f,spot_width,spot_height):
     plt.figure(figsize=(spot_width/20,spot_height/20))
