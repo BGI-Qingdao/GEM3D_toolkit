@@ -11,7 +11,6 @@ from st3d.model.slice_dataframe import slice_dataframe
 ############################################################################
 # logic codes
 #############################################################################
-
 def gem2bfm_one_slice(data:[]):
     gem_file_name  = data[0]
     z_index     = data[1]

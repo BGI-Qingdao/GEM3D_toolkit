@@ -37,6 +37,8 @@ Action:
     segmentmodel3d          segment model3d into multiply samples.
     segmentbfm              segment slice(s) into multiply samples.
 
+    secondregistration      second round registration
+
  actions work on intergrated 3d model:
 
     model2mesh              generate mesh from (x,y,z) model
@@ -71,6 +73,7 @@ if __name__ == "__main__":
                                                    "mask_xy_affine",
                                                    "chopimages",
                                                    "chopgems",
+                                                   "secondregistration",
                                                    "model3d") :
         main_usage()
         exit(1)
@@ -133,6 +136,10 @@ if __name__ == "__main__":
     elif  sys.argv[1] == "chopgems" :
         from st3d.control.chopgems import chopgems_main
         chopgems_main(sys.argv[2:])
+        exit(0)
+    elif sys.argv[1] == "secondregistration":
+        from st3d.control.secondregistration import secondregistration_main
+        secondregistration_main(sys.argv[2:])
         exit(0)
     else:
         main_usage()
