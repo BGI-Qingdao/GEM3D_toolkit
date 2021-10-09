@@ -198,7 +198,8 @@ def find_best_affine( mask_rna, mask_dapi , binsize, scale, fijiyama_reverse_aff
               [ 0 , 0, 1 ] ]))
     ## step-03 bin5-to-bin1
     DAPI_to_bin1_affine = np.matmul(bin5_to_bin1_affine , DAPI_to_bin5_affine)
-    print('match score of #1 :{}'.format(match_score(mask_rna,mask_dapi,DAPI_to_bin1_affine.I)),file=sys.stderr,flush=True)
+    first_affineR = DAPI_to_bin1_affine.I
+    print('match score of #1 :{}'.format(match_score(mask_rna,mask_dapi,first_affineR)),file=sys.stderr,flush=True)
 
     ########################################################
     # #2 round registration
@@ -252,14 +253,15 @@ def find_best_affine( mask_rna, mask_dapi , binsize, scale, fijiyama_reverse_aff
     shifted = np.matmul(shift,rotated)
     ##################################################
     # return affineR
-    return shifted.I
+    return first_affineR ,shifted.I
 
-def draw_masks(mask_rna,mask_dapi,affine,best_affineR,prefix):
+def draw_masks(mask_rna,mask_dapi,best_affineR,prefix,rid):
+    mask_rna=mask_rna.copy()
     affinem = nd.affine_transform(mask_dapi.T,best_affineR,output_shape=mask_rna.T.shape,order=0)
     affinem = affinem.T
     mask_rna[affinem==1]=1
     mask_rna[mask_rna==1]=255
-    skio.imsave(f'{prefix}.aligned.png',mask_rna)
+    skio.imsave(f'{prefix}.aligned.r{rid}.png',mask_rna)
 
 
 ############################################################################
@@ -370,10 +372,11 @@ def secondregistration_main(argv:[]) :
     #######################################################
     # find best affine
     #######################################################
-    best_affineR = find_best_affine( mask_rna, mask_dapi , binsize, scale, affine )
+    first_affineR , best_affineR = find_best_affine( mask_rna, mask_dapi , binsize, scale, affine )
 
     #######################################################
     # save result
     #######################################################
     print(best_affineR,file=sys.stderr)
-    draw_masks(mask_rna,mask_dapi,affine,best_affineR,prefix)
+    draw_masks(mask_rna,mask_dapi,first_affineR,prefix,1)
+    draw_masks(mask_rna,mask_dapi,best_affineR,prefix,2)
