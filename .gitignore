@@ -3,3 +3,9 @@
 */*/*.pyc
 test*
 *.json
+*.gem
+*.png
+*.tif
+*.tiff
+*.csv
+*.txt
