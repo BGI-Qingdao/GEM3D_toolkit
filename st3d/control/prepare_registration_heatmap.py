@@ -1,7 +1,6 @@
 import sys
 import time
 import getopt
-import json
 import numpy as np
 import scipy.ndimage as nd
 from skimage import io as skio
@@ -117,13 +116,12 @@ def get_mask_rna(gem_file : str , chip:str ,prefix : str) -> np.ndarray :
     # this may drop some high expression but it's ok for bin1
     # not ok for bin5 !
     expression = expression.astype('uint8')
-    skio.imsave(f'{prefix}.heatmap.tiff',expression)
+    #skio.imsave(f'{prefix}.heatmap.tiff',expression)
     print('gen mask_rna ...',file=sys.stderr)
     print(time.strftime("%Y-%m-%d %H:%M:%S"),file=sys.stderr,flush=True)
     mask=trackline_mask(expression,chip,prefix)
-    mask[mask==1] = 255
-    skio.imsave(f'{prefix}.heatmap.trackline.tiff',mask)
-    expression[mask==255]=255
+    #skio.imsave(f'{prefix}.heatmap.trackline.tiff',mask)
+    expression[mask==1]=255
     expression = exposure.equalize_adapthist(expression)
     expression = expression*255
     expression = expression.astype('uint8')
@@ -186,4 +184,3 @@ def prepareregistrationheatmap_main(argv:[]) :
     # loading gem and generate mask_rna
     #######################################################
     get_mask_rna(gem_file,chip,prefix)
-
