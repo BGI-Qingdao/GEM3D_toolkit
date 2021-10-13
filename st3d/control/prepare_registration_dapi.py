@@ -22,7 +22,7 @@ def get_mask_dapi(dapi_file,min_brightness,width_pixel,height_pixel,chip,prefix)
     print('gen mask_dapi ...',file=sys.stderr)
     print(time.strftime("%Y-%m-%d %H:%M:%S"),file=sys.stderr,flush=True)
     dapi_data[ dapi_data > min_brightness ] = 255
-    dapi_data[ dapi_data < min_brightness ] = 0
+    dapi_data[ dapi_data <= min_brightness ] = 0
     dapi_data = 255 - dapi_data
     raw_dapi[ dapi_data == 255 ] = 255
     dapi_data[dapi_data==255] =1
