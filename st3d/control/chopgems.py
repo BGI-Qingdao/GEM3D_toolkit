@@ -4,7 +4,7 @@ import getopt
 from st3d.control.load_miscdf import *
 
 from st3d.model.slice_dataframe import slice_dataframe
-from st3d.view.slice2d import *
+#from st3d.view.slice2d import *
 from st3d.control.save_miscdf import *
 
 def chopgems(roi_json,prefix):
@@ -22,10 +22,10 @@ def chopgems(roi_json,prefix):
             Height=roi[4]
             cropped = sdf.chop(BX,BY,Width,Height)
             cropped.printGEM("{}/{}-slice{}.gem".format(prefix,item_name,slice_id))
-            gec = cropped.get_expression_count_vector(1)
-            heatmap2D_png(gec,
-                          "{}/{}-slice{}.heatmap.png".format(prefix,item_name,slice_id),
-                          gec.shape[1],gec.shape[0] )
+            #gec = cropped.get_expression_count_vector(1)
+            #heatmap2D_png(gec,
+            #              "{}/{}-slice{}.heatmap.png".format(prefix,item_name,slice_id),
+            #              gec.shape[1],gec.shape[0] )
         print("slice {} is done".format(slice_id),flush=True)
     print("{} done".format(slice_id),flush=True)
 

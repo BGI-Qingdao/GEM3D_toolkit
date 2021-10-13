@@ -107,7 +107,20 @@ def trackline_mask(expression_matrix : np.ndarray, chip:str, prefix:str) -> np.n
 
     return mask
 
-def get_mask_rna(gem_file : str , chip:str ,prefix : str) -> np.ndarray :
+def enhance_bin5(expression):
+    ret = np.zeros(expression.shape,dtype=int)
+    h,w=expression.shape
+    for i in range(0,6):
+        for j in range(0,6):
+            newm = np.zeros(expression.shape)
+            newm[i:,j:] = expression[:h-i,:w-j]
+            ret = ret + newm
+    ret[ret>255]=255
+    ret = ret.astype('uint8')
+    return ret
+
+
+def get_mask_rna(gem_file : str , chip:str ,prefix : str, eb5:str) -> np.ndarray :
     print('loading gem ...',file=sys.stderr)
     print(time.strftime("%Y-%m-%d %H:%M:%S"),file=sys.stderr,flush=True)
     gem = slice_dataframe()
@@ -116,11 +129,13 @@ def get_mask_rna(gem_file : str , chip:str ,prefix : str) -> np.ndarray :
     # this may drop some high expression but it's ok for bin1
     # not ok for bin5 !
     expression = expression.astype('uint8')
-    #skio.imsave(f'{prefix}.heatmap.tiff',expression)
+    #kio.imsave(f'{prefix}.heatmap.tiff',expression)
     print('gen mask_rna ...',file=sys.stderr)
     print(time.strftime("%Y-%m-%d %H:%M:%S"),file=sys.stderr,flush=True)
     mask=trackline_mask(expression,chip,prefix)
     #skio.imsave(f'{prefix}.heatmap.trackline.tiff',mask)
+    if eb5 == 'yes':
+        expression=enhance_bin5(expression)
     expression[mask==1]=255
     expression = exposure.equalize_adapthist(expression)
     expression = expression*255
@@ -139,18 +154,21 @@ def prepareregistrationheatmap_usage():
     print("""
 Usage : GEM_toolkit.py secondregistration  -g <gem file>  \\
                                            -o <output prefix> \\
-                                           -c [chip715/chip500, default chip715]
+                                           -c [chip715/chip500, default chip715] \\
+                                           -e [enhance by bin5, default not set]\\
 """)
 
 def prepareregistrationheatmap_main(argv:[]) :
     gem_file = ''
-    prefix=''
-    chip='chip715'
+    prefix = ''
+    chip = 'chip715'
+    eb5 = 'no'
     try:
-        opts, args = getopt.getopt(argv,"hg:c:o:",["help",
+        opts, args = getopt.getopt(argv,"hg:c:o:e",["help",
                                                   "gem=",
                                                   "chip=",
-                                                  "output="])
+                                                  "output=",
+                                                  "eb5"])
     except getopt.GetoptError:
         prepareregistrationheatmap_usage()
         sys.exit(2)
@@ -164,6 +182,8 @@ def prepareregistrationheatmap_main(argv:[]) :
             chip = arg
         elif opt in ('-o' , '--output'):
             prefix = arg
+        elif opt in ('-e' , '--eb5'):
+            eb5 = 'yes'
 
     if  ( gem_file == "" or
           prefix == "" or
@@ -183,4 +203,4 @@ def prepareregistrationheatmap_main(argv:[]) :
     #######################################################
     # loading gem and generate mask_rna
     #######################################################
-    get_mask_rna(gem_file,chip,prefix)
+    get_mask_rna(gem_file,chip,prefix,eb5)

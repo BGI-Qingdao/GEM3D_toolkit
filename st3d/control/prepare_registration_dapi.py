@@ -91,7 +91,7 @@ def prepareregistrationdapi_main(argv:[]) :
         elif opt in ('-o' , '--output'):
             prefix = arg
         elif opt in ('-c' , '--chip'):
-            prefix = arg
+            chip = arg
 
     if  ( dapi_file == "" or
           prefix == "" or
