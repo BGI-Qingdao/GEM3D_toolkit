@@ -6,6 +6,8 @@ import numpy as np
 import scipy.ndimage as nd
 from skimage import io as skio
 
+from multiprocessing import Pool
+
 def get_fujiyama(param : str) -> np.matrix:
     """
         handle  '0.9789672225355872 -0.014001262294250694 0 0.014001262294229377 0.9789672225355872 0 0 0 0.9790673409653101 -49.386112981985995 -98.51787299912003 0'
@@ -56,94 +58,69 @@ def draw_masks(mask_rna,mask_dapi,best_affineR,prefix,rid):
     draw[mask_rna==1,1]=255
     skio.imsave(f'{prefix}.aligned.r{rid}.png',draw)
 
-def find_best_affine( mask_rna, mask_dapi ,chip, width_pixel,height_pixel,affine ,prefix,level ):
+
+def find_best_affine(args:[]):
+    heatmap_file = args[0]
+    dapi_file = args[1]
+    width_scale = args[2]
+    height_scale = args[3]
+    affine_list = args[4]
+    prefix = args[5]
+    s = args[6]
+    r = args[7]
+    shifts=args[8]
+
+    mask_rna = np.loadtxt(heatmap_file,delimiter=' ',dtype='uint8')
+    mask_dapi = np.loadtxt(dapi_file,delimiter=' ',dtype='uint8')
+    affine = np.matrix(np.array(affine_list))
+
     ########################################################
     # construct the #1 affine matrix
     #
-    ## step-01 zoom
-    if chip == 'chip715' :
-        width_scale = width_pixel / 0.715
-        height_scale = height_pixel / 0.715
-    else :
-        width_scale = width_pixel / 0.5
-        height_scale = height_pixel / 0.5
-
     DAPI_to_smallDAPI_affine = np.matrix(np.array([
               [ width_scale, 0, 0 ],
               [ 0,  height_scale, 0 ],
               [ 0,  0,        1 ] ]))
-
-    ## step-02 affine
     DAPI_to_bin1_affine = np.matmul(affine.I,DAPI_to_smallDAPI_affine)
-    first_affineR = DAPI_to_bin1_affine.I
-    print('match score of #1 :{}'.format(match_score(mask_rna,mask_dapi,first_affineR)),file=sys.stderr,flush=True)
-    draw_masks(mask_rna,mask_dapi,first_affineR,prefix,1)
+    if s == 1 and r == 0 :
+        ## step-02 affine
+        first_affineR = DAPI_to_bin1_affine.I
+        print('match score of #1 :{}'.format(match_score(mask_rna,mask_dapi,first_affineR)),file=sys.stderr,flush=True)
+        draw_masks(mask_rna,mask_dapi,first_affineR,prefix,1)
 
     ########################################################
     # #2 round registration
     #
-    print('iterate now ...',file=sys.stderr)
-    print(time.strftime("%Y-%m-%d %H:%M:%S"),file=sys.stderr,flush=True)
-    fscores=[]
-    fparams=[]
-    if level == 'S':
-        scales = [1,0.999,0.998,0.997,0.996,1.001,1.002,1.003,1.004]
-        rotates = [399.6,399.7,399.8,399.9,0,0.1,0.2,0.3,0.4]
-        shifts = range(-10, 12, 1)
-    elif level == 'M' :
-        scales = [1,0.999,0.998,0.997,0.996,0.995,0.994,0.993,1.001,1.002,1.003,1.004,1.005,1.006,1.007]
-        rotates = [399.5,399.4,399.3,399.6,399.7,399.8,399.9,0,0.1,0.2,0.3,0.4,0.5,0.6,0.7]
-        shifts = range(-20, 22, 1)
-    elif level == 'L' :
-        scales = [1,0.999,0.998,0.997,0.996,0.995,0.994,0.993,0.992,0.991,0.99,1.001,1.002,1.003,1.004,1.005,1.006,1.007,1.008,1.009,1.01]
-        rotates = [399.5,399.4,399.3,399.2,399.1,399,399.6,399.7,399.8,399.9,0,0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9,1]
-        shifts = range(-30, 32, 1)
 
-    for s in scales:
-        scale_matrix =  np.matrix(np.array([[s,0,0],[0,s,0],[0,0,1]]))
-        scaled = np.matmul(scale_matrix,DAPI_to_bin1_affine)
-        for r in rotates:
-            rs = np.sin(r*np.pi/180)
-            rc = np.cos(r*np.pi/180)
-            rotate_matrix = np.matrix(np.array([[rc,rs,0],[-rs,rc,0,],[0,0,1]]))
-            rotated = np.matmul(rotate_matrix,scaled)
-            t = 0
-            scores = []
-            ls = []
-            for l in shifts:
-                shift = np.matrix(np.array([[1,0,l],[0,1,t],[0,0,1]]))
-                shifted = np.matmul(shift,rotated)
-                scores.append(match_score(mask_rna,mask_dapi,shifted.I))
-                ls.append(l)
-
-            maxhit=max(scores)
-            l = ls[scores.index(maxhit)]
-            for t in shifts:
-                shift = np.matrix(np.array([[1,0,l],[0,1,t],[0,0,1]]))
-                shifted = np.matmul(shift,rotated)
-                fscores.append(match_score(mask_rna,mask_dapi,shifted.I))
-                fparams.append([s,r,l,t])
-    print('iterate end...',file=sys.stderr)
-    print(time.strftime("%Y-%m-%d %H:%M:%S"),file=sys.stderr,flush=True)
-    maxhit=max(fscores)
-    param = fparams[fscores.index(maxhit)]
-    print(f'match score of #2 :{maxhit}',file=sys.stderr,flush=True)
-    print(f'#2 modify : {param}',file=sys.stderr,flush=True)
-    ##################################################
-    # reconstruct the best affine matrix
-    s,r,l,t = param
     scale_matrix =  np.matrix(np.array([[s,0,0],[0,s,0],[0,0,1]]))
     scaled = np.matmul(scale_matrix,DAPI_to_bin1_affine)
     rs = np.sin(r*np.pi/180)
     rc = np.cos(r*np.pi/180)
     rotate_matrix = np.matrix(np.array([[rc,rs,0],[-rs,rc,0,],[0,0,1]]))
     rotated = np.matmul(rotate_matrix,scaled)
-    shift = np.matrix(np.array([[1,0,l],[0,1,t],[0,0,1]]))
-    shifted = np.matmul(shift,rotated)
-    best_affineR = shifted.I
-    print(best_affineR,file=sys.stderr)
-    np.savetxt(f'{prefix}.best_affineR.txt',best_affineR)
-    draw_masks(mask_rna,mask_dapi,best_affineR,prefix,2)
+
+    scores = []
+    ls = []
+    t = 0
+    for l in shifts:
+        shift = np.matrix(np.array([[1,0,l],[0,1,t],[0,0,1]]))
+        shifted = np.matmul(shift,rotated)
+        scores.append(match_score(mask_rna,mask_dapi,shifted.I))
+        ls.append(l)
+
+    maxhit=max(scores)
+    l = ls[scores.index(maxhit)]
+
+    fscores=[]
+    fparams=[]
+    for t in shifts:
+        shift = np.matrix(np.array([[1,0,l],[0,1,t],[0,0,1]]))
+        shifted = np.matmul(shift,rotated)
+        fscores.append(match_score(mask_rna,mask_dapi,shifted.I))
+        fparams.append([s,r,l,t])
+    maxhit=max(fscores)
+    param = fparams[fscores.index(maxhit)]
+    return maxhit, param
 
 ############################################################################
 # main logic of second registration
@@ -161,6 +138,7 @@ Usage : GEM_toolkit.py secondregistration  -H <heatmap.trackline.txt>  \\
                                            -w [um per pixel in width,  default 0.4803250]\\
                                            -h [um per pixel in height, default 0.4802272]\\
                                            -l [S/M/L search area. default S] \\
+                                           -s [thread number, default 8] \\
 
 Notice :
      please only use one of ( -f , -a , -t ) .
@@ -186,8 +164,9 @@ def secondregistration_main(argv:[]) :
     width_pixel = 0.4803250
     height_pixel = 0.4802272
     level='S'
+    tasks=8
     try:
-        opts, args = getopt.getopt(argv,"H:d:o:f:a:t:c:w:h:l:",["heatmap=",
+        opts, args = getopt.getopt(argv,"H:d:o:f:a:t:c:w:h:l:s",["heatmap=",
                                                          "dapi=",
                                                          "output=",
                                                          "fujiyama=",
@@ -196,7 +175,8 @@ def secondregistration_main(argv:[]) :
                                                          "chip=",
                                                          "width=",
                                                          "height=",
-                                                         "level="])
+                                                         "level=",
+                                                         'thread='])
     except getopt.GetoptError:
         secondregistration_usage()
         sys.exit(2)
@@ -221,13 +201,16 @@ def secondregistration_main(argv:[]) :
             height_pixel = float(arg)
         elif opt in ("-l", "--level"):
             level = arg
+        elif opt in ("-s", "--thread"):
+            tasks = int(arg)
 
     if  ( heatmap_file == "" or
           dapi_file == "" or
           prefix == "" or
           np.sum(affine) == 0 or 
           not chip in ('chip715','chip500') or 
-          not level in ('S','L','M') ):
+          not level in ('S','L','M')  or 
+          tasks < 1 ):
         secondregistration_usage()
         sys.exit(3)
 
@@ -243,11 +226,82 @@ def secondregistration_main(argv:[]) :
     print(f'um per pixel in width is {width_pixel}',file=sys.stderr)
     print(f'um per pixel in height is {height_pixel}',file=sys.stderr)
     print(f"chip is {chip}",file=sys.stderr)
+    print(f"level is {level}",file=sys.stderr)
+    print(f"thread number is {tasks}",file=sys.stderr,flush=True)
 
-    mask_rna = np.loadtxt(heatmap_file,delimiter=' ',dtype='uint8')
-    mask_dapi= np.loadtxt(dapi_file,delimiter=' ',dtype='uint8')
+    ## step-01 zoom
+    if chip == 'chip715' :
+        width_scale = width_pixel / 0.715
+        height_scale = height_pixel / 0.715
+    else :
+        width_scale = width_pixel / 0.5
+        height_scale = height_pixel / 0.5
 
+    if level == 'S':
+        scales = [1,0.999,0.998,0.997,0.996,1.001,1.002,1.003,1.004]
+        rotates = [399.6,399.7,399.8,399.9,0,0.1,0.2,0.3,0.4]
+        shifts = range(-10, 12, 1)
+    elif level == 'M' :
+        scales = [1,0.999,0.998,0.997,0.996,0.995,0.994,0.993,1.001,1.002,1.003,1.004,1.005,1.006,1.007]
+        rotates = [399.5,399.4,399.3,399.6,399.7,399.8,399.9,0,0.1,0.2,0.3,0.4,0.5,0.6,0.7]
+        shifts = range(-20, 22, 1)
+    elif level == 'L' :
+        scales = [1,0.999,0.998,0.997,0.996,0.995,0.994,0.993,0.992,0.991,0.99,1.001,1.002,1.003,1.004,1.005,1.006,1.007,1.008,1.009,1.01]
+        rotates = [399.5,399.4,399.3,399.2,399.1,399,399.6,399.7,399.8,399.9,0,0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9,1]
+        shifts = range(-30, 32, 1)
+
+    #scales = [1,0.999,0.998]
+    #rotates = [399.5,399.4,1]
+    #shifts = [1,2,3]
     #######################################################
     # find best affine
     #######################################################
-    find_best_affine( mask_rna, mask_dapi ,chip, width_pixel,height_pixel,affine ,prefix ,level)
+    #find_best_affine( mask_rna, mask_dapi ,chip, width_pixel,height_pixel,affine ,prefix ,level)
+    print('iterate now ...',file=sys.stderr)
+    print(time.strftime("%Y-%m-%d %H:%M:%S"),file=sys.stderr,flush=True)
+    args = []
+    for s in scales:
+        for r in rotates:
+            args.append([heatmap_file,
+                             dapi_file,
+                             width_scale,
+                             height_scale,
+                             affine.tolist(),
+                             prefix,
+                             s,
+                             r,
+                             shifts])
+    fscores=[]
+    fparams=[]
+    with Pool(tasks) as p:
+        for maxhit,param in  p.map(find_best_affine,args):
+            fscores.append(maxhit)
+            fparams.append(param)
+    print('iterate end...',file=sys.stderr)
+    print(time.strftime("%Y-%m-%d %H:%M:%S"),file=sys.stderr,flush=True)
+    maxhit=max(fscores)
+    param = fparams[fscores.index(maxhit)]
+    print(f'match score of #2 :{maxhit}',file=sys.stderr,flush=True)
+    print(f'#2 modify : {param}',file=sys.stderr,flush=True)
+    s,r,l,t=param
+    ##################################################
+    # reconstruct the best affine matrix
+    DAPI_to_smallDAPI_affine = np.matrix(np.array([
+              [ width_scale, 0, 0 ],
+              [ 0,  height_scale, 0 ],
+              [ 0,  0,        1 ] ]))
+    DAPI_to_bin1_affine = np.matmul(affine.I,DAPI_to_smallDAPI_affine)
+    scale_matrix =  np.matrix(np.array([[s,0,0],[0,s,0],[0,0,1]]))
+    scaled = np.matmul(scale_matrix,DAPI_to_bin1_affine)
+    rs = np.sin(r*np.pi/180)
+    rc = np.cos(r*np.pi/180)
+    rotate_matrix = np.matrix(np.array([[rc,rs,0],[-rs,rc,0,],[0,0,1]]))
+    rotated = np.matmul(rotate_matrix,scaled)
+    shift = np.matrix(np.array([[1,0,l],[0,1,t],[0,0,1]]))
+    shifted = np.matmul(shift,rotated)
+    best_affineR = shifted.I
+    print(best_affineR,file=sys.stderr)
+    np.savetxt(f'{prefix}.best_affineR.txt',best_affineR)
+    mask_rna = np.loadtxt(heatmap_file,delimiter=' ',dtype='uint8')
+    mask_dapi = np.loadtxt(dapi_file,delimiter=' ',dtype='uint8')
+    draw_masks(mask_rna,mask_dapi,best_affineR,prefix,2)

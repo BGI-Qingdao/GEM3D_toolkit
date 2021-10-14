@@ -14,7 +14,7 @@ def get_mask_dapi(dapi_file,min_brightness,width_pixel,height_pixel,chip,prefix)
         new_data = new_data + dapi_data[:,:,0]
         new_data = new_data + dapi_data[:,:,1]
         new_data = new_data + dapi_data[:,:,2]
-        new_data = new_data / 3
+        new_data = (new_data+2) / 3
         dapi_data = new_data
     dapi_data = dapi_data.astype('uint8')
     raw_dapi = dapi_data.copy()
