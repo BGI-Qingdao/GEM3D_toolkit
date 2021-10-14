@@ -166,7 +166,7 @@ def secondregistration_main(argv:[]) :
     level='S'
     tasks=8
     try:
-        opts, args = getopt.getopt(argv,"H:d:o:f:a:t:c:w:h:l:s",["heatmap=",
+        opts, args = getopt.getopt(argv,"H:d:o:f:a:t:c:w:h:l:s:",["heatmap=",
                                                          "dapi=",
                                                          "output=",
                                                          "fujiyama=",
