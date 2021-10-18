@@ -50,15 +50,21 @@ def get_mask_dapi(dapi_file,min_brightness,width_pixel,height_pixel,chip,prefix)
 # usage
 def prepareregistrationdapi_usage():
     print("""
-Usage : GEM_toolkit.py secondregistration  -d <dapi tiff file> \\
-                                           -o <output prefix>  \\
-                                           -c [chip500/chip715, default chip715] \\
-                                           -w [um per pixel in width,  default 0.4803250]\\
-                                           -h [um per pixel in height, default 0.4802272]\\
-                                           -m [min_brightness, default 1]
+Usage : GEM_toolkit.py prepareregistrationssdna -d <ssdna tiff file> \\
+                                                -o <output prefix>  \\
+                                                -c [chip500/chip715, default chip715] \\
+                                                -w [um per pixel in width,  default 0.4803250]\\
+                                                -h [um per pixel in height, default 0.4802272]\\
+                                                -m [min_brightness, default 1]
 Notice:
       If the tracklines in result are too dark to find, please try -m 2.
       If the tracklines in result are too bright to find, please try -m 0.
+
+      If the quality of ssDNA graph are too bad, try to update it by ImageJ :
+         1. convert it int 8bit; 
+         2. run enhance contrast;
+         3. find the trackline brightness by eye;
+         4. use the new ssDNA as input and assign the trackline brightness by -m.
 """)
 
 def prepareregistrationdapi_main(argv:[]) :
@@ -106,7 +112,7 @@ def prepareregistrationdapi_main(argv:[]) :
     # print logs
     #
     #######################################################
-    print(f"dapi file is {dapi_file}",file=sys.stderr)
+    print(f"ssdna file is {dapi_file}",file=sys.stderr)
     print(f"chip is {chip}",file=sys.stderr)
     print(f'prefix is {prefix}',file=sys.stderr)
     print(f'min_brightness is {min_brightness}',file=sys.stderr)

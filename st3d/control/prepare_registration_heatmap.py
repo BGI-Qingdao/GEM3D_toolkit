@@ -152,10 +152,10 @@ def get_mask_rna(gem_file : str , chip:str ,prefix : str, eb5:str) -> np.ndarray
 # usage
 def prepareregistrationheatmap_usage():
     print("""
-Usage : GEM_toolkit.py secondregistration  -g <gem file>  \\
-                                           -o <output prefix> \\
-                                           -c [chip715/chip500, default chip715] \\
-                                           -e [enhance by bin5, default not set]\\
+Usage : GEM_toolkit.py prepareregistrationheatmap -g <gem file>  \\
+                                                  -o <output prefix> \\
+                                                  -c [chip715/chip500, default chip715] \\
+                                                  -e [enhance by bin5, default not set]\\
 """)
 
 def prepareregistrationheatmap_main(argv:[]) :

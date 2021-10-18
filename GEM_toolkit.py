@@ -21,7 +21,7 @@ Action:
     gem2bfm                 convert GEM into BFM.
     heatmap                 heatmap of expression counts.
     prepareregistrationheatmap  generate 8bit bin1 heatmap with highlighted tracklines.
-    prepareregistrationdapi     generate 8bit bin1-scaled dapi graph with highlighted tracklines.
+    prepareregistrationssdna    generate 8bit bin1-scaled ssDNA graph with highlighted tracklines.
 
  actions work on bin5 coordinate space :
 
@@ -77,6 +77,7 @@ if __name__ == "__main__":
                                                    "chopgems",
                                                    "secondregistration",
                                                    "prepareregistrationheatmap",
+                                                   "prepareregistrationssdna",
                                                    "prepareregistrationdapi",
                                                    "model3d") :
         main_usage()
@@ -149,7 +150,7 @@ if __name__ == "__main__":
         from st3d.control.prepare_registration_heatmap import prepareregistrationheatmap_main 
         prepareregistrationheatmap_main(sys.argv[2:])
         exit(0)
-    elif sys.argv[1] == "prepareregistrationdapi":
+    elif sys.argv[1] in ("prepareregistrationssdna" , "prepareregistrationdapi"):
         from st3d.control.prepare_registration_dapi import prepareregistrationdapi_main 
         prepareregistrationdapi_main(sys.argv[2:])
         exit(0)
