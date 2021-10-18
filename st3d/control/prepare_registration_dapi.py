@@ -25,8 +25,9 @@ def get_mask_dapi(dapi_file,min_brightness,width_pixel,height_pixel,chip,prefix)
     dapi_data[ dapi_data <= min_brightness ] = 0
     dapi_data = 255 - dapi_data
     raw_dapi[ dapi_data == 255 ] = 255
-    dapi_data[dapi_data==255] =1
-    np.savetxt(f'{prefix}.dapi.trackline.txt',dapi_data,fmt="%d")
+    #dapi_data[dapi_data==255] =1
+    #np.savetxt(f'{prefix}.dapi.trackline.txt',dapi_data,fmt="%d")
+    skio.imsave(f'{prefix}.dapi.trackline.tiff',dapi_data)
 
     if chip == 'chip715' :
         width_scale = width_pixel / 0.715

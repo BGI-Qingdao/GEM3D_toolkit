@@ -129,20 +129,18 @@ def get_mask_rna(gem_file : str , chip:str ,prefix : str, eb5:str) -> np.ndarray
     # this may drop some high expression but it's ok for bin1
     # not ok for bin5 !
     expression = expression.astype('uint8')
-    #kio.imsave(f'{prefix}.heatmap.tiff',expression)
     print('gen mask_rna ...',file=sys.stderr)
     print(time.strftime("%Y-%m-%d %H:%M:%S"),file=sys.stderr,flush=True)
     mask=trackline_mask(expression,chip,prefix)
-    #skio.imsave(f'{prefix}.heatmap.trackline.tiff',mask)
+    mask[mask==1] = 255
+    skio.imsave(f'{prefix}.heatmap.trackline.tiff',mask)
     if eb5 == 'yes':
         expression=enhance_bin5(expression)
-    expression[mask==1]=255
+    expression[mask==255]=255
     expression = exposure.equalize_adapthist(expression)
     expression = expression*255
     expression = expression.astype('uint8')
     skio.imsave(f'{prefix}.heatmap.marked.tiff',expression)
-    mask[mask==255] = 1
-    np.savetxt(f'{prefix}.heatmap.trackline.txt',mask,fmt="%d")
     print('gen mask_rna end...',file=sys.stderr)
     print(time.strftime("%Y-%m-%d %H:%M:%S"),file=sys.stderr,flush=True)
 

@@ -70,8 +70,12 @@ def find_best_affine(args:[]):
     r = args[7]
     shifts=args[8]
 
-    mask_rna = np.loadtxt(heatmap_file,delimiter=' ',dtype='uint8')
-    mask_dapi = np.loadtxt(dapi_file,delimiter=' ',dtype='uint8')
+    mask_rna = skio.imread(heatmap_file)
+    mask_rna[mask_rna==255] = 1
+    mask_dapi = skio.imread(dapi_file)
+    mask_dapi[mask_dapi==255] = 1
+    #mask_rna = np.loadtxt(heatmap_file,delimiter=' ',dtype='uint8')
+    #mask_dapi = np.loadtxt(dapi_file,delimiter=' ',dtype='uint8')
     affine = np.matrix(np.array(affine_list))
 
     ########################################################
@@ -128,8 +132,8 @@ def find_best_affine(args:[]):
 # usage
 def secondregistration_usage():
     print("""
-Usage : GEM_toolkit.py secondregistration  -H <heatmap.trackline.txt>  \\
-                                           -d <dapi.trackline.txt> \\
+Usage : GEM_toolkit.py secondregistration  -H <heatmap.trackline.tiff>  \\
+                                           -d <dapi.trackline.tiff> \\
                                            -o <output prefix> \\
                                            -f [Fujiyama output matrix, default None] \\
                                            -t [TrackEM output matrix, default None]\\
@@ -176,7 +180,8 @@ def secondregistration_main(argv:[]) :
                                                          "width=",
                                                          "height=",
                                                          "level=",
-                                                         'thread='])
+                                                         'thread='
+                                                         ])
     except getopt.GetoptError:
         secondregistration_usage()
         sys.exit(2)
@@ -240,7 +245,7 @@ def secondregistration_main(argv:[]) :
     if level == 'S':
         scales = [1,0.999,0.998,0.997,0.996,1.001,1.002,1.003,1.004]
         rotates = [399.6,399.7,399.8,399.9,0,0.1,0.2,0.3,0.4]
-        shifts = range(-10, 12, 1)
+        shifts = range(-15, 16, 1)
     elif level == 'M' :
         scales = [1,0.999,0.998,0.997,0.996,0.995,0.994,0.993,1.001,1.002,1.003,1.004,1.005,1.006,1.007]
         rotates = [399.5,399.4,399.3,399.6,399.7,399.8,399.9,0,0.1,0.2,0.3,0.4,0.5,0.6,0.7]
@@ -302,6 +307,10 @@ def secondregistration_main(argv:[]) :
     best_affineR = shifted.I
     print(best_affineR,file=sys.stderr)
     np.savetxt(f'{prefix}.best_affineR.txt',best_affineR)
-    mask_rna = np.loadtxt(heatmap_file,delimiter=' ',dtype='uint8')
-    mask_dapi = np.loadtxt(dapi_file,delimiter=' ',dtype='uint8')
+    mask_rna = skio.imread(heatmap_file)
+    mask_rna[mask_rna==255] = 1
+    mask_dapi = skio.imread(dapi_file)
+    mask_dapi[mask_dapi==255] = 1
+    #mask_rna = np.loadtxt(heatmap_file,delimiter=' ',dtype='uint8')
+    #mask_dapi = np.loadtxt(dapi_file,delimiter=' ',dtype='uint8')
     draw_masks(mask_rna,mask_dapi,best_affineR,prefix,2)
