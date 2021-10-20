@@ -7,7 +7,7 @@ from st3d.model.slice_dataframe import slice_dataframe
 #from st3d.view.slice2d import *
 from st3d.control.save_miscdf import *
 
-def chopgems(roi_json,prefix):
+def chopgems(roi_json,prefix,binsize):
     create_a_folder(prefix)
     for sinfo in roi_json:
         slice_id = int(sinfo[0])
@@ -20,7 +20,7 @@ def chopgems(roi_json,prefix):
             BY=roi[2]
             Width=roi[3]
             Height=roi[4]
-            cropped = sdf.chop(BX,BY,Width,Height)
+            cropped = sdf.chop(BX,BY,Width,Height,binsize)
             cropped.printGEM("{}/{}-slice{}.gem".format(prefix,item_name,slice_id))
             #gec = cropped.get_expression_count_vector(1)
             #heatmap2D_png(gec,
@@ -56,10 +56,12 @@ def chopgems_main(argv:[]):
             sys.exit(0)
         elif opt in ("-o", "--output"):
             prefix = arg
+        elif opt in ("-b", "--binsize"):
+            binsize = int(arg)
         elif opt in ("-i", "--input"):
             ijson = arg
 
-    if  ijson == "" or prefix== "" :
+    if  ijson == "" or prefix== "" or binsize <1:
         chopgems_usage()
         sys.exit(3)
 
@@ -70,7 +72,7 @@ def chopgems_main(argv:[]):
     roi_json=load_json(ijson)
     print('chopgems now...')
     print(time.strftime("%Y-%m-%d %H:%M:%S"),flush=True)
-    chopgems(roi_json,prefix)
+    chopgems(roi_json,prefix,binsize)
     print('chopgems  all done')
     print(time.strftime("%Y-%m-%d %H:%M:%S"),flush=True)
 

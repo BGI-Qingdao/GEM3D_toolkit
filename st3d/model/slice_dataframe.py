@@ -8,7 +8,6 @@ import pandas as pd
 from sklearn import preprocessing
 from st3d.model.slice_xyz import slice_xyz
 from st3d.model.rect_bin import bins_of_slice
-import threading
 
 class slice_meta_data:
     def __init__(self, slice_id , slice_min_x , slice_min_y, slice_width, slice_height):
@@ -20,7 +19,7 @@ class slice_meta_data:
 
     def assign_bininfo(self, binsize, binwidth, binheight):
         self.binsize     = binsize
-        self.binwidth 	 = binwidth
+        self.binwidth    = binwidth
         self.binheight   = binheight
 
         #return self
@@ -55,12 +54,12 @@ class slice_dataframe:
         self.m_xyz=slice_xyz(max_x-self.min_x+1,max_y-self.min_y+1, self.min_x,self.min_y)
         self.slice_index = slice_index
 
-    def chop(self, x1 , y1, width,height) :
+    def chop(self, x1 , y1, width,height ,binsize=1) :
         new_df = slice_dataframe()
         x_coords = self.m_dataframe['x'] - self.min_x
-        x_coords = x_coords // 5
+        x_coords = x_coords // binsize
         y_coords = self.m_dataframe['y'] - self.min_y
-        y_coords = y_coords // 5
+        y_coords = y_coords // binsize
         coords=pd.DataFrame(x_coords,columns=['x'])
         coords['y']=y_coords
         choped_df = self.m_dataframe[ (( coords['x'] >= x1) & ( coords['x']  < x1+width -1 ) & (coords['y'] >= y1) & (coords['y']< y1 + height +1 ) )]
