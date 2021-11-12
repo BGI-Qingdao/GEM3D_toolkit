@@ -62,7 +62,7 @@ class slice_dataframe:
         y_coords = y_coords // binsize
         coords=pd.DataFrame(x_coords,columns=['x'])
         coords['y']=y_coords
-        choped_df = self.m_dataframe[ (( coords['x'] >= x1) & ( coords['x']  < x1+width -1 ) & (coords['y'] >= y1) & (coords['y']< y1 + height +1 ) )]
+        choped_df = self.m_dataframe[ (( coords['x'] >= x1) & ( coords['x']  < x1+width  ) & (coords['y'] >= y1) & (coords['y']< y1 + height ) )]
         new_df.init(choped_df.copy(),self.slice_index)
         return new_df
 

@@ -19,6 +19,7 @@ Action:
  actions work on GEM :
 
     gem2bfm                 convert GEM into BFM.
+    gem_to_cfm              convert GEM into CFM
     heatmap                 heatmap of expression counts.
     prepareregistrationheatmap  generate 8bit bin1 heatmap with highlighted tracklines.
     prepareregistrationssdna    generate 8bit bin1-scaled ssDNA graph with highlighted tracklines.
@@ -79,7 +80,9 @@ if __name__ == "__main__":
                                                    "prepareregistrationheatmap",
                                                    "prepareregistrationssdna",
                                                    "prepareregistrationdapi",
-                                                   "model3d") :
+                                                   "model3d",
+                                                   "gem_to_cfm",
+                                                   ) :
         main_usage()
         exit(1)
     elif sys.argv[1] == "gem2bfm" :
@@ -153,6 +156,10 @@ if __name__ == "__main__":
     elif sys.argv[1] in ("prepareregistrationssdna" , "prepareregistrationdapi"):
         from st3d.control.prepare_registration_dapi import prepareregistrationdapi_main 
         prepareregistrationdapi_main(sys.argv[2:])
+        exit(0)
+    elif sys.argv[1] == "gem_to_cfm":
+        from st3d.control.gem_to_cfm import gem_to_cfm_main
+        gem_to_cfm_main(sys.argv[2:])
         exit(0)
     else:
         main_usage()
