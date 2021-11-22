@@ -115,6 +115,7 @@ def find_best_affine_roi(args:[]):
         ## step-02 affine
         first_affineR = DAPI_to_heatmap.I
         print('match score of #1 :{}'.format(match_score(mask_rna,mask_dapi,first_affineR)),file=sys.stderr,flush=True)
+        print(first_affineR.tolist(),file=sys.stderr,flush=True)
         draw_masks(mask_rna,mask_dapi,first_affineR,prefix,1)
 
     ########################################################
@@ -238,7 +239,7 @@ def correct_roi(heatmap_file,dapi_file,width_scale,height_scale,affine,prefix,ta
     shift = np.matrix(np.array([[1,0,l],[0,1,t],[0,0,1]]))
     shifted = np.matmul(shift,rotated)
     best_affineR = shifted.I
-    print(best_affineR,file=sys.stderr)
+    print(best_affineR.tolist(),file=sys.stderr)
     np.savetxt(f'{prefix}_{region_name}.best_affineR.txt',best_affineR)
     ########################################################
     # draw the #2 results
@@ -276,6 +277,7 @@ def find_best_affine(args:[]):
         ## step-02 affine
         first_affineR = DAPI_to_bin1_affine.I
         print('match score of #1 :{}'.format(match_score(mask_rna,mask_dapi,first_affineR)),file=sys.stderr,flush=True)
+        print(first_affineR.tolist(),file=sys.stderr,flush=True)
         draw_masks(mask_rna,mask_dapi,first_affineR,prefix,1)
 
     ########################################################
@@ -355,7 +357,7 @@ def correct_all(heatmap_file,dapi_file,width_scale,height_scale,affine,prefix,ta
     shift = np.matrix(np.array([[1,0,l],[0,1,t],[0,0,1]]))
     shifted = np.matmul(shift,rotated)
     best_affineR = shifted.I
-    print(best_affineR,file=sys.stderr)
+    print(best_affineR.tolist(),file=sys.stderr)
     np.savetxt(f'{prefix}.best_affineR.txt',best_affineR)
     mask_rna = skio.imread(heatmap_file)
     mask_rna[mask_rna==255] = 1
@@ -486,7 +488,8 @@ def secondregistration_main(argv:[]) :
 
     if level == 'S':
         scales = [1,0.999,0.998,0.997,0.996,1.001,1.002,1.003,1.004]
-        rotates = [399.6,399.7,399.8,399.9,0,0.1,0.2,0.3,0.4]
+        #rotates = [399.6,399.7,399.8,399.9,0,0.1,0.2,0.3,0.4]
+        rotates = [399.8,399.85,399,399.95,0,0.05,0.1,0.15,0.2]
         shifts = range(-15, 16, 1)
     elif level == 'M' :
         scales = [1,0.999,0.998,0.997,0.996,0.995,0.994,0.993,1.001,1.002,1.003,1.004,1.005,1.006,1.007]
