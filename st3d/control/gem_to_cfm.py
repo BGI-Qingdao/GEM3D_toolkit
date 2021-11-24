@@ -370,17 +370,6 @@ def gem_to_cfm_main(argv:[]):
             cell_cems = cell_cems.groupby(['x', 'y']).agg(UMI_sum=('MIDCounts', 'sum')).reset_index()
             coords[cell_cems['y'], cell_cems['x']] = cell_cems['UMI_sum']
             coords = coords.astype('uint8')
-            expression = coords
-            ret = np.zeros(expression.shape,dtype=int)
-            h,w = expression.shape
-            for i in range(0,6):
-                for j in range(0,6):
-                    newm = np.zeros(expression.shape)
-                    newm[i:,j:] = expression[:h-i,:w-j]
-                    ret = ret + newm
-            ret[ret>255]=255
-            ret = ret.astype('uint8')
-            coords = ret
             skio.imsave(f'{prefix}/{item_name}.heatmap.mask.tif',coords)
             coords[affined_roi_border==1]=0
             skio.imsave(f'{prefix}/{item_name}.heatmap.border_masked.tif',coords)
@@ -467,17 +456,6 @@ def gem_to_cfm_main(argv:[]):
         coords = np.zeros((heatmap.shape), dtype=int)
         cell_cems = cell_cems.groupby(['x', 'y']).agg(UMI_sum=('MIDCounts', 'sum')).reset_index()
         coords[cell_cems['y'], cell_cems['x']] = cell_cems['UMI_sum']
-        expression = coords
-        ret = np.zeros(expression.shape, dtype=int)
-        h, w = expression.shape
-        for i in range(0, 6):
-            for j in range(0, 6):
-                newm = np.zeros(expression.shape)
-                newm[i:, j:] = expression[:h - i, :w - j]
-                ret = ret + newm
-        ret[ret > 255] = 255
-        ret = ret.astype('uint8')
-        coords = ret
         skio.imsave(f'{prefix}.heatmap.mask.tif', coords)
         coords[affined_border == 1] = 0
         skio.imsave(f'{prefix}.heatmap.border_masked.tif', coords)
