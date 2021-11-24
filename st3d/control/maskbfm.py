@@ -83,9 +83,7 @@ def gen_one_masked_bfm(args : []):
     print_matrix_mtx(new_matrix,prefix,slice_index,g_num,b_num)
     print("end mask bfm for slice {} ...".format(slice_index))
     print(time.strftime("%Y-%m-%d %H:%M:%S"),flush=True)
-
     # all done
-
 
 def mask_bfms(masks_map,input_folder,prefix,downsize,tasks):
     create_a_folder(prefix)
