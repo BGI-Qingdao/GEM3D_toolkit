@@ -497,7 +497,7 @@ def gem_to_cfm_main(argv:[]):
 
 
 
-#if __name__ == "__main__":
-gem_to_cfm_main(sys.argv[1:])
-print('all file has been saved')
-print(time.strftime("%Y-%m-%d %H:%M:%S"), file=sys.stderr, flush=True)
+if __name__ == "__main__":
+    gem_to_cfm_main(sys.argv[1:])
+    print('all file has been saved')
+    print(time.strftime("%Y-%m-%d %H:%M:%S"), file=sys.stderr, flush=True)
