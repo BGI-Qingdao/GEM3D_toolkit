@@ -71,13 +71,13 @@ def find_best_affine_roi(args:[]):
     # load data of whole image
     mask_rna = skio.imread(heatmap_file)
     # chop roi
-    mask_rna = mask_rna[yh-1:yh+hh,xh-1:xh+wh]
+    mask_rna = mask_rna[yh:yh+hh,xh:xh+wh]
     # format mask
     mask_rna[mask_rna==255] = 1
     # load data of whole image
     mask_dapi = skio.imread(dapi_file)
     # chop roi
-    mask_dapi = mask_dapi[yd-1:yd+hd,xd-1:xd+wd]
+    mask_dapi = mask_dapi[yd:yd+hd,xd:xd+wd]
     # format mask
     mask_dapi[mask_dapi==255] = 1
 

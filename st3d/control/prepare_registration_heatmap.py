@@ -8,15 +8,14 @@ from skimage import exposure
 from st3d.model.slice_dataframe import slice_dataframe
 
 ###############################################################################
-#
 # basic chip settings
-#
 ###############################################################################
-### T1  715  2940 
+
+### chip715
 grid_x_715 = [112, 144, 208, 224, 224, 208, 144, 112, 160]
 grid_y_715 = [112, 144, 208, 224, 224, 208, 144, 112, 160]
 
-## T10  500
+##  chip500
 grid_x_500 = [ 240, 300, 330, 390, 390, 330, 300, 240, 420]
 grid_y_500 = [ 240, 300, 330, 390, 390, 330, 300, 240, 420]
 
@@ -24,40 +23,32 @@ grid_y_500 = [ 240, 300, 330, 390, 390, 330, 300, 240, 420]
 # main logic of second registration
 #############################################################################
 
-def find_minPatten(sums,pattern):
+def find_pattern(sums,pattern):
     """
-    find the minimum pattern
+    find the tracklines 
 
     @args :
         sums     : one-dimension array of all data
         pattern  : one-dimension array of pattern
     @return :
-        index of pattern
-        the minimum value
+        start of all tracklines
     """
-    patterns = np.hstack((pattern,pattern))
-    for min_len in range(9, 2, -1):
-        targets = []
-        target_sps = []
-        for start_pos in range(0,9):
-            pattern_slice = patterns[start_pos:start_pos+min_len]
-            tmp_positions = np.cumsum(pattern_slice)
-            positions = np.zeros(len(tmp_positions)+1,dtype=int)
-            positions[1:len(tmp_positions)+1]=tmp_positions
-            results = []
-            for pos in  range(len(sums) - np.max(positions) - 1):
-                results.append(np.sum(sums[positions+pos]))
-            if len(results) == 0 :
-                continue
-            elif min(results) == 0 :
-                targets.append(results.index(0))
-                target_sps.append(start_pos)
-        if len(targets) == 0 :
+    pattern_len = np.sum(pattern)
+    max_pattern_num = int(int((len(sums)+pattern_len-1)//pattern_len)+1)
+    patterns = pattern * max_pattern_num
+    patternarr = np.array(patterns)
+    tmp_positions = np.cumsum(patternarr)
+    positions = np.zeros(len(tmp_positions)+1,dtype=int)
+    positions[1:len(tmp_positions)+1]=tmp_positions
+    for shift_x in range(0,pattern_len,1):
+        tmp_indexs = positions - shift_x
+        tmp_indexs = tmp_indexs[tmp_indexs>=0]
+        tmp_indexs = tmp_indexs[tmp_indexs<len(sums)-2]
+        if len(tmp_indexs)<2:
             continue
-        else:
-            min_pos = min(targets)
-            min_id = target_sps[targets.index(min_pos)]
-            return min_len, min_id , min_pos
+        if np.sum(sums[tmp_indexs])+ np.sum(sums[tmp_indexs+1])+np.sum(sums[tmp_indexs+2]) == 0 :
+             return tmp_indexs
+ 
     print('FATAL : non pattern found !',file=sys.stderr,flush=True)
     exit(1)
 
@@ -68,10 +59,7 @@ def trackline_mask(expression_matrix : np.ndarray, chip:str, prefix:str) -> np.n
     @return :
        mask of rna trackline. 1 represent trackline and 0 represent others.
     '''
-
     height , width  = expression_matrix.shape
-    # -------------------------------------------------------------------------
-    # find the first (left-top) point of trackline a 10*10 pattern
     x_sum = np.sum(expression_matrix, 0)  ## horizontal
     y_sum = np.sum(expression_matrix, 1)  ## vertical
     if chip == 'chip715':
@@ -80,31 +68,15 @@ def trackline_mask(expression_matrix : np.ndarray, chip:str, prefix:str) -> np.n
     else :
         grid_x = grid_x_500
         grid_y = grid_y_500
-    _, x_index , x_pos = find_minPatten(x_sum,grid_x)
-    _, y_index , y_pos = find_minPatten(y_sum,grid_y)
-
-    # -------------------------------------------------------------------------
-    # find all point of trackline a 10*10 pattern
+    x_indexes = find_pattern(x_sum,grid_x)
+    y_indexes = find_pattern(y_sum,grid_y)
     mask = np.zeros(expression_matrix.shape, dtype='uint8')
-
-    while x_pos < width :
-        if x_pos + 2 < width :
-            mask[:,x_pos:x_pos + 3] = 1
-        else :
-            mask[:,x_pos:width] =1 
-        x_pos += grid_x[x_index]
-        x_index = x_index + 1
-        x_index = x_index % 9
-
-    while y_pos < height:
-        if y_pos + 2 < height :
-            mask[y_pos:y_pos + 3,:] = 1
-        else :
-            mask[y_pos:width,:] = 1
-        y_pos += grid_y[y_index]
-        y_index = y_index + 1
-        y_index = y_index % 9
-
+    mask[:,x_indexes]=1
+    mask[:,x_indexes+1]=1
+    mask[:,x_indexes+2]=1
+    mask[y_indexes,:] = 1
+    mask[y_indexes+1,:] = 1
+    mask[y_indexes+2,:] = 1
     return mask
 
 def enhance_bin5(expression):
