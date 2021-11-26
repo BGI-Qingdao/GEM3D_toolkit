@@ -185,8 +185,8 @@ def ssdna_cut_gem(prefix,ssdna_file,gem_file,affine):
     mask = get_mask(ssdna_file,prefix)
     gem = pd.read_csv(gem_file,sep='\t', header=0, compression='infer', comment='#')
     affineR = np.matrix(np.loadtxt(affine))
-
-    heatmap_image = get_heatmap(gem)
+    gem_image = gem.copy()
+    heatmap_image = get_heatmap(gem_image)
     heatmap = heatmap_image.copy()
 
     affine_mask = nd.affine_transform(mask.T,affineR,output_shape=heatmap.T.shape,order=0)
@@ -207,8 +207,8 @@ def mask_cut_gem(prefix,mask_file,gem_file,affine):
     mask = skio.imread(mask_file)
     gem = pd.read_csv(gem_file,sep='\t', header=0, compression='infer', comment='#')
     affineR = np.matrix(np.loadtxt(affine))
-
-    heatmap_image = get_heatmap(gem)
+    gem_image = gem.copy()
+    heatmap_image = get_heatmap(gem_image)
     heatmap = heatmap_image.copy()
 
     affine_mask = nd.affine_transform(mask.T,affineR,output_shape=heatmap.T.shape,order=0)
@@ -306,6 +306,13 @@ def gem_to_cfm_main(argv:[]):
             roi_mask = masks[yd:yd+hd,xd:xd+wd]
             roi_border = borders[yd:yd+hd,xd:xd+wd]
             roi_ssdna = dapi_data[yd:yd+hd,xd:xd+wd]
+
+            roi_list = pd.DataFrame(columns=['x', 'y', 'width', 'height'])
+            roi_list.loc['heatmap'] = [xh, yh, wh, hh]
+            roi_list.loc['ssdna'] = [xd, yd, wd, hd]
+            roi_list.loc['gem'] = [xh+gem_data_x_min, yh+gem_data_y_min, wh, hh]
+            roi_list.to_csv(f'{prefix}/{item_name}.roi.txt', sep='\t', header=True, index=True)
+
 
             affined_roi_mask = nd.affine_transform(roi_mask.T,affineR,output_shape=(wh,hh),order=0)
             affined_roi_mask = affined_roi_mask.T
