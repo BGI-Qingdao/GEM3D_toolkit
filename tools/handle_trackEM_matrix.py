@@ -77,5 +77,6 @@ def handle_trackEM_matrix_main(argv:[]) :
     if not valid :
         handle_trackEM_matrix_usage()
         sys.exit(2)
+    get_affine(chip , width_pixel, height_pixel,affine)
 
 handle_trackEM_matrix_main(sys.argv[1:])

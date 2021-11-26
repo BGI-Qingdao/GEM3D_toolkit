@@ -57,7 +57,7 @@ def apply_affine_tiff_main(argv:[]) :
             flip = arg
         elif opt in ('-r' , '--ref'):
             ref = arg
-        elif opt in ('-O' , '--overlap'):
+        #elif opt in ('-O' , '--overlap'):
 
 
     if inputf == '' or prefix == '' or not flip in ('fliph','flipv','noflip') or ref == '':
