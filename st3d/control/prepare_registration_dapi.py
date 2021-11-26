@@ -6,7 +6,7 @@ import scipy.ndimage as nd
 import scipy.signal as sg
 from skimage import io as skio
 
-def get_mask_dapi(dapi_file,min_brightness,width_pixel,height_pixel,chip,prefix,need_filter):
+def get_mask_dapi(dapi_file,min_brightness,width_pixel,height_pixel,chip,prefix,need_filter,mask_mode):
     print('loading ssDNA ...',file=sys.stderr)
     print(time.strftime("%Y-%m-%d %H:%M:%S"),file=sys.stderr,flush=True)
     dapi_data = skio.imread(dapi_file)
@@ -22,18 +22,22 @@ def get_mask_dapi(dapi_file,min_brightness,width_pixel,height_pixel,chip,prefix,
 
     print('gen mask_ssDNA...',file=sys.stderr)
     print(time.strftime("%Y-%m-%d %H:%M:%S"),file=sys.stderr,flush=True)
-    dapi_data[ dapi_data > min_brightness ] = 255
-    dapi_data[ dapi_data <= min_brightness ] = 0
-    dapi_data = 255 - dapi_data
-
-    if need_filter:
-        filtered_data = sg.medfilt(dapi_data,kernel_size=(5,5))
-        dapi_data = np.uint8(filtered_data)
     
-    raw_dapi[ dapi_data == 255 ] = 255
-    #dapi_data[dapi_data==255] =1
-    #np.savetxt(f'{prefix}.dapi.trackline.txt',dapi_data,fmt="%d")
-    skio.imsave(f'{prefix}.ssdna.trackline.tiff',dapi_data)
+    if mask_mode :
+        dapi_data[ dapi_data > min_brightness ] = 255
+        dapi_data[ dapi_data <= min_brightness ] = 0
+        dapi_data = 255 - dapi_data
+        if need_filter:
+            filtered_data = sg.medfilt(dapi_data,kernel_size=(5,5))
+            dapi_data = np.uint8(filtered_data)
+        skio.imsave(f'{prefix}.ssdna.trackline.tiff',dapi_data)
+        raw_dapi[ dapi_data == 255 ] = 255
+    else:
+        dapi_data[ dapi_data <= min_brightness ] = 255 - dapi_data[ dapi_data <= min_brightness ]
+        dapi_data[ raw_dapi > min_brightness ] = 0
+        dapi_data[ dapi_data > 0 ] = 256 - dapi_data[ dapi_data > 0 ]
+        dapi_data[ dapi_data > 0 ] = (255+(100//(min_brightness)))-( (100//(min_brightness)) * dapi_data[ dapi_data > 0 ])
+        raw_dapi[ dapi_data >0 ] = dapi_data[dapi_data>0]
 
     if chip == 'chip715' :
         width_scale = width_pixel / 0.715
@@ -41,6 +45,7 @@ def get_mask_dapi(dapi_file,min_brightness,width_pixel,height_pixel,chip,prefix,
     else :
         width_scale = width_pixel / 0.5
         height_scale = height_pixel / 0.5
+
     small=np.matrix(np.array([[width_scale,0,1],[0,height_scale,1],[0,0,1]]))
     new_w = int(raw_dapi.shape[1]*width_scale)
     new_h = int(raw_dapi.shape[0]*height_scale)
@@ -64,6 +69,7 @@ Usage : GEM_toolkit.py prepareregistrationssdna -d <ssdna tiff file> \\
                                                 -h [um per pixel in height, default 0.4802272]\\
                                                 -f [midfilt or not. default not set] \\
                                                 -m [min_brightness, default 1]
+                                                -M [generate mask, default not set] \\
 Notice:
       If the tracklines in result are too dark to find, please try -m 2.
       If the tracklines in result are too bright to find, please try -m 0 or set -f.
@@ -83,13 +89,14 @@ def prepareregistrationdapi_main(argv:[]) :
     width_pixel = 0.4803250
     height_pixel = 0.4802272
     need_filter=False
+    mask_mode = False
     try:
-        opts, args = getopt.getopt(argv,"d:m:o:w:h:c:f",[   "dapi=",
+        opts, args = getopt.getopt(argv,"d:m:o:w:h:c:fM",[   "dapi=",
                                                          "minbright=",
                                                          "output=",
                                                          "width=",
                                                          "height=",
-                                                         "chip=","filter"])
+                                                         "chip=","filter","Mask"])
     except getopt.GetoptError:
         prepareregistrationdapi_usage()
         sys.exit(2)
@@ -108,6 +115,8 @@ def prepareregistrationdapi_main(argv:[]) :
             chip = arg
         elif opt in ('-f' , '--filter'):
             need_filter = True
+        elif opt in ('-M' , '--Mask'):
+            mask_mode = True
 
     if  ( dapi_file == "" or
           prefix == "" or
@@ -133,5 +142,5 @@ def prepareregistrationdapi_main(argv:[]) :
     #######################################################
     # loading dapi and generate mask_dapi
     #######################################################
-    get_mask_dapi(dapi_file,min_brightness,width_pixel,height_pixel,chip,prefix,need_filter)
+    get_mask_dapi(dapi_file,min_brightness,width_pixel,height_pixel,chip,prefix,need_filter,mask_mode)
 
