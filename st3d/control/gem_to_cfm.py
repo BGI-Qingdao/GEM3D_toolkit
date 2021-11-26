@@ -193,7 +193,7 @@ def ssdna_cut_gem(prefix,ssdna_file,gem_file,affine):
     affine_mask = affine_mask.T
     heatmap[affine_mask == 0] = 0
     gem_cut = gem.copy()
-    gem_cut['cell'] = heatmap[gem['y'],gem['x']]
+    gem_cut['cell'] = heatmap[gem['y'] - gem['y'].min(), gem['x'] - gem['x'].min()]
     gem_cut = gem_cut[gem_cut['cell']!=0]
     gem_cut.drop(columns=['cell'], inplace=True)
 
@@ -215,7 +215,7 @@ def mask_cut_gem(prefix,mask_file,gem_file,affine):
     affine_mask = affine_mask.T
     heatmap[affine_mask == 0] = 0
     gem_cut = gem.copy()
-    gem_cut['cell'] = heatmap[gem['y'],gem['x']]
+    gem_cut['cell'] = heatmap[gem['y'] - gem['y'].min(), gem['x'] - gem['x'].min()]
     gem_cut = gem_cut[gem_cut['cell']!=0]
     gem_cut.drop(columns=['cell'], inplace=True)
 
