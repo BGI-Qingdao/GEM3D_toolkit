@@ -329,7 +329,7 @@ def gem_to_cfm_main(argv:[]):
             affined_roi_ssdna = affined_roi_ssdna.T
             #affined_roi_ssdna = affined_roi_ssdna[300:-300, 300:-300]
             skio.imsave(f'{prefix}/{item_name}.ssDNA.tif',affined_roi_ssdna)
-            #affined_roi_ssdna[affined_roi_border==1]=255
+            affined_roi_ssdna[affined_roi_border==1]=255
             skio.imsave(f'{prefix}/{item_name}.ssDNA.border_masked.tif',affined_roi_ssdna)
             print(f'{item_name} mask and border image is saved')
 
