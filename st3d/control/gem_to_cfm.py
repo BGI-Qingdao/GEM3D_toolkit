@@ -386,7 +386,7 @@ def gem_to_cfm_main(argv:[]):
         print(time.strftime("%Y-%m-%d %H:%M:%S"), file=sys.stderr, flush=True)
         # load gems
         gem_data = pd.read_csv(gem, sep='\t', header=0, compression='infer', comment='#')
-        gem_image = gem.copy()
+        gem_image = gem_data.copy()
         heatmap = get_heatmap(gem_image)
         skio.imsave(f'{prefix}.heatmap.tif',heatmap)
 
