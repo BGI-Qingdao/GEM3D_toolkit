@@ -378,7 +378,7 @@ def gem_to_cfm_main(argv:[]):
             coords[cell_cems['y'], cell_cems['x']] = cell_cems['UMI_sum']
             coords = coords.astype('uint8')
             skio.imsave(f'{prefix}/{item_name}.heatmap.mask.tif',coords)
-            coords[affined_roi_border==1]=0
+            coords[affined_roi_border==1]=255
             skio.imsave(f'{prefix}/{item_name}.heatmap.border_masked.tif',coords)
 
     elif ssdna != "" and mask != "" and prefix != "" and border != "" and gem != "" and roi_affines == "" and affine !="" and Mask =="":
@@ -464,8 +464,9 @@ def gem_to_cfm_main(argv:[]):
         coords = np.zeros((heatmap.shape), dtype=int)
         cell_cems = cell_cems.groupby(['x', 'y']).agg(UMI_sum=('MIDCounts', 'sum')).reset_index()
         coords[cell_cems['y'], cell_cems['x']] = cell_cems['UMI_sum']
+        coords = coords.astype('uint8')
         skio.imsave(f'{prefix}.heatmap.mask.tif', coords)
-        coords[affined_border == 1] = 0
+        coords[affined_border == 1] = 255
         skio.imsave(f'{prefix}.heatmap.border_masked.tif', coords)
 
     elif ssdna != "" and mask == "" and prefix != "" and border == "" and gem != "" and roi_affines == "" and affine != "" and Mask == "":
