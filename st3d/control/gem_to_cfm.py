@@ -338,17 +338,15 @@ def gem_to_cfm_main(argv:[]):
             choped_gem = choped_gem.copy()
 
 
-            choped_gem_x_min = choped_gem['x'].min()
-            choped_gem_y_min = choped_gem['y'].min()
-            choped_gem['x'] = choped_gem['x'] - choped_gem_x_min
-            choped_gem['y'] = choped_gem['y'] - choped_gem_y_min
+            choped_gem['x'] = choped_gem['x'] - xh
+            choped_gem['y'] = choped_gem['y'] - yh
             choped_gem['cell'] =  affined_roi_mask[choped_gem['y'],choped_gem['x']]
 
             choped_gem_tosave = choped_gem.copy()
 
 
-            choped_gem_tosave['x'] = choped_gem_tosave['x'] + gem_data_x_min + choped_gem_x_min
-            choped_gem_tosave['y'] = choped_gem_tosave['y'] + gem_data_y_min + choped_gem_y_min
+            choped_gem_tosave['x'] = choped_gem_tosave['x'] + gem_data_x_min + xh
+            choped_gem_tosave['y'] = choped_gem_tosave['y'] + gem_data_y_min + yh
             choped_gem_tosave.to_csv(f'{prefix}/{item_name}.gemc', sep='\t', header=True, index=False)
 
             #delete cells outside mask
