@@ -20,6 +20,7 @@ Usage : GEM_toolkit.py gem_to_cfm               -s <ssdna tiff file> \\
                                                 -m <cell segment mask file>\\
                                                 -M <mask file>
                                                 -r <roi with affine file>\\
+                                                -a <matrix file output from handle_trackEM_matrix>
                                                 -h [show this usage]\\
                                                 -o <output prefix>
 Notice:
