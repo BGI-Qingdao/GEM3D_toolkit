@@ -20,7 +20,9 @@ Usage : GEM_toolkit.py gem_to_cfm               -s <ssdna tiff file> \\
                                                 -m <cell segment mask file>\\
                                                 -M <mask file>
                                                 -r <roi with affine file>\\
-                                                -a <matrix file output from handle_trackEM_matrix>
+                                                -a <matrix file output from handle_trackEM_matrix>\\
+                                                -e <expanding the radius of one pixel, default 9>\\
+                                                -v <increasing or decreasing the value of threshold, apply threhold = auto threshold + value, default 0>\\
                                                 -h [show this usage]\\
                                                 -o <output prefix>
 Notice:
@@ -153,7 +155,7 @@ def get_heatmap(gem_data):
     return coords
 
 
-def get_mask(ssdna_file,prefix):
+def get_mask(ssdna_file,prefix,value,expand):
     ssdna = skio.imread(ssdna_file)
 
     if len(ssdna.shape) == 3:  # RGB tiff to 8 bit gray tiff
@@ -168,11 +170,23 @@ def get_mask(ssdna_file,prefix):
 
     #convert to mask
     thre = filters.threshold_otsu(ssdna)
+    print("the auto-set threshold is :",thre)
+    print("the value you want to increase is :",value)
+    thre = thre + int(value)
+    if thre > 255:
+        thre = 255
+    elif thre < 0:
+        thre = 0
+    else:
+        thre = thre
+    
+    print("the threshold what you set is :",thre)
+    
     ssdna[ssdna >= thre] = 255
     ssdna[ssdna < thre] = 0
 
     #expand pixel
-    ssdna_dilation = sm.dilation(ssdna, sm.disk(9))
+    ssdna_dilation = sm.dilation(ssdna, sm.disk(int(expand)))
     # ssdna_dilation=sm.dilation(ssdna_dilation,sm.square(5))
     # edges = edges.astype('uint8')
     # print(edges)
@@ -181,9 +195,9 @@ def get_mask(ssdna_file,prefix):
     skio.imsave(f'{prefix}.mask.tif', ssdna_dilation)
     return ssdna_dilation
 
-def ssdna_cut_gem(prefix,ssdna_file,gem_file,affine):
+def ssdna_cut_gem(prefix,ssdna_file,gem_file,affine,value,expand):
 
-    mask = get_mask(ssdna_file,prefix)
+    mask = get_mask(ssdna_file,prefix,value,expand)
     gem = pd.read_csv(gem_file,sep='\t', header=0, compression='infer', comment='#')
     affineR = np.matrix(np.loadtxt(affine))
     gem_image = gem.copy()
@@ -234,9 +248,10 @@ def gem_to_cfm_main(argv:[]):
     ssdna = ''
     affine = ''
     Mask = ''
-
+    expand = 9
+    value = 0
     try:
-        opts, args = getopt.getopt(argv,"hm:b:g:o:r:s:a:M:",["help","mask=","border=","gem=","output=","roi=","ssdna=","affine","Mask"])
+        opts, args = getopt.getopt(argv,"hm:b:g:o:r:s:a:M:e:v:",["help","mask=","border=","gem=","output=","roi=","ssdna=","affine","Mask","expand","value"])
     except getopt.GetoptError:
         gem_to_cfm_usage()
         sys.exit(2)
@@ -260,6 +275,10 @@ def gem_to_cfm_main(argv:[]):
             affine = arg
         elif opt in ("-s", "--ssdna"):
             ssdna = arg
+        elif opt in ("-e", "--expand"):
+            expand = arg
+        elif opt in ("-v", "--value"):
+            value = arg
 
 
 
@@ -469,10 +488,10 @@ def gem_to_cfm_main(argv:[]):
         skio.imsave(f'{prefix}.heatmap.border_masked.tif', coords)
 
     elif ssdna != "" and mask == "" and prefix != "" and border == "" and gem != "" and roi_affines == "" and affine != "" and Mask == "":
-        ssdna_cut_gem(prefix,ssdna,gem,affine)
+        ssdna_cut_gem(prefix,ssdna,gem,affine,value,expand)
 
     elif ssdna != "" and mask == "" and prefix != "" and border == "" and gem == "" and roi_affines == "" and affine == "" and Mask == "":
-        get_mask(ssdna,prefix)
+        get_mask(ssdna,prefix,value,expand)
 
     elif ssdna == '' and mask == "" and prefix != "" and border == "" and gem != "" and roi_affines == "" and affine != "" and Mask !="":
         mask_cut_gem(prefix,Mask,gem,affine)
