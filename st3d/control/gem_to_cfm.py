@@ -22,8 +22,10 @@ Usage : GEM_toolkit.py gem_to_cfm               -s <ssdna tiff file> \\
                                                 -r <roi with affine file>\\
                                                 -a <matrix file output from handle_trackEM_matrix>\\
                                                 -e <expanding the radius of one pixel, default 9>\\
-                                                -v <increasing or decreasing the value of threshold, apply threhold = auto threshold + value, default 0>\\
+                                                -v <use value to increase or decrease the threshold, apply threhold = auto threshold + value, default 0>\\
                                                 -h [show this usage]\\
+                                                -Z <output the fold gem>
+                                                -N <customize the after_cut.gem file name, default after_cut>
                                                 -o <output prefix>
 Notice:
 total 5 model
@@ -195,7 +197,7 @@ def get_mask(ssdna_file,prefix,value,expand):
     skio.imsave(f'{prefix}.mask.tif', ssdna_dilation)
     return ssdna_dilation
 
-def ssdna_cut_gem(prefix,ssdna_file,gem_file,affine,value,expand):
+def ssdna_cut_gem(prefix,ssdna_file,gem_file,affine,value,expand,Zip,Name):
 
     mask = get_mask(ssdna_file,prefix,value,expand)
     gem = pd.read_csv(gem_file,sep='\t', header=0, compression='infer', comment='#')
@@ -212,12 +214,16 @@ def ssdna_cut_gem(prefix,ssdna_file,gem_file,affine,value,expand):
     gem_cut = gem_cut[gem_cut['cell']!=0]
     gem_cut.drop(columns=['cell'], inplace=True)
 
-
-    gem_cut.to_csv(f'{prefix}.after_cut.gem', sep='\t', header=True, index=False)
+    if Zip:
+       gem_cut.to_csv(f'{prefix}.{Name}.gem', sep='\t', header=True, index=False)
+       print("+++++")
+       check_call(f'gzip {prefix}.{Name}.gem',shell=True)
+    else:
+       gem_cut.to_csv(f'{prefix}.{Name}.gem', sep='\t', header=True, index=False)
     skio.imsave(f'{prefix}.heatmap.tif',heatmap_image)
     skio.imsave(f'{prefix}.heatmap.mask.tif',heatmap)
 
-def mask_cut_gem(prefix,mask_file,gem_file,affine):
+def mask_cut_gem(prefix,mask_file,gem_file,affine,Zip,Name):
 
     mask = skio.imread(mask_file)
     gem = pd.read_csv(gem_file,sep='\t', header=0, compression='infer', comment='#')
@@ -234,8 +240,11 @@ def mask_cut_gem(prefix,mask_file,gem_file,affine):
     gem_cut = gem_cut[gem_cut['cell']!=0]
     gem_cut.drop(columns=['cell'], inplace=True)
 
-
-    gem_cut.to_csv(f'{prefix}.after_cut.gem', sep='\t', header=True, index=False)
+    if Zip:
+       gem_cut.to_csv(f'{prefix}.{Name}.gem', sep='\t', header=True, index=False)
+       check_call(f'gzip {prefix}.{Name}.gem',shell=True)
+    else:
+       gem_cut.to_csv(f'{prefix}.{Name}.gem', sep='\t', header=True, index=False)
     skio.imsave(f'{prefix}.heatmap.tif',heatmap_image)
     skio.imsave(f'{prefix}.heatmap.mask.tif',heatmap)
 
@@ -250,8 +259,12 @@ def gem_to_cfm_main(argv:[]):
     Mask = ''
     expand = 9
     value = 0
+    Name = 'after_cut'
+    Zip = False  
+
+    
     try:
-        opts, args = getopt.getopt(argv,"hm:b:g:o:r:s:a:M:e:v:",["help","mask=","border=","gem=","output=","roi=","ssdna=","affine","Mask","expand","value"])
+        opts, args = getopt.getopt(argv,"hm:b:g:o:r:s:a:M:e:v:N:Z",["help","mask=","border=","gem=","output=","roi=","ssdna=","affine","Mask","expand","value","Name","Zip"])
     except getopt.GetoptError:
         gem_to_cfm_usage()
         sys.exit(2)
@@ -279,6 +292,10 @@ def gem_to_cfm_main(argv:[]):
             expand = arg
         elif opt in ("-v", "--value"):
             value = arg
+        elif opt in ("-N", "--Name"):
+            Name = arg
+        elif opt in ("-Z", "--Zip"):
+            Zip = True
 
 
 
@@ -488,13 +505,13 @@ def gem_to_cfm_main(argv:[]):
         skio.imsave(f'{prefix}.heatmap.border_masked.tif', coords)
 
     elif ssdna != "" and mask == "" and prefix != "" and border == "" and gem != "" and roi_affines == "" and affine != "" and Mask == "":
-        ssdna_cut_gem(prefix,ssdna,gem,affine,value,expand)
+        ssdna_cut_gem(prefix,ssdna,gem,affine,value,expand,Zip,Name)
 
     elif ssdna != "" and mask == "" and prefix != "" and border == "" and gem == "" and roi_affines == "" and affine == "" and Mask == "":
         get_mask(ssdna,prefix,value,expand)
 
     elif ssdna == '' and mask == "" and prefix != "" and border == "" and gem != "" and roi_affines == "" and affine != "" and Mask !="":
-        mask_cut_gem(prefix,Mask,gem,affine)
+        mask_cut_gem(prefix,Mask,gem,affine,Zip,Name)
 
     else:
         gem_to_cfm_usage()
