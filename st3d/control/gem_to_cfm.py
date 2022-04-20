@@ -25,7 +25,7 @@ Usage : GEM_toolkit.py gem_to_cfm               -s <ssdna tiff file> \\
                                                 -v <use value to increase or decrease the threshold, apply threhold = auto threshold + value, default 0>\\
                                                 -h [show this usage]\\
                                                 -Z <output the fold gem>
-                                                -N <customize the after_cut.gem file name, default after_cut>
+                                                -N <customize the after_cut.gem file name, default TissueCut>
                                                 -o <output prefix>
 Notice:
 total 5 model
@@ -216,7 +216,6 @@ def ssdna_cut_gem(prefix,ssdna_file,gem_file,affine,value,expand,Zip,Name):
 
     if Zip:
        gem_cut.to_csv(f'{prefix}.{Name}.gem', sep='\t', header=True, index=False)
-       print("+++++")
        check_call(f'gzip {prefix}.{Name}.gem',shell=True)
     else:
        gem_cut.to_csv(f'{prefix}.{Name}.gem', sep='\t', header=True, index=False)
@@ -259,7 +258,7 @@ def gem_to_cfm_main(argv:[]):
     Mask = ''
     expand = 9
     value = 0
-    Name = 'after_cut'
+    Name = 'TissueCut'
     Zip = False  
 
     
