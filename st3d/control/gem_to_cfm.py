@@ -9,7 +9,7 @@ import pandas as pd
 import scipy.ndimage as nd
 from subprocess import check_call
 from skimage import io as skio
-frim skimage import img_as_ubyte
+from skimage import img_as_ubyte
 import skimage.morphology as sm
 from skimage import filters
 
