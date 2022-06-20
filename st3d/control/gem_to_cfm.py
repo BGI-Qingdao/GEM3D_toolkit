@@ -9,6 +9,7 @@ import pandas as pd
 import scipy.ndimage as nd
 from subprocess import check_call
 from skimage import io as skio
+frim skimage import img_as_ubyte
 import skimage.morphology as sm
 from skimage import filters
 
@@ -159,13 +160,13 @@ def get_heatmap(gem_data):
 
 def get_mask(ssdna_file,prefix,value,expand):
     ssdna = skio.imread(ssdna_file)
-
-    if len(ssdna.shape) == 3:  # RGB tiff to 8 bit gray tiff
-        new_data = np.zeros((ssdna.shape[0], ssdna.shape[1]), dtype=int)
-        new_data = new_data + ssdna[:, :, 0]
-        new_data = new_data + ssdna[:, :, 1]
-        new_data = new_data + ssdna[:, :, 2]
-        ssdna = new_data.astype('uint8')
+    ssdna = img_as_ubyte(ssdna)
+    #if len(ssdna.shape) == 3:  # RGB tiff to 8 bit gray tiff
+    #    new_data = np.zeros((ssdna.shape[0], ssdna.shape[1]), dtype=int)
+    #    new_data = new_data + ssdna[:, :, 0]
+    #    new_data = new_data + ssdna[:, :, 1]
+    #    new_data = new_data + ssdna[:, :, 2]
+    ssdna = new_data.astype('uint8')
 
     # ssdna =sfr.enhance_contrast(ssdna, sm.disk(9))
     # ssdna =sfr.enhance_contrast(ssdna, sm.disk(3))
@@ -315,14 +316,16 @@ def gem_to_cfm_main(argv:[]):
         gem_data['y'] = gem_data['y'].astype(int)
         # load ssdna
         dapi_data = skio.imread(ssdna)
+        dapi_data = img_as_ubyte(dapi_data)
+
         print(f'ssdna file is {ssdna}')
-        if len(dapi_data.shape) == 3 : # RGB tiff to 8 bit gray tiff
-            new_data = np.zeros((dapi_data.shape[0],dapi_data.shape[1]),dtype=int)
-            new_data = new_data + dapi_data[:,:,0]
-            new_data = new_data + dapi_data[:,:,1]
-            new_data = new_data + dapi_data[:,:,2]
-            new_data = (new_data+2) / 3
-            dapi_data = new_data
+        #if len(dapi_data.shape) == 3 : # RGB tiff to 8 bit gray tiff
+        #    new_data = np.zeros((dapi_data.shape[0],dapi_data.shape[1]),dtype=int)
+        #    new_data = new_data + dapi_data[:,:,0]
+        #    new_data = new_data + dapi_data[:,:,1]
+        #    new_data = new_data + dapi_data[:,:,2]
+        #    new_data = (new_data+2) / 3
+        #    dapi_data = new_data
         dapi_data = dapi_data.astype('uint8')
 
         # load cell ids and borders
@@ -434,14 +437,15 @@ def gem_to_cfm_main(argv:[]):
         gem_data['y'] = gem_data['y'].astype(int)
         # load ssdna
         ssdna_data = skio.imread(ssdna)
+        ssdna_data = img_as_ubyte(ssdna_data)
         print(f'ssdna file is {ssdna}')
-        if len(ssdna_data.shape) == 3 : # RGB tiff to 8 bit gray tiff
-            new_data = np.zeros((ssdna_data.shape[0],ssdna_data.shape[1]),dtype=int)
-            new_data = new_data + ssdna_data[:,:,0]
-            new_data = new_data + ssdna_data[:,:,1]
-            new_data = new_data + ssdna_data[:,:,2]
-            new_data = (new_data+2) / 3
-            ssdna_data = new_data
+        #if len(ssdna_data.shape) == 3 : # RGB tiff to 8 bit gray tiff
+        #    new_data = np.zeros((ssdna_data.shape[0],ssdna_data.shape[1]),dtype=int)
+        #    new_data = new_data + ssdna_data[:,:,0]
+        #    new_data = new_data + ssdna_data[:,:,1]
+        #    new_data = new_data + ssdna_data[:,:,2]
+        #    new_data = (new_data+2) / 3
+        #    ssdna_data = new_data
         ssdna_data = ssdna_data.astype('uint8')
 
         # load cell ids and borders

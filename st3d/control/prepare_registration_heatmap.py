@@ -92,7 +92,7 @@ def enhance_bin5(expression):
     return ret
 
 
-def get_mask_rna(gem_file : str , chip:str ,prefix : str, eb5:str) -> np.ndarray :
+def get_mask_rna(gem_file : str , chip:str ,prefix : str, eb5:str,draw_trackline) -> np.ndarray :
     print('loading gem ...',file=sys.stderr)
     print(time.strftime("%Y-%m-%d %H:%M:%S"),file=sys.stderr,flush=True)
     gem = slice_dataframe()
@@ -108,7 +108,8 @@ def get_mask_rna(gem_file : str , chip:str ,prefix : str, eb5:str) -> np.ndarray
     skio.imsave(f'{prefix}.heatmap.trackline.tiff',mask)
     if eb5 == 'yes':
         expression=enhance_bin5(expression)
-    expression[mask==255]=255
+    if draw_trackline == True:
+        expression[mask==255]=255
     expression = exposure.equalize_adapthist(expression)
     expression = expression*255
     expression = expression.astype('uint8')
@@ -125,7 +126,8 @@ def prepareregistrationheatmap_usage():
 Usage : GEM_toolkit.py prepareregistrationheatmap -g <gem file>  \\
                                                   -o <output prefix> \\
                                                   -c [chip715/chip500, default chip715] \\
-                                                  -e [enhance by bin5, default not set]\\
+                                                  -e [enhance by bin5, default not set] \\
+                                                  -n [yes/no  draw trackline, default yes] \\
 """)
 
 def prepareregistrationheatmap_main(argv:[]) :
@@ -133,8 +135,9 @@ def prepareregistrationheatmap_main(argv:[]) :
     prefix = ''
     chip = 'chip715'
     eb5 = 'no'
+    draw_trackline=True
     try:
-        opts, args = getopt.getopt(argv,"hg:c:o:e",["help",
+        opts, args = getopt.getopt(argv,"hg:c:o:n:e",["help",
                                                   "gem=",
                                                   "chip=",
                                                   "output=",
@@ -150,6 +153,9 @@ def prepareregistrationheatmap_main(argv:[]) :
             gem_file = arg
         elif opt in ("-c", "--chip"):
             chip = arg
+        elif opt in ('-n' ):
+            if arg == 'no' :
+                draw_trackline=False
         elif opt in ('-o' , '--output'):
             prefix = arg
         elif opt in ('-e' , '--eb5'):
@@ -173,4 +179,4 @@ def prepareregistrationheatmap_main(argv:[]) :
     #######################################################
     # loading gem and generate mask_rna
     #######################################################
-    get_mask_rna(gem_file,chip,prefix,eb5)
+    get_mask_rna(gem_file,chip,prefix,eb5,draw_trackline)

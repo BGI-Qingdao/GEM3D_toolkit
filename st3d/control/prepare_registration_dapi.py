@@ -5,18 +5,19 @@ import numpy as np
 import scipy.ndimage as nd
 import scipy.signal as sg
 from skimage import io as skio
-
+from skimage import img_as_ubyte
 def get_mask_dapi(dapi_file,min_brightness,width_pixel,height_pixel,chip,prefix,need_filter,mask_mode):
     print('loading ssDNA ...',file=sys.stderr)
     print(time.strftime("%Y-%m-%d %H:%M:%S"),file=sys.stderr,flush=True)
     dapi_data = skio.imread(dapi_file)
-    if len(dapi_data.shape) == 3 : # RGB tiff to 8 bit gray tiff
-        new_data = np.zeros((dapi_data.shape[0],dapi_data.shape[1]),dtype=int)
-        new_data = new_data + dapi_data[:,:,0]
-        new_data = new_data + dapi_data[:,:,1]
-        new_data = new_data + dapi_data[:,:,2]
-        new_data = (new_data+2) / 3
-        dapi_data = new_data
+    dapi_data = img_as_ubyte(dapi_data)
+    #if len(dapi_data.shape) == 3 : # RGB tiff to 8 bit gray tiff
+    #    new_data = np.zeros((dapi_data.shape[0],dapi_data.shape[1]),dtype=int)
+    #    new_data = new_data + dapi_data[:,:,0]
+    #    new_data = new_data + dapi_data[:,:,1]
+    #    new_data = new_data + dapi_data[:,:,2]
+    #    new_data = (new_data+2) / 3
+    #    dapi_data = new_data
     dapi_data = dapi_data.astype('uint8')
     raw_dapi = dapi_data.copy()
 
