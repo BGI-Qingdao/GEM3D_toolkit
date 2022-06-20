@@ -166,7 +166,7 @@ def get_mask(ssdna_file,prefix,value,expand):
     #    new_data = new_data + ssdna[:, :, 0]
     #    new_data = new_data + ssdna[:, :, 1]
     #    new_data = new_data + ssdna[:, :, 2]
-    ssdna = new_data.astype('uint8')
+    ssdna = ssdna.astype('uint8')
 
     # ssdna =sfr.enhance_contrast(ssdna, sm.disk(9))
     # ssdna =sfr.enhance_contrast(ssdna, sm.disk(3))
