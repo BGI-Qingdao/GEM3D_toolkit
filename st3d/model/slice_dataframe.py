@@ -46,7 +46,10 @@ class slice_dataframe:
 
     def init(self, df , slice_index ):
         self.m_dataframe = df
-        self.m_dataframe.columns = ['geneID','x','y','MIDCounts']
+        if len(self.m_dataframe.columns) == 4 :
+            self.m_dataframe.columns = ['geneID','x','y','MIDCounts']
+        elif len(self.m_dataframe.columns) == 5:
+            self.m_dataframe.columns = ['geneID','x','y','MIDCounts','ExonCount']
         self.min_x=np.min(self.m_dataframe.x)
         max_x=np.max(self.m_dataframe.x)
         self.min_y=np.min(self.m_dataframe.y)
