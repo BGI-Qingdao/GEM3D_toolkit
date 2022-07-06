@@ -161,12 +161,22 @@ def get_heatmap(gem_data):
 def get_mask(ssdna_file,prefix,value,expand):
     ssdna = skio.imread(ssdna_file)
     ssdna = img_as_ubyte(ssdna)
-    #if len(ssdna.shape) == 3:  # RGB tiff to 8 bit gray tiff
-    #    new_data = np.zeros((ssdna.shape[0], ssdna.shape[1]), dtype=int)
-    #    new_data = new_data + ssdna[:, :, 0]
-    #    new_data = new_data + ssdna[:, :, 1]
-    #    new_data = new_data + ssdna[:, :, 2]
-    ssdna = ssdna.astype('uint8')
+    if len(ssdna.shape) == 3:  # RGB tiff to 8 bit gray tiff
+        if ssdna.shape[2] == 3:
+            new_data = np.zeros((ssdna.shape[0], ssdna.shape[1]), dtype=int)
+            new_data = new_data + ssdna[:, :, 0]
+            new_data = new_data + ssdna[:, :, 1]
+            new_data = new_data + ssdna[:, :, 2]
+            new_data = new_data/3
+            ssdna = new_data
+            ssdna = ssdna.astype('uint8')
+        elif ssdna.shape[2] == 2:
+            new_data = np.zeros((ssdna.shape[0], ssdna.shape[1]), dtype=int)
+            new_data = new_data + ssdna[:, :, 0]
+            new_data = new_data + ssdna[:, :, 1]
+            new_data = new_data/2
+            ssdna = new_data
+            ssdna = ssdna.astype('uint8')
 
     # ssdna =sfr.enhance_contrast(ssdna, sm.disk(9))
     # ssdna =sfr.enhance_contrast(ssdna, sm.disk(3))
@@ -317,6 +327,22 @@ def gem_to_cfm_main(argv:[]):
         # load ssdna
         dapi_data = skio.imread(ssdna)
         dapi_data = img_as_ubyte(dapi_data)
+        if len(dapi_data.shape) == 3:  # RGB tiff to 8 bit gray tiff
+            if dapi_data.shape[2] == 3:
+                new_data = np.zeros((dapi_data.shape[0], dapi_data.shape[1]), dtype=int)
+                new_data = new_data + dapi_data[:, :, 0]
+                new_data = new_data + dapi_data[:, :, 1]
+                new_data = new_data + dapi_data[:, :, 2]
+                new_data = new_data/3
+                dapi_data = new_data
+                dapi_data = dapi_data.astype('uint8')
+            elif dapi_data.shape[2] == 2:
+                new_data = np.zeros((dapi_data.shape[0], dapi_data.shape[1]), dtype=int)
+                new_data = new_data + dapi_data[:, :, 0]
+                new_data = new_data + dapi_data[:, :, 1]
+                new_data = new_data/2
+                dapi_data = new_data
+                dapi_data = dapi_data.astype('uint8')
 
         print(f'ssdna file is {ssdna}')
         #if len(dapi_data.shape) == 3 : # RGB tiff to 8 bit gray tiff
@@ -438,7 +464,23 @@ def gem_to_cfm_main(argv:[]):
         # load ssdna
         ssdna_data = skio.imread(ssdna)
         ssdna_data = img_as_ubyte(ssdna_data)
-        print(f'ssdna file is {ssdna}')
+        if len(ssdna_data.shape) == 3:  # RGB tiff to 8 bit gray tiff
+            if ssdna_data.shape[2] == 3:
+                new_data = np.zeros((ssdna_data.shape[0], ssdna_data.shape[1]), dtype=int)
+                new_data = new_data + ssdna_data[:, :, 0]
+                new_data = new_data + ssdna_data[:, :, 1]
+                new_data = new_data + ssdna_data[:, :, 2]
+                new_data = new_data/3
+                ssdna_data = new_data
+                ssdna_data = ssdna_data.astype('uint8')
+            elif ssdna_data.shape[2] == 2:
+                new_data = np.zeros((ssdna_data.shape[0], ssdna_data.shape[1]), dtype=int)
+                new_data = new_data + ssdna_data[:, :, 0]
+                new_data = new_data + ssdna_data[:, :, 1]
+                new_data = new_data/2
+                ssdna_data = new_data
+                ssdna_data = ssdna_data.astype('uint8')
+            print(f'ssdna file is {ssdna}')
         #if len(ssdna_data.shape) == 3 : # RGB tiff to 8 bit gray tiff
         #    new_data = np.zeros((ssdna_data.shape[0],ssdna_data.shape[1]),dtype=int)
         #    new_data = new_data + ssdna_data[:,:,0]
