@@ -139,7 +139,10 @@ def gemc_to_cfm_all(gemc,prefix):
     print(f'{prefix} cfm file is saved')
 
 def get_heatmap(gem_data):
-    gem_data.columns = ['geneID', 'x', 'y', 'MIDCounts']
+    if len(gem_data.columns) == 4:
+        gem_data.columns = ['geneID', 'x', 'y', 'MIDCounts']
+    elif len(gem_data.columns) == 5:
+        gem_data.columns = ['geneID', 'x', 'y', 'MIDCounts','EXonCount']
     gem_data_x_min = gem_data['x'].min()
     gem_data_y_min = gem_data['y'].min()
     gem_data_x_max = gem_data['x'].max()
@@ -317,7 +320,10 @@ def gem_to_cfm_main(argv:[]):
         # load gems
         gem_data = pd.read_csv(gem, sep='\t', header=0, compression='infer', comment='#')
         print(f'gem file is {gem}')
-        gem_data.columns = ['geneID','x','y','MIDCounts']
+        if len(gem_data.columns) == 4 :
+            gem_data.columns = ['geneID','x','y','MIDCounts']
+        elif len(gem_data.columns) == 5 :
+            gem_data.columns = ['geneID','x','y','MIDCounts','ExonCount']
         gem_data_x_min = gem_data['x'].min()
         gem_data_y_min = gem_data['y'].min()
         gem_data['x'] = gem_data['x'] - gem_data_x_min
@@ -454,7 +460,10 @@ def gem_to_cfm_main(argv:[]):
         skio.imsave(f'{prefix}.heatmap.tif',heatmap)
 
         print(f'gem file is {gem}')
-        gem_data.columns = ['geneID','x','y','MIDCounts']
+        if len(gem_data.columns) == 4 :
+            gem_data.columns = ['geneID','x','y','MIDCounts']
+        elif len(gem_data.columns) == 5 :
+            gem_data.columns = ['geneID','x','y','MIDCounts','ExonCount']
         gem_data_x_min = gem_data['x'].min()
         gem_data_y_min = gem_data['y'].min()
         gem_data['x'] = gem_data['x'] - gem_data_x_min
