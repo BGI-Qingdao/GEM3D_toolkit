@@ -60,102 +60,31 @@ if __name__ == "__main__":
     if len(sys.argv) == 2 and sys.argv[1] in ( "-h" , "--help" ):
         main_usage()
         exit(0)
-    elif len(sys.argv) < 2 or not sys.argv[1] in ("gem2bfm",
-                                                   "maskbfm",
-                                                   "heatmap",
-                                                   "maskheatmap",
-                                                   "apply_affinematrix",
-                                                   "scatter3d",
-                                                   "segmentbfm",
-                                                   "segmentmodel3d",
-                                                   "handlemasks",
-                                                   "model2mesh",
-                                                   "model2slices",
-                                                   "mask_xy_affine",
-                                                   "chopimages",
-                                                   "chopgems",
+    elif len(sys.argv) < 2 or not sys.argv[1] in ( "second_registration",
                                                    "secondregistration",
                                                    "prepareregistrationheatmap",
+                                                   "prepare_registration_heatmap",
+                                                   "prepare_registration_ssdna",
                                                    "prepareregistrationssdna",
                                                    "prepareregistrationdapi",
-                                                   "model3d",
                                                    "gem_to_cfm",
+                                                   "gem_to_gemc",
                                                    ) :
         main_usage()
         exit(1)
-    elif sys.argv[1] == "gem2bfm" :
-        from st3d.control.gem2bfm import gem2bfm_main
-        gem2bfm_main(sys.argv[2:])
-        exit(0)
-    elif sys.argv[1] == "maskbfm" :
-        from st3d.control.maskbfm import maskbfm_main
-        maskbfm_main(sys.argv[2:])
-        exit(0)
-    elif sys.argv[1] == "maskheatmap" :
-        from st3d.control.maskheatmap import maskheatmap_main
-        maskheatmap_main(sys.argv[2:])
-        exit(0)
-    elif sys.argv[1] == "heatmap" :
-        from st3d.control.gem2heatmap import heatmap_main
-        heatmap_main(sys.argv[2:])
-        exit(0)
-    elif sys.argv[1] == "apply_affinematrix" :
-        from st3d.control.apply_affinematrix import affine_main
-        affine_main(sys.argv[2:])
-        exit(0)
-    elif sys.argv[1] == "scatter3d":
-        from st3d.control.build_scatter3d import scatter3d_main
-        scatter3d_main(sys.argv[2:])
-        exit(0)
-    elif sys.argv[1] == "model3d":
-        from st3d.control.model3d import model3d_main
-        model3d_main(sys.argv[2:])
-        exit(0)
-    elif  sys.argv[1] == "segmentbfm" :
-        from st3d.control.segmentbfm import segmentbfm_main
-        segmentbfm_main(sys.argv[2:])
-        exit(0)
-    elif  sys.argv[1] == "segmentmodel3d" :
-        from st3d.control.segmentmodel3d import segmentmodel3d_main
-        segmentmodel3d_main(sys.argv[2:])
-        exit(0)
-    elif  sys.argv[1] == "handlemasks" :
-        from st3d.control.handlemasks import handlemasks_main
-        handlemasks_main(sys.argv[2:])
-        exit(0)
-    elif  sys.argv[1] == "model2mesh":
-        from st3d.control.model2mesh import model2mesh_main
-        model2mesh_main(sys.argv[2:])
-        exit(0)
-    elif  sys.argv[1] == "mask_xy_affine" :
-        from st3d.control.mask_xy_affine import mask_xy_affine_main
-        mask_xy_affine_main(sys.argv[2:])
-        exit(0)
-    elif  sys.argv[1] == "model2slices" :
-        from st3d.control.model2slices import model2slices_main
-        model2slices_main(sys.argv[2:])
-        exit(0)
-    elif  sys.argv[1] == "chopimages" :
-        from st3d.control.chopimages import chopimages_main
-        chopimages_main(sys.argv[2:])
-        exit(0)
-    elif  sys.argv[1] == "chopgems" :
-        from st3d.control.chopgems import chopgems_main
-        chopgems_main(sys.argv[2:])
-        exit(0)
-    elif sys.argv[1] == "secondregistration":
+    elif sys.argv[1] in ( "secondregistration" , "second_registration"):
         from st3d.control.secondregistration import secondregistration_main
         secondregistration_main(sys.argv[2:])
         exit(0)
-    elif sys.argv[1] == "prepareregistrationheatmap":
+    elif sys.argv[1] in ("prepareregistrationheatmap" or "prepare_registration_heatmap"):
         from st3d.control.prepare_registration_heatmap import prepareregistrationheatmap_main 
         prepareregistrationheatmap_main(sys.argv[2:])
         exit(0)
-    elif sys.argv[1] in ("prepareregistrationssdna" , "prepareregistrationdapi"):
+    elif sys.argv[1] in ("prepareregistrationssdna" , "prepareregistrationdapi","prepare_registration_ssdna"):
         from st3d.control.prepare_registration_dapi import prepareregistrationdapi_main 
         prepareregistrationdapi_main(sys.argv[2:])
         exit(0)
-    elif sys.argv[1] == "gem_to_cfm":
+    elif sys.argv[1] in ("gem_to_cfm", "gem_to_gemc"):
         from st3d.control.gem_to_cfm import gem_to_cfm_main
         gem_to_cfm_main(sys.argv[2:])
         exit(0)

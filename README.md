@@ -70,7 +70,16 @@ Actions:
 
 ## Frequent Q & A
 
-TODO
+### Why some valid actions not exist in usage?
+
+We rename some action name in this new version and keep the old action name valid for barkwark compatible:
+
+```
+prepareregistrationheatmap ==  prepare_registration_heatmap
+prepareregistrationssdna == prepare_registration_ssdna
+secondregistration == second_registration
+gem_to_cfm == gem_to_gemc
+```
 
 ## Cite us
 
