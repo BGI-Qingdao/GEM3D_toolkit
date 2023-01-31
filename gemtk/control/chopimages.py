@@ -9,19 +9,18 @@ def chopimages(roi_json,prefix):
     Image.LOAD_TRUNCATED_IMAGES = True
     Image.MAX_IMAGE_PIXELS = None
     create_a_folder(prefix)
-    for sinfo in roi_json:
-        slice_name = sinfo[0]
-        slice_tif = sinfo[1]
-        img = Image.open(slice_tif)
-        for roi in sinfo[2]:
-            item_name = roi[0]
-            BX=roi[1]
-            BY=roi[2]
-            Width=roi[3]
-            Height=roi[4]
-            cropped = img.crop((BX,BY,BX+Width,BY+Height))
-            cropped.save("{}/{}-{}.tif".format(prefix,item_name,slice_name))
-        print("{} done".format(slice_name),flush=True)
+    sinfo = roi_json
+    slice_tif = sinfo[0]
+    img = Image.open(slice_tif)
+    for roi in sinfo[1]:
+        item_name = roi[0]
+        BX=roi[1]
+        BY=roi[2]
+        Width=roi[3]
+        Height=roi[4]
+        cropped = img.crop((BX,BY,BX+Width,BY+Height))
+        cropped.save("{}/{}.tif".format(prefix,item_name))
+    print("{} done".format(slice_name),flush=True)
 
 ############################################################################
 # section 14 : chopimages
@@ -29,8 +28,18 @@ def chopimages(roi_json,prefix):
 # usage
 def chopimages_usage():
     print("""
-Usage : GEM_toolkit.py chopimages   -i <roi.json>  \\
+Usage : GEM_toolkit.py chop_image   -i <roi.json>  \\
                                     -o <output-folder>
+example of roi.json:
+[
+    "input.tif",
+     [
+         [sample1, 0,0,100,200],
+         [sample2, 300,400,200,300],
+         ...
+         [samplen, x,y,w,h]
+     ]
+]
 """)
 
 def chopimages_main(argv:[]) :

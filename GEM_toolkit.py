@@ -17,13 +17,13 @@ Actions:
 ---------------------------------------------------------------------
 
  Workflow for single slice to generate single-cell resolved data:
-    prepare_registration_heatmap  generate 8bit bin1 heatmap with highlighted tracklines.
-    prepare_registration_ssdna    generate 8bit bin1-scaled ssDNA graph with highlighted tracklines.
+    prepare_registration_heatmap  generate 8bit spot-level heatmap with highlighted tracklines.
+    prepare_registration_ssdna    generate 8bit close-spot-level ssDNA iamge with highlighted tracklines.
     second_registration           second round registration.
     gem_to_gemc                   convert GEM into GEMC based on cellbin result and registration results.
 
  Workflow for multiply slices (3D mode) to generate 3D resolved coordinates:
-    prepare_alignment_image       generate 8bit bin1 binary/annatation image for 3D alignment.
+    prepare_alignment_image       generate 8bit spot-level binary/annatation image for 3D alignment.
     apply_alignment               set 3D coordinate for GEM(C)/h5ad/ssDNA/cell.mask.
 
  Format coverting tools:
@@ -36,8 +36,8 @@ Actions:
     affine_ssdna                  affine the ssdna image by user-defined affine matrix.
 
  Region of interest(ROI) tools: 
-    chopimage                     chop region of interests from whole image.
-    chopgem                       chop region of interests from GEM(C).
+    chop_image                    chop region of interests from whole image.
+    chop_gem                      chop region of interests from GEM(C).
 
  Mask tools:
     mask_gem                      mask GEM(C) by mask image.
@@ -45,11 +45,12 @@ Actions:
     mask_h5ad                     mask h5ad data by mask image.
   
  Visualization tools:
-    heatmap                       draw heatmap of expression counts with/without cellbin and with/without ssDNA.
+    heatmap                       draw heatmap of expression counts in bin1 resolution with/without cellbin and with/without ssDNA.
+    draw_annotation               draw annotation result in bin1 resolution with/without cellbin and with/without ssDNA.
  
  Other tools:
     chop_paste                    chop or paste ssDNA image. This tools is useful for ultra-large ssDNA image.
-    handle_trakEM2_matrix         covert trakEM2_matrix to standart affine matrix.
+    trakEM2_to_affine             covert trakEM2_matrix to standart affine matrix.
 
     -----------------------------------------------------------------
     -h/--help               show this short usage
@@ -69,6 +70,8 @@ if __name__ == "__main__":
                                                    "prepareregistrationdapi",
                                                    "gem_to_cfm",
                                                    "gem_to_gemc",
+                                                   "chop_image",
+                                                   "chop_gem",
                                                    ) :
         main_usage()
         exit(1)
@@ -87,6 +90,14 @@ if __name__ == "__main__":
     elif sys.argv[1] in ("gem_to_cfm", "gem_to_gemc"):
         from gemtk.control.gem_to_cfm import gem_to_cfm_main
         gem_to_cfm_main(sys.argv[2:])
+        exit(0)
+    elif  sys.argv[1] == "chop_image" :
+        from gemtk.control.chopimages import chopimages_main
+        chopimages_main(sys.argv[2:])
+        exit(0)
+    elif  sys.argv[1] == "chop_gem" :
+        from gemtk.control.chopgems import chopgems_main
+        chopgems_main(sys.argv[2:])
         exit(0)
     else:
         main_usage()
