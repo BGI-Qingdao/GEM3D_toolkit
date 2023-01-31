@@ -29,7 +29,5 @@ The Stereo-seq platform: [Chen, et al., Cell, 2022 Spatiotemporal transcriptomic
 
 ImageJ/TrakEM2: [Cardona1, et al., PLOS ONE, 2012 TrakEM2 Software for Neural Circuit Reconstruction](https://doi.org/10.1371/journal.pone.0038011)
 
-CellProfiler: [DR, et al., BMC Bioinformatics, 2021 CellProfiler 4: improvements in speed, utility and usability](https://doi.org/10.1186/s12859-021-04344-9
-
-)
+CellProfiler: [DR, et al., BMC Bioinformatics, 2021 CellProfiler 4: improvements in speed, utility and usability](https://doi.org/10.1186/s12859-021-04344-9)
 
