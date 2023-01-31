@@ -63,24 +63,28 @@ class slice_dataframe:
     def __init__(self): 
         self.m_dataframe=None
         self.m_xyz=None
-        self.slice_index=-1
 
-    def init_from_file(self,gem_file_name:str, slice_index):
+    def init_from_file(self,gem_file_name:str, min_x = None, min_y=None):
         df = pd.read_csv(gem_file_name, sep='\t', header=0, compression='infer', comment='#')
-        self.init(df,slice_index)
+        self.init(df,min_x,min_y)
 
-    def init(self, df , slice_index ):
+    def init(self, df,min_x=None, min_y=None):
         self.m_dataframe = df
         if len(self.m_dataframe.columns) == 4 :
             self.m_dataframe.columns = ['geneID','x','y','MIDCounts']
         elif len(self.m_dataframe.columns) == 5:
             self.m_dataframe.columns = ['geneID','x','y','MIDCounts','ExonCount']
-        self.min_x=np.min(self.m_dataframe.x)
+        if min_x is None:
+            self.min_x = np.min(self.m_dataframe.x)
+        else: 
+            self.min_x = min_x
         max_x=np.max(self.m_dataframe.x)
-        self.min_y=np.min(self.m_dataframe.y)
+        if min_y is None:
+            self.min_y=np.min(self.m_dataframe.y)
+        else: 
+            self.min_y = min_y
         max_y=np.max(self.m_dataframe.y)
         self.m_xyz=slice_xyz(max_x-self.min_x+1,max_y-self.min_y+1, self.min_x,self.min_y)
-        self.slice_index = slice_index
 
     def chop(self, x1 , y1, width,height ,binsize=1) :
         new_df = slice_dataframe()
@@ -93,7 +97,7 @@ class slice_dataframe:
         coords=pd.DataFrame(x_coords,columns=['x'])
         coords['y']=y_coords
         choped_df = self.m_dataframe[ (( coords['x'] >= x1) & ( coords['x']  < x1+width  ) & (coords['y'] >= y1) & (coords['y']< y1 + height ) )]
-        new_df.init(choped_df.copy(),self.slice_index)
+        new_df.init(choped_df.copy())
         return new_df
 
     def printGEM(self,out_f):
@@ -108,18 +112,16 @@ class slice_dataframe:
         xyz = self.m_xyz
         draw_width , draw_height  = xyz.get_bin_wh(binsize)
         coords=np.zeros((draw_height,draw_width))
-
         df = self.m_dataframe
         df['x'] = df['x'] - df['x'].min()
         df['y'] = df['y'] - df['y'].min()
-        df['x'] = (df['x'] / binsize).astype(int)
-        df['y'] = (df['y'] / binsize).astype(int)
+        if binsize > 1 :
+            df['x'] = (df['x'] / binsize).astype(int)
+            df['y'] = (df['y'] / binsize).astype(int)
         df = df.groupby(['x', 'y']).agg(UMI_sum=('MIDCounts', 'sum')).reset_index()
-
         if df['x'].max() +1 != draw_width or df['y'].max() +1 != draw_height :
             print("ERROR : heatmap wh error ")
             exit(1001)
-
         coords[df['y'], df['x']] = df['UMI_sum']
 
         return coords

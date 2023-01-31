@@ -3,7 +3,7 @@ import time
 import json
 import getopt
 from PIL import Image
-from gemtk.control.save_miscdf import create_a_folder
+from gemtk.save_miscdf import create_a_folder
 
 def chopimages(roi_json,prefix):
     Image.LOAD_TRUNCATED_IMAGES = True

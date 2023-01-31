@@ -76,27 +76,27 @@ if __name__ == "__main__":
         main_usage()
         exit(1)
     elif sys.argv[1] in ( "secondregistration" , "second_registration"):
-        from gemtk.control.secondregistration import secondregistration_main
+        from gemtk.secondregistration import secondregistration_main
         secondregistration_main(sys.argv[2:])
         exit(0)
     elif sys.argv[1] in ("prepareregistrationheatmap","prepare_registration_heatmap"):
-        from gemtk.control.prepare_registration_heatmap import prepareregistrationheatmap_main 
+        from gemtk.prepare_registration_heatmap import prepareregistrationheatmap_main 
         prepareregistrationheatmap_main(sys.argv[2:])
         exit(0)
     elif sys.argv[1] in ("prepareregistrationssdna" , "prepareregistrationdapi","prepare_registration_ssdna"):
-        from gemtk.control.prepare_registration_dapi import prepareregistrationdapi_main 
+        from gemtk.prepare_registration_dapi import prepareregistrationdapi_main 
         prepareregistrationdapi_main(sys.argv[2:])
         exit(0)
     elif sys.argv[1] in ("gem_to_cfm", "gem_to_gemc"):
-        from gemtk.control.gem_to_cfm import gem_to_cfm_main
+        from gemtk.gem_to_cfm import gem_to_cfm_main
         gem_to_cfm_main(sys.argv[2:])
         exit(0)
     elif  sys.argv[1] == "chop_image" :
-        from gemtk.control.chopimages import chopimages_main
+        from gemtk.chopimages import chopimages_main
         chopimages_main(sys.argv[2:])
         exit(0)
     elif  sys.argv[1] == "chop_gem" :
-        from gemtk.control.chopgems import chopgems_main
+        from gemtk.chopgems import chopgems_main
         chopgems_main(sys.argv[2:])
         exit(0)
     else:
