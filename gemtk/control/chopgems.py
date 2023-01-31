@@ -1,10 +1,8 @@
 import sys
 import time
 import getopt
-from gemtk.control.load_miscdf import *
 
 from gemtk.model.slice_dataframe import slice_dataframe
-#from gemtk.view.slice2d import *
 from gemtk.control.save_miscdf import *
 
 def chopgems(roi_json,prefix,binsize):
@@ -71,7 +69,7 @@ def chopgems_main(argv:[]):
     print("output prefix is {}".format( prefix))
     print('get roi.json now...')
     print(time.strftime("%Y-%m-%d %H:%M:%S"),flush=True)
-    roi_json=load_json(ijson)
+    roi_json=json.load(open(ijson))
     print('chopgems now...')
     print(time.strftime("%Y-%m-%d %H:%M:%S"),flush=True)
     chopgems(roi_json,prefix,binsize)

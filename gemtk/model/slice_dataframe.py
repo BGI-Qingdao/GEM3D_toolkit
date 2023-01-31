@@ -6,24 +6,50 @@ import time
 import numpy as np
 import pandas as pd
 from sklearn import preprocessing
-from gemtk.model.slice_xyz import slice_xyz
-from gemtk.model.rect_bin import bins_of_slice
 
-class slice_meta_data:
-    def __init__(self, slice_id , slice_min_x , slice_min_y, slice_width, slice_height):
-        self.slice_id    = slice_id
-        self.slice_min_x = slice_min_x
-        self.slice_min_y = slice_min_y
-        self.slice_width = slice_width
-        self.slice_height= slice_height
+"""Model for manipulate the coordinate of spots in one slice
 
-    def assign_bininfo(self, binsize, binwidth, binheight):
-        self.binsize     = binsize
-        self.binwidth    = binwidth
-        self.binheight   = binheight
+One slice_xyz object corresponding to one gem file
+"""
+class slice_xyz:
+    """
+    Brief   :
+    """
 
-        #return self
+    ###########################################################################
+    # Init and configuare functions 
+    ##########################################################################
 
+    def __init__(self, width : int , height : int, min_x: int , min_y : int):
+        """Init the rectangle area of the slice"""
+        self.spot_width = width
+        self.spot_height= height
+        self.spot_min_x = min_x
+        self.spot_min_y = min_y
+
+    ###########################################################################
+    # overall interfaces
+    ##########################################################################
+
+    def get_bin_wh(self, binsize=50) -> (int ,int):
+        draw_width = self.spot_width//binsize
+        draw_height = self.spot_height//binsize
+        if self.spot_width % binsize > 0:
+            draw_width = draw_width + 1
+        if self.spot_height % binsize > 0:
+            draw_height = draw_height + 1
+        return draw_width ,draw_height
+
+    def get_bins(self,binsize=50) ->np.ndarray :
+        draw_width ,draw_height = self.get_bin_wh(binsize)
+        coords=np.zeros((draw_width*draw_height,2))
+        for y in range(draw_height):
+            for x in range(draw_width):
+                index=y*draw_width+x
+                bin_mid_x = x*binsize + self.spot_min_x 
+                bin_mid_y = y*binsize + self.spot_min_y
+                coords[index][0],coords[index][1]= bin_mid_x , bin_mid_y
+        return coords
 
 class slice_dataframe:
     """
@@ -34,11 +60,10 @@ class slice_dataframe:
         most of the time we only want to see one aspect of the slice at one time.
     """
 
-    def __init__(self): #,gem_file_name:str, slice_index ) :
+    def __init__(self): 
         self.m_dataframe=None
         self.m_xyz=None
         self.slice_index=-1
-        #self.m_dataframe=pd.read_csv(gem_file_name, sep='\t', header=0, compression='infer', comment='#')
 
     def init_from_file(self,gem_file_name:str, slice_index):
         df = pd.read_csv(gem_file_name, sep='\t', header=0, compression='infer', comment='#')
@@ -60,9 +85,11 @@ class slice_dataframe:
     def chop(self, x1 , y1, width,height ,binsize=1) :
         new_df = slice_dataframe()
         x_coords = self.m_dataframe['x'] - self.min_x
-        x_coords = x_coords // binsize
+        if binsize>1:
+            x_coords = x_coords // binsize
         y_coords = self.m_dataframe['y'] - self.min_y
-        y_coords = y_coords // binsize
+        if binsize>1:
+            y_coords = y_coords // binsize
         coords=pd.DataFrame(x_coords,columns=['x'])
         coords['y']=y_coords
         choped_df = self.m_dataframe[ (( coords['x'] >= x1) & ( coords['x']  < x1+width  ) & (coords['y'] >= y1) & (coords['y']< y1 + height ) )]
@@ -71,18 +98,6 @@ class slice_dataframe:
 
     def printGEM(self,out_f):
         self.m_dataframe.to_csv(out_f,sep='\t',header=True,index=False)
-
-    #def get_expression_count(self,binsize=50) -> np.ndarray:
-    #    """
-    #    Return : rectangar matrix with UMI counts
-    #    """
-    #    xyz = self.m_xyz
-    #    draw_width , draw_height  = xyz.get_bin_wh(binsize)
-    #    coords=np.zeros((draw_height,draw_width))
-    #    for _,row in self.m_dataframe.iterrows():
-    #        bin_x , bin_y = self.m_xyz.bin_coord_from_spot(row['x'],row['y'],binsize)
-    #        coords[bin_y,bin_x]+= row['MIDCounts']
-    #    return coords
 
     def get_expression_count_vector(self,binsize=50) -> np.ndarray:
         """
@@ -108,67 +123,3 @@ class slice_dataframe:
         coords[df['y'], df['x']] = df['UMI_sum']
 
         return coords
-
-    def get_gene_ids(self) -> []:
-        """
-        Return : dict {gene_name : gene_id, ...}
-        """
-        uniq_gene_names=self.m_dataframe['geneID'].unique().tolist()
-        gene_ids={}
-        for index, name in enumerate(uniq_gene_names):
-            gene_ids[name]=index
-        return gene_ids
-
-    def get_bins_of_slice(self,  binsize=50):
-        """
-        @input  bin_min , binsize 
-        @return meta data of slice , bins of slices
-        """
-        bos = bins_of_slice(self.slice_index,0)
-        bin_w, bin_h = self.m_xyz.get_bin_wh(binsize)
-        bin_xy = self.m_xyz.get_bins(binsize)
-        #print(bin_xy.shape)
-        bos.init_bins(bin_xy)
-        slice_meta = slice_meta_data(self.slice_index,
-                                     self.m_xyz.spot_min_x,
-                                     self.m_xyz.spot_min_y, 
-                                     self.m_xyz.spot_width,
-                                     self.m_xyz.spot_height)
-        slice_meta.assign_bininfo(binsize,bin_w,bin_h)
-        self.slice_info = slice_meta
-        #print(len(bos.bins))
-        return slice_meta , bos
-
-    def get_mtx_1( self , mtx , gen_map , bos ):
-        cache={}
-        for _ , row in self.m_dataframe.iterrows():
-            bin_x , bin_y =self.m_xyz.bin_coord_from_spot(row['x'],row['y'],self.slice_info.binsize)
-            bin_index = bin_x + bin_y*self.slice_info.binwidth
-            bos.set_valid(bin_index)
-            bid = bos.get_bin(bin_index).bin_id + 1
-            count=row['MIDCounts']
-            gid= gen_map[row['geneID']] +1
-            if not bid in cache:
-                cache[bid]={}
-            b_cache = cache[bid]
-            if gid in b_cache:
-                b_cache[gid] += count
-            else:
-                b_cache[gid] = count
-
-        index=0
-        for bid in cache:
-            for gid in cache[bid]:
-                mtx.loc[index]=[gid,bid,cache[bid][gid]]
-                index+=1
-
-    def get_mtx( self, gen_map:{}, bos:bins_of_slice ) :
-        mtx=pd.DataFrame(columns=('gid','bid','count'),index=range(0,len(self.m_dataframe)))
-        print('#line in gem: {}, slice {}'.format(len(mtx),self.slice_index))
-        print(time.strftime("%Y-%m-%d %H:%M:%S"),flush=True)
-        self.get_mtx_1(mtx,gen_map,bos)
-        mtx.dropna(inplace=True)
-        print("hanle a gem : done slice {}".format(self.slice_info))
-        print(time.strftime("%Y-%m-%d %H:%M:%S"),flush=True)
-        return mtx
-

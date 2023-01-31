@@ -1,7 +1,7 @@
 import sys
 import time
+import json
 import getopt
-from gemtk.control.load_miscdf import *
 from PIL import Image
 from gemtk.control.save_miscdf import create_a_folder
 
@@ -67,7 +67,7 @@ def chopimages_main(argv:[]) :
     print("output prefix is {}".format( prefix))
     print('get roi.json now...')
     print(time.strftime("%Y-%m-%d %H:%M:%S"),flush=True)
-    roi_json=load_json(ijson)
+    roi_json=json.load(open(ijson))
     print('chopimages now...')
     print(time.strftime("%Y-%m-%d %H:%M:%S"),flush=True)
     chopimages(roi_json,prefix)
