@@ -1,13 +1,13 @@
 import sys
 import time
 import getopt
-from st3d.control.load_miscdf import *
+from gemtk.control.load_miscdf import *
 
 import pandas as pd
 import numpy as np
 
-from st3d.control.save_miscdf import create_a_folder
-from st3d.view.slice2d import heatmap2D_png
+from gemtk.control.save_miscdf import create_a_folder
+from gemtk.view.slice2d import heatmap2D_png
 
 def handle_one_mask(mask : np.ndarray, prefix :str, slice_index : int) :
     total = np.sum(mask)

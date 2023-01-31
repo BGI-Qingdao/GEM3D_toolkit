@@ -1,9 +1,9 @@
 import sys
 import time
 import getopt
-from st3d.control.load_miscdf import *
+from gemtk.control.load_miscdf import *
 from PIL import Image
-from st3d.control.save_miscdf import create_a_folder
+from gemtk.control.save_miscdf import create_a_folder
 
 def chopimages(roi_json,prefix):
     Image.LOAD_TRUNCATED_IMAGES = True

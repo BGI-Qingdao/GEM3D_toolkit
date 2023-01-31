@@ -3,8 +3,8 @@ import time
 import getopt
 import numpy as np
 import pandas as pd
-from st3d.control.load_miscdf import *
-from st3d.control.save_miscdf import create_a_folder
+from gemtk.control.load_miscdf import *
+from gemtk.control.save_miscdf import create_a_folder
 
 
 def mask_xy_affine(affines,mask_xy_map,prefix):

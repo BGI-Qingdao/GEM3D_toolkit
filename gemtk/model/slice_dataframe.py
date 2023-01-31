@@ -6,8 +6,8 @@ import time
 import numpy as np
 import pandas as pd
 from sklearn import preprocessing
-from st3d.model.slice_xyz import slice_xyz
-from st3d.model.rect_bin import bins_of_slice
+from gemtk.model.slice_xyz import slice_xyz
+from gemtk.model.rect_bin import bins_of_slice
 
 class slice_meta_data:
     def __init__(self, slice_id , slice_min_x , slice_min_y, slice_width, slice_height):

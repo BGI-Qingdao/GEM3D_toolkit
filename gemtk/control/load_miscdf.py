@@ -6,8 +6,8 @@ import numpy as np
 import pandas as pd
 import json
 
-from st3d.model.slice_dataframe import slice_meta_data
-from st3d.model.rect_bin import bins_of_slice
+from gemtk.model.slice_dataframe import slice_meta_data
+from gemtk.model.rect_bin import bins_of_slice
 ###########################################################
 # common
 ###########################################################

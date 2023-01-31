@@ -73,19 +73,19 @@ if __name__ == "__main__":
         main_usage()
         exit(1)
     elif sys.argv[1] in ( "secondregistration" , "second_registration"):
-        from st3d.control.secondregistration import secondregistration_main
+        from gemtk.control.secondregistration import secondregistration_main
         secondregistration_main(sys.argv[2:])
         exit(0)
     elif sys.argv[1] in ("prepareregistrationheatmap" or "prepare_registration_heatmap"):
-        from st3d.control.prepare_registration_heatmap import prepareregistrationheatmap_main 
+        from gemtk.control.prepare_registration_heatmap import prepareregistrationheatmap_main 
         prepareregistrationheatmap_main(sys.argv[2:])
         exit(0)
     elif sys.argv[1] in ("prepareregistrationssdna" , "prepareregistrationdapi","prepare_registration_ssdna"):
-        from st3d.control.prepare_registration_dapi import prepareregistrationdapi_main 
+        from gemtk.control.prepare_registration_dapi import prepareregistrationdapi_main 
         prepareregistrationdapi_main(sys.argv[2:])
         exit(0)
     elif sys.argv[1] in ("gem_to_cfm", "gem_to_gemc"):
-        from st3d.control.gem_to_cfm import gem_to_cfm_main
+        from gemtk.control.gem_to_cfm import gem_to_cfm_main
         gem_to_cfm_main(sys.argv[2:])
         exit(0)
     else:

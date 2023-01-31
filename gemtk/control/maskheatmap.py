@@ -6,11 +6,11 @@ from multiprocessing import Pool
 
 import numpy as np
 
-from st3d.control.save_miscdf import *
-from st3d.control.load_miscdf import *
-from st3d.model.slice_dataframe import slice_dataframe
-from st3d.model.slice_xyz import slice_xyz
-from st3d.view.slice2d import *
+from gemtk.control.save_miscdf import *
+from gemtk.control.load_miscdf import *
+from gemtk.model.slice_dataframe import slice_dataframe
+from gemtk.model.slice_xyz import slice_xyz
+from gemtk.view.slice2d import *
 
 def gen_one_masked_heatmap(args : []):
     mask_file = args[0]

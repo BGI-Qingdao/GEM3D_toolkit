@@ -3,9 +3,9 @@ import time
 import getopt
 import pandas as pd
 
-from st3d.control.load_miscdf import *
-from st3d.control.save_miscdf import print_model3d,init_model3d,create_a_folder
-from st3d.view.model3d import html_model3d
+from gemtk.control.load_miscdf import *
+from gemtk.control.save_miscdf import print_model3d,init_model3d,create_a_folder
+from gemtk.view.model3d import html_model3d
 
 def segmentmodel3d(  segmentations : pd.DataFrame, input_folder : str ,  prefix : str, downsize=4 ):
     model3d = pd.read_csv( '{}/model3d.csv'.format(input_folder), sep=',' )

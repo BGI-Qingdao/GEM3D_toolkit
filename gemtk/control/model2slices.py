@@ -4,10 +4,10 @@ import getopt
 
 import numpy as np
 import pandas as pd
-from st3d.control.save_miscdf import create_a_folder
-from st3d.control.load_miscdf import *
-from st3d.view.slice2d import *
-from st3d.model.volumn2D import *
+from gemtk.control.save_miscdf import create_a_folder
+from gemtk.control.load_miscdf import *
+from gemtk.view.slice2d import *
+from gemtk.model.volumn2D import *
 import nibabel as nib
 
 def model2slices(xyz,prefix,downsize,max_x,min_x,max_y,min_y):

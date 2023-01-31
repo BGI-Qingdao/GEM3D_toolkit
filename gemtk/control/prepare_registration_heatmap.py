@@ -5,7 +5,7 @@ import numpy as np
 import scipy.ndimage as nd
 from skimage import io as skio
 from skimage import exposure
-from st3d.model.slice_dataframe import slice_dataframe
+from gemtk.model.slice_dataframe import slice_dataframe
 
 ###############################################################################
 # basic chip settings

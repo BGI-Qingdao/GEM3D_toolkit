@@ -5,9 +5,9 @@ import getopt
 import pandas as pd
 import numpy as np
 
-from st3d.view.model3d import *
-from st3d.control.load_miscdf import *
-from st3d.control.save_miscdf import create_a_folder
+from gemtk.view.model3d import *
+from gemtk.control.load_miscdf import *
+from gemtk.control.save_miscdf import create_a_folder
 from vedo import *
 
 def waterflow_from( y_index , x_index , markers, xmax , ymax):

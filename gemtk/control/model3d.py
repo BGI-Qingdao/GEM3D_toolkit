@@ -1,15 +1,15 @@
 import sys
 import time
 import getopt
-from st3d.control.load_miscdf import *
+from gemtk.control.load_miscdf import *
 
 import numpy as np
 import pandas as pd
-from st3d.control.save_miscdf import print_model3d,init_model3d
-from st3d.model.volumn2D import xyv_to_volumn2D
-from st3d.view.model3d import html_model3d
-from st3d.model.slice_xyz import slice_xyz
-from st3d.view.slice2d import *
+from gemtk.control.save_miscdf import print_model3d,init_model3d
+from gemtk.model.volumn2D import xyv_to_volumn2D
+from gemtk.view.model3d import html_model3d
+from gemtk.model.slice_xyz import slice_xyz
+from gemtk.view.slice2d import *
 
 def build_model3d(cluster_df : pd.DataFrame, boss:{},sinfos:{},prefix, downsize:int):
     init_model3d(prefix)

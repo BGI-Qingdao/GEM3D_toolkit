@@ -5,8 +5,8 @@ import numpy as np
 import pandas as pd
 from subprocess import check_call
 
-from st3d.model.rect_bin import bins_of_slice, bins_of_slices
-from st3d.model.slice_dataframe import slice_dataframe
+from gemtk.model.rect_bin import bins_of_slice, bins_of_slices
+from gemtk.model.slice_dataframe import slice_dataframe
 
 ###########################################################
 # section1 : common functions

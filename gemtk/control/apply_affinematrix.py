@@ -3,11 +3,11 @@ import time
 import getopt
 from multiprocessing import Pool
 
-from st3d.control.load_miscdf import *
-from st3d.control.save_miscdf import *
+from gemtk.control.load_miscdf import *
+from gemtk.control.save_miscdf import *
 
-from st3d.model.slice_xyz import slice_xyz
-from st3d.view.slice2d import print_affined_scatter_2d
+from gemtk.model.slice_xyz import slice_xyz
+from gemtk.view.slice2d import print_affined_scatter_2d
 
 def affine_one( data : [] ):
     bos_dataframe = data[0]

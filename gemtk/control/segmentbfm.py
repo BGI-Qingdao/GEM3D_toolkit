@@ -7,8 +7,8 @@ from multiprocessing import Pool
 import numpy as np
 import pandas as pd
 
-from  st3d.control.save_miscdf import *
-from  st3d.control.load_miscdf import *
+from  gemtk.control.save_miscdf import *
+from  gemtk.control.load_miscdf import *
 
 def segment_one_bfm(argv :[]):
     segmentations = argv[0]
