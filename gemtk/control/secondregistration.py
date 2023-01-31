@@ -371,18 +371,19 @@ def correct_all(heatmap_file,dapi_file,width_scale,height_scale,affine,prefix,ta
 # usage
 def secondregistration_usage():
     print("""
-Usage : GEM_toolkit.py secondregistration  -H <heatmap.trackline.tiff>  \\
-                                           -d <ssDNA.trackline.tiff> \\
-                                           -o <output prefix> \\
-                                           -f [Fujiyama output matrix, default None] \\
-                                           -t [TrackEM output matrix, default None]\\
-                                           -a [3*3 backward affine matrix, default none] \\
-                                           -c [chip715/chip500, default chip715] \\
-                                           -w [um per pixel in width,  default 0.4803250]\\
-                                           -h [um per pixel in height, default 0.4802272]\\
-                                           -l [S/M/L search area. default S] \\
-                                           -s [thread number, default 8] \\
-                                           -r [roi json file, default none ] \\
+Usage : GEM_toolkit.py second_registration \\
+                 -H <heatmap.trackline.tiff>  \\
+                 -d <ssDNA.trackline.tiff> \\
+                 -o <output prefix> \\
+                 -f [Fujiyama output matrix, default None] \\
+                 -t [TrackEM output matrix, default None]\\
+                 -a [3*3 backward affine matrix, default none] \\
+                 -c [chip715/chip500, default chip715] \\
+                 -w [um per pixel in width,  default 0.4803250]\\
+                 -h [um per pixel in height, default 0.4802272]\\
+                 -l [S/M/L search area. default S] \\
+                 -s [thread number, default 8] \\
+                 -r [roi json file, default none ] \\
 
 Notice :
      please only use one of ( -f , -a , -t ) .

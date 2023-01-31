@@ -15,19 +15,20 @@ from skimage import filters
 
 def gem_to_cfm_usage():
     print("""
-Usage : GEM_toolkit.py gem_to_cfm               -s <ssdna tiff file> \\
-                                                -g <gem file>  \\
-                                                -b <cell segment outline file> \\
-                                                -m <cell segment mask file>\\
-                                                -M <mask file>
-                                                -r <roi with affine file>\\
-                                                -a <matrix file output from handle_trackEM_matrix>\\
-                                                -e <expanding the radius of one pixel, default 9>\\
-                                                -v <use value to increase or decrease the threshold, apply threhold = auto threshold + value, default 0>\\
-                                                -h [show this usage]\\
-                                                -Z <output the fold gem>
-                                                -N <customize the after_cut.gem file name, default TissueCut>
-                                                -o <output prefix>
+Usage : GEM_toolkit.py gem_to_gemc \\
+             -s <ssdna tiff file> \\
+             -g <gem file>  \\
+             -b <cell segment outline file> \\
+             -m <cell segment mask file>\\
+             -M <mask file>
+             -r <roi with affine file>\\
+             -a <matrix file output from handle_trackEM_matrix>\\
+             -e <expanding the radius of one pixel, default 9>\\
+             -v <use value to increase or decrease the threshold, apply threhold = auto threshold + value, default 0>\\
+             -h [show this usage]\\
+             -Z <output the fold gem>
+             -N <customize the after_cut.gem file name, default TissueCut>
+             -o <output prefix>
 Notice:
 total 5 model
     1. -s ssdna.tif -g gem.gem -b border.txt -m mask.txt -r roi_affine.json -o output  

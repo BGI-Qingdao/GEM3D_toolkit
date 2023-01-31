@@ -76,7 +76,7 @@ if __name__ == "__main__":
         from gemtk.control.secondregistration import secondregistration_main
         secondregistration_main(sys.argv[2:])
         exit(0)
-    elif sys.argv[1] in ("prepareregistrationheatmap" or "prepare_registration_heatmap"):
+    elif sys.argv[1] in ("prepareregistrationheatmap","prepare_registration_heatmap"):
         from gemtk.control.prepare_registration_heatmap import prepareregistrationheatmap_main 
         prepareregistrationheatmap_main(sys.argv[2:])
         exit(0)
