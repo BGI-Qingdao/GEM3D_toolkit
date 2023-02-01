@@ -61,11 +61,11 @@ class slice_dataframe:
     """
 
     def __init__(self): 
-        self.m_dataframe=None
-        self.m_xyz=None
-        self.cellbin=False
-        self.excon=False
-        self.spatial3d=False
+        self.m_dataframe = None
+        self.m_xyz = None
+        self.cellbin = False
+        self.excon = False
+        self.spatial3d = False
 
     def init_from_file(self,gem_file_name:str, min_x = None, min_y=None):
         df = pd.read_csv(gem_file_name, sep='\t', header=0, compression='infer', comment='#')
@@ -169,10 +169,34 @@ class slice_dataframe:
 
     def get_cellbins(self):
         """
-        Return : [genes...], dict {gene_name : gene_id, ...}
+        Return : [cells...], dict {cell: cell_id, ...}
         """
         uniq_cells = self.m_dataframe['cell'].unique()
         cell_ids = {}
         for index, name in enumerate(uniq_cells):
             cell_ids[name] = index
         return uniq_cells, cell_ids
+
+    def getxy_cellbins(self):
+        return self.m_dataframe.groupby('cell')[['x','y']].mean()
+           
+    def get3dxyz_cellbins(self):
+        return self.m_dataframe.groupby('cell')[['spatial3d_x','spatial3d_y','spatial3d_z']].mean()
+
+    def get_bins(self,binsize=50):
+        """
+        Return : [genes...], dict {gene_name : gene_id, ...}
+        """
+        self.m_dataframe['bin_x'] = self.m_dataframe['x'] // binsize
+        self.m_dataframe['bin_y'] = self.m_dataframe['y'] // binsize
+        self.m_dataframe['bin_name'] = self.m_dataframe.apply(lambda row: f'{row["bin_x"]}_{row["bin_y"]}',axis=1)
+        uniq_cells = self.m_dataframe['bin_name'].unique()
+        cell_ids = {}
+        for index, name in enumerate(uniq_cells):
+            cell_ids[name] = index
+        return uniq_cells, cell_ids
+
+    def getxy_bins(self):
+        return self.m_dataframe.groupby('bin_name')[['x','y']].mean()
+    def get3dxyz_bins(self):
+        return self.m_dataframe.groupby('bin_name')[['spatial3d_x','spatial3d_y','spatial3d_z']].mean()

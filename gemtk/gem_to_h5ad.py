@@ -9,31 +9,35 @@ import numpy as np
 from anndata import AnnData
 #############################################################################
 # usage
-def gemc_to_h5ad_usage():
+def gem_to_h5ad_usage():
     print("""
-Usage : GEM_toolkit.py gemc_to_h5ad  -i <xxx.gemc>  \\
-                                     -o <prefix> \\
+Usage : GEM_toolkit.py gem_to_h5ad  -i <xxx.gemc>  \\
+                                    -o <prefix> \\
+                                    -b <binsize> 
 """)
 
-def gemc_to_h5ad_main(argv:[]):
-    prefix=''
-    ingemc=''
+def gem_to_h5ad_main(argv:[]):
+    prefix = ''
+    ingemc = ''
+    binsize = 0
     try:
-        opts, args = getopt.getopt(argv,"hi:o:",["help","input=","output="])
+        opts, args = getopt.getopt(argv,"hi:o:b:",["help","input=","output=","binsize="])
     except getopt.GetoptError:
-        gemc_to_h5ad_usage()
+        gem_to_h5ad_usage()
         sys.exit(2)
     for opt, arg in opts:
         if opt in ('-h' ,'--help'):
-            gemc_to_h5ad_usage()
+            gem_to_h5ad_usage()
             sys.exit(0)
         elif opt in ("-o", "--output"):
             prefix = arg
         elif opt in ("-i", "--input"):
             ingemc = arg
+        elif opt in ("-b", "--binsize"):
+            binsize = int(arg)
 
-    if ingemc == "" or prefix== "" :
-        gemc_to_h5ad_usage()
+    if ingemc == "" or prefix== "" or binsize <1 :
+        gem_to_h5ad_usage()
         sys.exit(3)
 
     print("input gemc is {}".format(ingemc))
@@ -42,18 +46,16 @@ def gemc_to_h5ad_main(argv:[]):
     print('loading gemc now...')
     sdf = slice_dataframe()
     sdf.init_from_file(ingemc)
-    if not sdf.cellbin:
-        print('ERROR: input GEMC file fail to detect cellbin result. exit...',flush=True)
-        sys.exit(1)
     print('prepare dataframe now...')
     print(time.strftime("%Y-%m-%d %H:%M:%S"),flush=True)
-    cells, cellmap = sdf.get_cellbins()
-    cellxy = sdf.getxy_cellbins()
+    genes, genemap = sdf.get_gene_ids()
+    cells, cellmap = sdf.get_bins(binsize = binsize)
+    cellxy = sdf.getxy_bins()
     if sdf.spatial3d:
-        cell3dxyz = sdf.get3dxyz_cellbins()
+        cell3dxyz = sdf.get3dxyz_bins()
     obs = pd.DataFrame()
     obs['cellid'] = cells
-    obs['cellname'] = obs.apply(lambda row: f'cell{row["cellid"]}',axis=1)
+    obs['binname'] = obs.apply(lambda row: f'cell{row["cellid"]}',axis=1)
     obs = obs.set_index('cellid')
     obs['x'] = cellxy['x']
     obs['y'] = cellxy['y']
@@ -61,8 +63,7 @@ def gemc_to_h5ad_main(argv:[]):
         obs['spatial3d_x'] = cell3dxyz['spatial3d_x']
         obs['spatial3d_y'] = cell3dxyz['spatial3d_y']
         obs['spatial3d_z'] = cell3dxyz['spatial3d_z']
-    obs = obs.set_index('cellname')
-    genes, genemap = sdf.get_gene_ids()
+    obs = obs.set_index('binname')
     var = pd.DataFrame()
     var['genename'] = genes
     var = var.set_index('genename')
@@ -70,10 +71,10 @@ def gemc_to_h5ad_main(argv:[]):
     ncell = len(cells)
     densityarray = np.zeros((ncell, ngene),dtype = int)
     for row in sdf.m_dataframe.itertuples():
-        densityarray[cellmap[row.cell],genemap[row.geneID]] = densityarray[cellmap[row.cell],genemap[row.geneID]]+row.MIDCounts
+        densityarray[cellmap[row.bin_name],genemap[row.geneID]] = densityarray[cellmap[row.bin_name],genemap[row.geneID]]+row.MIDCounts
     yidx,xidx = np.nonzero(densityarray)
     sparseMatrix = csr_matrix((densityarray[yidx,xidx],(yidx,xidx)), shape=(ncell,ngene))
-    data = AnnData(X=sparseMatrix,dtype=sparseMatrix.dtype,obs=obs,var=var)
+    data = AnnData(X=sparseMatrix, dtype=sparseMatrix.dtype, obs=obs, var=var)
     data.obsm['spatial'] = obs[['x','y']].to_numpy()
     if sdf.spatial3d:
         data.obsm['spatial3d'] = obs[['spatial3d_x','spatial3d_y','spatial3d_z']].to_numpy()
