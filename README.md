@@ -83,7 +83,9 @@ gem_to_cfm == gem_to_gemc
 
 ## Cite us
 
-Please cite our GitHub url: http://github.com/BGI-Qingdao/GEM3D_toolkit.
+Please cite our GitHub url: http://github.com/BGI-Qingdao/GEM3D_toolkit directly.
+
+The registration scripts have no update between dev branch and the old main branch, however, if you really need specify the software version, please cite the zendo doi [![DOI](https://zenodo.org/badge/373742809.svg)](https://zenodo.org/badge/latestdoi/373742809) that we special released for the previous stable codes.
 
 ## References
 
