@@ -2,7 +2,7 @@
 
 NOTICE: this dev branch is still under developing, you can find previous codes in the main branch.
 
-Specially designed for Stereo-seq platform, GEM_toolkit is a collection of scrips that cooperates with ImageJ/TrakEM2 and CellProfiler to semi-automatic generate single-cell and 3D spatial resolved transtriptomics data from gene expression matrix (GEM).
+Specially designed for Stereo-seq platform, GEM_toolkit is a collection of scrips that cooperates with ImageJ/TrakEM2 and CellProfiler to semi-automatic generate single-cell and 3D spatial resolved transtriptomics data from gene expression matrix (GEM) and ssDNA image.
 
 GEM_toolkit also provide severial handly tools for file convert, image or data subset/mask/ROI/affine coordinate/visualize. Enjoy with GEM_toolkit.
 
