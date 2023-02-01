@@ -1,4 +1,4 @@
-## misc R scripts for format convertion
+## R scripts for format convertion
 
 ### STOmics_seurat.only_gem2rds.R 
 
