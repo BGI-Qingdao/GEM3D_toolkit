@@ -63,6 +63,9 @@ class slice_dataframe:
     def __init__(self): 
         self.m_dataframe=None
         self.m_xyz=None
+        self.cellbin=False
+        self.excon=False
+        self.spatial3d=False
 
     def init_from_file(self,gem_file_name:str, min_x = None, min_y=None):
         df = pd.read_csv(gem_file_name, sep='\t', header=0, compression='infer', comment='#')
@@ -73,7 +76,36 @@ class slice_dataframe:
         if len(self.m_dataframe.columns) == 4 :
             self.m_dataframe.columns = ['geneID','x','y','MIDCounts']
         elif len(self.m_dataframe.columns) == 5:
-            self.m_dataframe.columns = ['geneID','x','y','MIDCounts','ExonCount']
+            if self.m_dataframe.columns[4] == 'cell':
+                self.m_dataframe.columns = ['geneID','x','y','MIDCounts','cell']
+                self.cellbin=True
+            else:
+                self.m_dataframe.columns = ['geneID','x','y','MIDCounts','ExonCount']
+                self.excon=True
+        elif len(self.m_dataframe.columns) == 6:
+            self.m_dataframe.columns = ['geneID','x','y','MIDCounts','ExonCount','cell']
+            self.cellbin=True
+            self.excon=True
+        elif len(self.m_dataframe.columns) == 7:
+            self.m_dataframe.columns = ['geneID','x','y','MIDCounts','spatial3d_x','spatial3d_y','spatial3d_z']
+            self.spatial3d=True
+        elif len(self.m_dataframe.columns) == 8:
+            if self.m_dataframe.columns[4] == 'cell':
+                self.m_dataframe.columns = ['geneID','x','y','MIDCounts','cell','spatial3d_x','spatial3d_y','spatial3d_z']
+                self.cellbin=True
+                self.spatial3d=True
+            else:
+                self.m_dataframe.columns = ['geneID','x','y','MIDCounts','ExonCount','spatial3d_x','spatial3d_y','spatial3d_z']
+                self.excon=True
+                self.spatial3d=True
+        elif len(self.m_dataframe.columns) == 9:
+            self.m_dataframe.columns = ['geneID','x','y','MIDCounts','ExonCount','cell','spatial3d_x','spatial3d_y','spatial3d_z']
+            self.cellbin=True
+            self.excon=True
+            self.spatial3d=True
+        else:
+            print('Unknow GEM(C) header, please contact guolidong@genomics.cn',flush=True)
+            sys.exit(1)
         if min_x is None:
             self.min_x = np.min(self.m_dataframe.x)
         else: 
