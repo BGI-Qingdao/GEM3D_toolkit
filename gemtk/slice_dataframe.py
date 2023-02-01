@@ -155,5 +155,24 @@ class slice_dataframe:
             print("ERROR : heatmap wh error ")
             exit(1001)
         coords[df['y'], df['x']] = df['UMI_sum']
-
         return coords
+
+    def get_gene_ids(self):
+        """
+        Return : [genes...], dict {gene_name : gene_id, ...}
+        """
+        uniq_gene_names = self.m_dataframe['geneID'].unique()
+        gene_ids = {}
+        for index, name in enumerate(uniq_gene_names):
+            gene_ids[name] = index
+        return uniq_gene_names, gene_ids
+
+    def get_cellbins(self):
+        """
+        Return : [genes...], dict {gene_name : gene_id, ...}
+        """
+        uniq_cells = self.m_dataframe['cell'].unique()
+        cell_ids = {}
+        for index, name in enumerate(uniq_cells):
+            cell_ids[name] = index
+        return uniq_cells, cell_ids

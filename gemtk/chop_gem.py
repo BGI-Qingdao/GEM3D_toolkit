@@ -10,7 +10,7 @@ def chopgems(roi_json,prefix,binsize):
     sinfo = roi_json
     slice_gem  = sinfo[0]
     sdf = slice_dataframe()
-    sdf.init_from_file(slice_gem,slice_id)
+    sdf.init_from_file(slice_gem)
     for roi in sinfo[1]:
         item_name = roi[0]
         BX=roi[1]

@@ -70,6 +70,7 @@ if __name__ == "__main__":
                                                    "prepareregistrationdapi",
                                                    "gem_to_cfm",
                                                    "gem_to_gemc",
+                                                   "gemc_to_h5ad",
                                                    "chop_image",
                                                    "chop_gem",
                                                    ) :
@@ -98,6 +99,10 @@ if __name__ == "__main__":
     elif  sys.argv[1] == "chop_gem" :
         from gemtk.chop_gem import chopgems_main
         chopgems_main(sys.argv[2:])
+        exit(0)
+    elif  sys.argv[1] == "gemc_to_h5ad" :
+        from gemtk.gemc_to_h5ad import gemc_to_h5ad_main 
+        gemc_to_h5ad_main(sys.argv[2:])
         exit(0)
     else:
         main_usage()

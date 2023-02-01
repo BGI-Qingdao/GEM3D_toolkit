@@ -96,7 +96,7 @@ def get_mask_rna(gem_file : str , chip:str ,prefix : str, eb5:str,draw_trackline
     print('loading gem ...',file=sys.stderr)
     print(time.strftime("%Y-%m-%d %H:%M:%S"),file=sys.stderr,flush=True)
     gem = slice_dataframe()
-    gem.init_from_file(gem_file,1)
+    gem.init_from_file(gem_file)
     expression = gem.get_expression_count_vector(binsize=1)
     # this may drop some high expression but it's ok for bin1
     # not ok for bin5 !

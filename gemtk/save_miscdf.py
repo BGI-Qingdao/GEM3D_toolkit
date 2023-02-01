@@ -5,8 +5,6 @@ import pandas as pd
 from json import JSONEncoder
 from subprocess import check_call
 
-from gemtk.slice_dataframe import slice_dataframe
-
 ###########################################################
 # section1 : common functions
 ###########################################################
