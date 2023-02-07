@@ -114,6 +114,14 @@ if __name__ == "__main__":
         from gemtk.gemc_to_h5ad import gemc_to_h5ad_main 
         gemc_to_h5ad_main(sys.argv[2:])
         exit(0)
+    elif sys.argv[1] == "affine_ssdna" :
+        from gemtk.affine_ssdna import affine_ssdna_main
+        affine_ssdna_main(sys.argv[2:])
+        exit(0)
+    elif sys.argv[1] == "affine_gem" :
+        from gemtk.affine_gem import affine_gem_main
+        affine_gem_main(sys.argv[2:])
+        exit(0)
     else:
         main_usage()
         exit(1)
