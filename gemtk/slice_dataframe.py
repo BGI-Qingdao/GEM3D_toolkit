@@ -145,8 +145,8 @@ class slice_dataframe:
         draw_width , draw_height  = xyz.get_bin_wh(binsize)
         coords=np.zeros((draw_height,draw_width))
         df = self.m_dataframe
-        df['x'] = df['x'] - df['x'].min()
-        df['y'] = df['y'] - df['y'].min()
+        df['x'] = df['x'] - self.min_x
+        df['y'] = df['y'] - self.min_y
         if binsize > 1 :
             df['x'] = (df['x'] / binsize).astype(int)
             df['y'] = (df['y'] / binsize).astype(int)

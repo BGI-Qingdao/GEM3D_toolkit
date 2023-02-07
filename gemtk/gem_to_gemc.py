@@ -55,47 +55,6 @@ def get_ids(data_map, data):
     return ids
 
 
-def gemc_to_cfm_roi(gemc,prefix,item_names):
-
-    gems = gemc
-    #pd.read_csv(f'{prefix}.gemc', sep='\t',header=0, compression='infer', comment='#')
-    gems.columns = ['geneID', 'x', 'y', 'MIDCounts', 'cell']
-
-    agg_gems = gems.groupby(by=['cell', 'geneID']).agg(np.sum).reset_index()  # ??
-    cells = np.unique(agg_gems['cell'])
-    genes = np.unique(agg_gems['geneID'])
-
-    os.mkdir(f'{prefix}/{item_names}_cfm')
-    np.savetxt(f'{prefix}/{item_names}_cfm/barcodes.tsv', cells.T, fmt="%s")
-    check_call(f'gzip {prefix}/{item_names}_cfm/barcodes.tsv', shell=True)
-    np.savetxt(f'{prefix}/{item_names}_cfm/features.tsv', genes.T, fmt="%s")
-    check_call(f'gzip {prefix}/{item_names}_cfm/features.tsv', shell=True)
-
-    cell_map = {}
-    gene_map = {}
-    for index, gene in enumerate(genes):
-        gene_map[gene] = index + 1
-    for index, cell in enumerate(cells):
-        cell_map[cell] = index + 1
-
-
-    #
-    mtx = pd.DataFrame(columns=('cid', 'gid', 'count'), index=range(len(agg_gems)))
-    mtx['cid'] = get_ids(cell_map, agg_gems['cell'])
-    mtx['gid'] = get_ids(gene_map, agg_gems['geneID'])
-    mtx['count'] = agg_gems['MIDCounts']
-
-    sourceFile = open(f'{prefix}/{item_names}_cfm/mtx.csv', 'w')
-    sourceFile.writelines(
-        """%%MatrixMarket matrix coordinate integer general                                   
-        %metadata_json: {"software_version": "Cell Ranger 4", "format_version": 2}           
-        """)
-    sourceFile.writelines("{} {} {}\n".format(len(gene_map), len(cell_map), len(mtx)))
-    for _, row in mtx.iterrows():
-        sourceFile.writelines("{} {} {}\n".format(row['gid'], row['cid'], row['count']))
-    sourceFile.close()
-    check_call(f'gzip {prefix}/{item_names}_cfm/mtx.csv', shell=True)
-    print(f'{prefix}/{item_names} cfm file is saved')
 
 def gemc_to_cfm_all(gemc,prefix):
 
@@ -426,11 +385,7 @@ def gem_to_cfm_main(argv:[]):
             deleted_gems_tosave = choped_gem_tosave[choped_gem_tosave['cell']==0]
             cell_cems_tosave.to_csv(f'{prefix}/{item_name}.gemc_saved',sep='\t',header=True,index=False)
             deleted_gems_tosave.to_csv(f'{prefix}/{item_name}.gemc_deleted',sep='\t',header=True,index=False)
-
-
             print(f'{item_name} gemc file is saved')
-
-            gemc_to_cfm_roi(cell_cems_tosave,prefix,item_name)
 
             heatmap_image = choped_gem.copy()
             coords_image = np.zeros((hh,wh),dtype=int)
@@ -438,8 +393,6 @@ def gem_to_cfm_main(argv:[]):
             coords_image[heatmap_image['y'], heatmap_image['x']] = heatmap_image['UMI_sum']
             coords_image = coords_image.astype('uint8')
             skio.imsave(f'{prefix}/{item_name}.heatmap.tif',coords_image)
-
-
 
             cell_cems = choped_gem[choped_gem['cell'] != 0]
             cell_cems = cell_cems.copy()

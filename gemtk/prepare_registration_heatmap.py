@@ -92,11 +92,11 @@ def enhance_bin5(expression):
     return ret
 
 
-def get_mask_rna(gem_file : str , chip:str ,prefix : str, eb5:str,draw_trackline) -> np.ndarray :
+def get_mask_rna(gem_file : str , chip:str ,prefix : str, eb5:str,draw_trackline,xmin,ymin) -> np.ndarray :
     print('loading gem ...',file=sys.stderr)
     print(time.strftime("%Y-%m-%d %H:%M:%S"),file=sys.stderr,flush=True)
     gem = slice_dataframe()
-    gem.init_from_file(gem_file)
+    gem.init_from_file(gem_file,xmin,ymin)
     expression = gem.get_expression_count_vector(binsize=1)
     # this may drop some high expression but it's ok for bin1
     # not ok for bin5 !
@@ -128,7 +128,9 @@ Usage : GEM_toolkit.py prepare_registration_heatmap \\
              -o <output prefix> \\
              -c [chip715/chip500, default chip715] \\
              -e [enhance by bin5, default not set] \\
-             -n [yes/no  draw trackline, default yes] \\
+             -n [yes/no draw trackline, default yes] \\
+             -x [xmin, default None and caculate real xmin]
+             -y [ymin, default None and caculate real ymin]
 """)
 
 def prepareregistrationheatmap_main(argv:[]) :
@@ -137,8 +139,10 @@ def prepareregistrationheatmap_main(argv:[]) :
     chip = 'chip715'
     eb5 = 'no'
     draw_trackline=True
+    xmin=None
+    ymin=None
     try:
-        opts, args = getopt.getopt(argv,"hg:c:o:n:e",["help",
+        opts, args = getopt.getopt(argv,"hg:c:o:n:x:y:e",["help",
                                                   "gem=",
                                                   "chip=",
                                                   "output=",
@@ -154,6 +158,10 @@ def prepareregistrationheatmap_main(argv:[]) :
             gem_file = arg
         elif opt in ("-c", "--chip"):
             chip = arg
+        elif opt == "-x":
+            xmin = int(arg)
+        elif opt == "-y":
+            ymin = int(arg)
         elif opt in ('-n' ):
             if arg == 'no' :
                 draw_trackline=False
@@ -180,4 +188,4 @@ def prepareregistrationheatmap_main(argv:[]) :
     #######################################################
     # loading gem and generate mask_rna
     #######################################################
-    get_mask_rna(gem_file,chip,prefix,eb5,draw_trackline)
+    get_mask_rna(gem_file,chip,prefix,eb5,draw_trackline,xmin,ymin)
