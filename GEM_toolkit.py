@@ -34,6 +34,7 @@ Actions:
     affine_gem                    modify the 2D coordinate in GEM(C) by user-defined affine matrix.
     affine_h5ad                   modify the 2D coordinate in GEM(C) by user-defined affine matrix.
     affine_ssdna                  affine the ssdna image by user-defined affine matrix.
+    affine_txt                    affine txt like cell.mask by user-defined affine matrix.
 
  Region of interest(ROI) tools: 
     chop_image                    chop region of interests from whole image.
@@ -41,7 +42,6 @@ Actions:
 
  Mask tools:
     mask_gem                      mask GEM(C) by mask image.
-    mask_ssdna                    mask ssDNA image by mask image.
     mask_h5ad                     mask h5ad data by mask image.
   
  Visualization tools:
@@ -74,6 +74,7 @@ if __name__ == "__main__":
                                                    "gem_to_h5ad",
                                                    "chop_image",
                                                    "chop_gem",
+                                                   "mask_gem",
                                                    ) :
         main_usage()
         exit(1)
@@ -100,6 +101,10 @@ if __name__ == "__main__":
     elif  sys.argv[1] == "chop_gem" :
         from gemtk.chop_gem import chopgems_main
         chopgems_main(sys.argv[2:])
+        exit(0)
+    elif  sys.argv[1] == "mask_gem" :
+        from gemtk.mask_gem import mask_gem_main 
+        mask_gem_main(sys.argv[2:])
         exit(0)
     elif  sys.argv[1] == "gem_to_h5ad" :
         from gemtk.gem_to_h5ad import gem_to_h5ad_main 

@@ -135,6 +135,14 @@ class slice_dataframe:
     def printGEM(self,out_f):
         self.m_dataframe.to_csv(out_f,sep='\t',header=True,index=False)
 
+    def mask(self,mask_array):
+        mask_array = mask_array.astype(int)
+        self.m_dataframe['valid'] = self.m_dataframe.apply(lambda row: mask_array[row['y'] - self.min_y,
+                                                                                  row['x'] - self.min_x],
+                                                           axis=1)
+        self.m_dataframe = self.m_dataframe[ self.m_dataframe['valid'] != 0 ].copy()
+        self.m_dataframe = self.m_dataframe.drop(columns=['valid'])  
+
     def get_expression_count_vector(self,binsize=50) -> np.ndarray:
         """
         Return : rectangar matrix with UMI counts
