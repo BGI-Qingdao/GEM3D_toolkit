@@ -78,7 +78,8 @@ if __name__ == "__main__":
                                                    "affine_gem",
                                                    "affine_ssdna",
                                                    "affine_txt",
-                                                   "affine_h5ad"
+                                                   "affine_h5ad",
+                                                   "mask_h5ad"
                                                    ) :
         main_usage()
         exit(1)
@@ -133,6 +134,10 @@ if __name__ == "__main__":
     elif sys.argv[1] == "affine_h5ad" :
         from gemtk.affine_h5ad import affine_h5ad_main
         affine_h5ad_main(sys.argv[2:])
+        exit(0)
+    elif sys.argv[1] == "mask_h5ad" :
+        from gemtk.mask_h5ad import mask_h5ad_main
+        mask_h5ad_main(sys.argv[2:])
         exit(0)
     else:
         main_usage()
