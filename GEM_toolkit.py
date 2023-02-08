@@ -75,6 +75,10 @@ if __name__ == "__main__":
                                                    "chop_image",
                                                    "chop_gem",
                                                    "mask_gem",
+                                                   "affine_gem",
+                                                   "affine_ssdna",
+                                                   "affine_txt",
+                                                   "affine_h5ad"
                                                    ) :
         main_usage()
         exit(1)
@@ -121,6 +125,14 @@ if __name__ == "__main__":
     elif sys.argv[1] == "affine_gem" :
         from gemtk.affine_gem import affine_gem_main
         affine_gem_main(sys.argv[2:])
+        exit(0)
+    elif sys.argv[1] == "affine_txt" :
+        from gemtk.affine_txt import affine_txt_main
+        affine_txt_main(sys.argv[2:])
+        exit(0)
+    elif sys.argv[1] == "affine_h5ad" :
+        from gemtk.affine_h5ad import affine_h5ad_main
+        affine_h5ad_main(sys.argv[2:])
         exit(0)
     else:
         main_usage()
