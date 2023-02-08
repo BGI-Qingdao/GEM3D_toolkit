@@ -1,53 +1,86 @@
 import sys
 import getopt
 import json
-import pandas as pd 
+import scipy.ndimage as nd
+from skimage import io as skio
 import numpy as np
-def affine_gem_usage():
-    print("""
-Usage : affine_gem.py  -i <input.gem> \\
-                            -o <output> \\
-                            -B [backward (reverse) affine matrix] 
-                            -F [forward affine matrix]
-Example:
-        affine_gem.py  -i input.gem \\
-                            -o output.gem \\
-                            -F '[[1,0,10], [0,1,0] [0.0, 0.0, 1.0]]'    
-Notice: please provide one of [ -B , -F ], if both present, the later one will overwrite previous one.                             
-    """,flush=True) 
 
-def affine_gem_main(argv:[]):
-    inputgem=''
-    prefix=''
-    affine=''
+# usage
+def affine_ssdna_usage():
+    print("""
+Usage : affine_ssdna.py  -i <input.tif> \\
+                             -o <output> \\
+                             -B <backword (reverse) affine matrix> \\
+                             -F <forword affine matrix> \\
+                             -r <ref image> \\
+                             -f [fliph/flipv/noflip, default noflip] 
+
+Example :
+        affine_ssdna.py -i input.tif \\
+                            -o out.tif \\
+                            -r ref.tif \\
+                            -f fliph  \\
+                            -F '[[1,0,10],[0,1,0],[0.0, 0.0, 1.0]]'   
+Notice: please provide one of [ -B , -F ], if both present, the later one will overwrite previous one.
+""",flush=True)
+
+
+def affine_ssdna_main(argv:[]) :
+    inputf = ''
+    prefix = ''
+    affine=np.eye(3)
+    flip = 'noflip'
+    ref = ''
     try:
-        opts,args = getopt.getopt(argv,"hi:o:F:B:",["help=",
-                                                  "input=",
-                                                  "output="])
+        opts, args = getopt.getopt(argv,"hi:o:F:B:f:r:",["help=" ,
+                                                     "input=",
+                                                     "output=",
+                                                     "ref=",
+                                                     "flip="
+                                                     ])
     except getopt.GetoptError:
-        affine_gem_usage()
+        affine_ssdna_usage()
         sys.exit(2)
-    
-    for opt,arg in opts:
-        if opt in ("-i", "--inputgem"):
-            inputgem=arg
-        elif opt in ("-o", "--output"):
-            prefix= arg
-        elif opt in ("-F",):
-            affine = np.matrix(np.array(json.loads(arg)))
-        elif opt in ("-B",):
-            affine = np.matrix(np.array(json.loads(arg))).I
-        elif opt in ("-h","--help"):
-            affine_gem_usage()
+    for opt, arg in opts:
+        if opt in ("-i", "--inputf"):
+            inputf = arg
+        elif opt in ('-h','--help'):
+            affine_ssdna_usage()
             sys.exit(0)
-    if inputgem == "" or prefix == "" :
-        affine_gem_usage()
+        elif opt in ("-o", "--output"):
+            prefix = arg
+        elif opt in ('-F'):
+            affine_r = np.matrix(np.array(json.loads(arg))).I
+        elif opt in ('-B'):
+            affine_r = np.matrix(np.array(json.loads(arg)))
+        elif opt in ('-f' , '--flip'):
+            flip = arg
+        elif opt in ('-r' , '--ref'):
+            ref = arg
+
+    if inputf == '' or prefix == '' or not flip in ('fliph','flipv','noflip') or ref == '':
+        affine_ssdna_usage()
         sys.exit(2)
-    
-    df = pd.read_csv(inputgem, sep='\t', comment='#')
-    gemxy=np.array(df[["x",'y']])
-    gemxy=np.insert(gemxy,2,values=np.ones((gemxy.shape[0],)),axis=1)
-    affine_result=np.dot(affine,gemxy.T)[0:2,:]
-    df["new_x"]=np.array(affine_result[0:1,:].T)
-    df["new_y"]=np.array(affine_result[1:2,:].T)
-    df.to_csv(prefix,index=None,sep='\t')
+    refd = skio.imread(ref)
+    w,h = refd.shape
+    print(f'ref w={w}, h={h}')
+
+    dapi_data  = skio.imread(inputf)
+    if len(dapi_data.shape) == 3 : # RGB tiff to 8 bit gray tiff
+        new_data = np.zeros((dapi_data.shape[0],dapi_data.shape[1]),dtype=int)
+        new_data = new_data + dapi_data[:,:,0]
+        new_data = new_data + dapi_data[:,:,1]
+        new_data = new_data + dapi_data[:,:,2]
+        new_data = (new_data+2) / 3
+        dapi_data = new_data
+    dapi_data = dapi_data.astype('uint8')
+    ind = dapi_data
+    if flip == 'fliph':
+        ind = np.fliplr(ind)
+    elif flip == 'flipv':
+        ind = np.flipud(ind)
+    outd = nd.affine_transform(ind.T,affine_r,output_shape=(h,w),order=0)
+    outd = outd.T
+    outd = outd.astype('uint8')
+    print(outd.shape)
+    skio.imsave(prefix,outd)
