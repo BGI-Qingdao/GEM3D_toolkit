@@ -29,7 +29,7 @@ def affine_gem_main(argv:[]):
         sys.exit(2)
     
     for opt,arg in opts:
-        if opt in ("-i", "--inputgem"):
+        if opt in ("-i", "--input"):
             inputgem=arg
         elif opt in ("-o", "--output"):
             prefix= arg
