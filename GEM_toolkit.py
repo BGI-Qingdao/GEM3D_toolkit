@@ -79,7 +79,9 @@ if __name__ == "__main__":
                                                    "affine_ssdna",
                                                    "affine_txt",
                                                    "affine_h5ad",
-                                                   "mask_h5ad"
+                                                   "mask_h5ad",
+                                                   "prepare_alignment_image",
+                                                   "apply_alignment"
                                                    ) :
         main_usage()
         exit(1)
@@ -138,6 +140,14 @@ if __name__ == "__main__":
     elif sys.argv[1] == "mask_h5ad" :
         from gemtk.mask_h5ad import mask_h5ad_main
         mask_h5ad_main(sys.argv[2:])
+        exit(0)
+    elif sys.argv[1] == "prepare_alignment_image" :
+        from gemtk.prepare_alignment_image import prepare_alignment_image_main
+        prepare_alignment_image_main(sys.argv[2:])
+        exit(0)
+    elif sys.argv[1] == "apply_alignment" :
+        from gemtk.apply_alignment import apply_alignment_main
+        apply_alignment_main(sys.argv[2:])
         exit(0)
     else:
         main_usage()
