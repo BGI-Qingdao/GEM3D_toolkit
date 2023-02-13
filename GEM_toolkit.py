@@ -81,7 +81,10 @@ if __name__ == "__main__":
                                                    "affine_h5ad",
                                                    "mask_h5ad",
                                                    "prepare_alignment_image",
-                                                   "apply_alignment"
+                                                   "apply_alignment",
+                                                   "trakEM2_to_affine",
+                                                   "chop_paste"
+
                                                    ) :
         main_usage()
         exit(1)
@@ -148,6 +151,14 @@ if __name__ == "__main__":
     elif sys.argv[1] == "apply_alignment" :
         from gem3dtk.apply_alignment import apply_alignment_main
         apply_alignment_main(sys.argv[2:])
+        exit(0)
+    elif sys.argv[1] == "chop_paste" :
+        from gemtk.chop_paste import chop_paste_main
+        chop_paste_main(sys.argv[2:])
+        exit(0)
+    elif sys.argv[1] == "trakEM2_to_affine" :
+        from gemtk.trakEM2_to_affine import trakEM2_to_affine_main
+        trakEM2_to_affine_main(sys.argv[2:])
         exit(0)
     else:
         main_usage()
