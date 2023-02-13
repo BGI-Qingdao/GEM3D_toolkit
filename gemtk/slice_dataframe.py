@@ -76,7 +76,7 @@ class slice_dataframe:
         if len(self.m_dataframe.columns) == 4 :
             self.m_dataframe.columns = ['geneID','x','y','MIDCounts']
         elif len(self.m_dataframe.columns) == 5:
-            if self.m_dataframe.columns[4] == 'cell':
+            if self.m_dataframe.columns[4] in ('cell', 'label'):
                 self.m_dataframe.columns = ['geneID','x','y','MIDCounts','cell']
                 self.cellbin=True
             else:
@@ -90,7 +90,7 @@ class slice_dataframe:
             self.m_dataframe.columns = ['geneID','x','y','MIDCounts','spatial3d_x','spatial3d_y','spatial3d_z']
             self.spatial3d=True
         elif len(self.m_dataframe.columns) == 8:
-            if self.m_dataframe.columns[4] == 'cell':
+            if self.m_dataframe.columns[4] in ('cell','label'):
                 self.m_dataframe.columns = ['geneID','x','y','MIDCounts','cell','spatial3d_x','spatial3d_y','spatial3d_z']
                 self.cellbin=True
                 self.spatial3d=True
@@ -115,6 +115,7 @@ class slice_dataframe:
             self.min_y=np.min(self.m_dataframe.y)
         else: 
             self.min_y = min_y
+        print(f'final GEM xmin = {self.min_x},final GEM ymin={self.min_y}',flush=True)
         max_y=np.max(self.m_dataframe.y)
         self.m_xyz=slice_xyz(max_x-self.min_x+1,max_y-self.min_y+1, self.min_x,self.min_y)
 

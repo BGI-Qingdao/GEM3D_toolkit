@@ -142,11 +142,11 @@ if __name__ == "__main__":
         mask_h5ad_main(sys.argv[2:])
         exit(0)
     elif sys.argv[1] == "prepare_alignment_image" :
-        from gemtk.prepare_alignment_image import prepare_alignment_image_main
+        from gem3dtk.prepare_alignment_image import prepare_alignment_image_main
         prepare_alignment_image_main(sys.argv[2:])
         exit(0)
     elif sys.argv[1] == "apply_alignment" :
-        from gemtk.apply_alignment import apply_alignment_main
+        from gem3dtk.apply_alignment import apply_alignment_main
         apply_alignment_main(sys.argv[2:])
         exit(0)
     else:
