@@ -1,7 +1,7 @@
 import sys
 import getopt
 import numpy as np
-b
+
 # functions
 def get_trackEM(param :str) -> np.matrix:
     """
@@ -41,7 +41,7 @@ Example :
 """,flush=True)
 
 
-def trackEM2_to_affine_main(argv:[]) :
+def trakEM2_to_affine_main(argv:[]) :
     chip = 'chip715'
     width_pixel = 0.4803250
     height_pixel = 0.4802272
