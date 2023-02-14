@@ -89,8 +89,10 @@ def affine_gem(inputgem,prefix,affine,N,value):
 def affine_ssdna(inputssdna,prefix,affine,flip,N):
     affine=affine.I
     dapi_data = skio.imread(inputssdna)
-    w,h= dapi_data.shape
-
+    if dapi_data.shape == 3:
+        w,h,_=dapi_data.shape
+    else:
+        w,h= dapi_data.shape
     if len(dapi_data.shape) == 3 : # RGB tiff to 8 bit gray tiff
         new_data = np.zeros((dapi_data.shape[0],dapi_data.shape[1]),dtype=int)
         new_data = new_data + dapi_data[:,:,0]
