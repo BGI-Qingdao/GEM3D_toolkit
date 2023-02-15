@@ -83,7 +83,8 @@ if __name__ == "__main__":
                                                    "prepare_alignment_image",
                                                    "apply_alignment",
                                                    "trakEM2_to_affine",
-                                                   "chop_paste"
+                                                   "chop_paste",
+                                                   "draw_annotation"
 
                                                    ) :
         main_usage()
@@ -159,6 +160,10 @@ if __name__ == "__main__":
     elif sys.argv[1] == "trakEM2_to_affine" :
         from gemtk.trakEM2_to_affine import trakEM2_to_affine_main
         trakEM2_to_affine_main(sys.argv[2:])
+        exit(0)
+    elif sys.argv[1] == "draw_annotation" :
+        from gemtk.draw_annotation import draw_annotation_main
+        draw_annotation_main(sys.argv[2:])
         exit(0)
     else:
         main_usage()
