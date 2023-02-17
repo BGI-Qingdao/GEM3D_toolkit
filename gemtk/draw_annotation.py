@@ -1,7 +1,10 @@
 from skimage import io as skio
-import cv2
 import sys
 import getopt
+from PIL import ImageFile
+from PIL import Image
+ImageFile.LOAD_TRUNCATED_IMAGES = True
+Image.MAX_IMAGE_PIXELS = None
 
 def draw_annotation_usage():
     print("""
@@ -40,10 +43,10 @@ def draw_annotation_main(argv:[]):
         draw_annotation_usage()
         sys.exit(2)
 
-    img1=cv2.imread(infile)
-    img2=cv2.imread(ssdna)
-    img=cv2.add(img1,img2)
+    img1=Image.open(infile).convert('RGB')
+    img2=Image.open(ssdna).convert('RGB')
+    img=Image.blend(img1,img2,0.3)
     if border != '':
-        img3=cv2.imread(border)
-        img=cv2.add(img,img3)
-    skio.imsave(prefix,img)
+        img3=Image.open(border).convert('RGB')
+        img=Image.blend(img,img3,0.5)
+    img.save(prefix)
