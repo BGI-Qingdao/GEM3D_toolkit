@@ -45,7 +45,7 @@ Actions:
     mask_h5ad                     mask h5ad data by mask image.
   
  Visualization tools:
-    heatmap                       draw heatmap of expression counts in bin1 resolution with/without cellbin and with/without ssDNA.
+    draw_heatmap                       draw heatmap of expression counts in bin1 resolution with/without cellbin and with/without ssDNA.
     draw_annotation               draw annotation result in bin1 resolution with/without cellbin and with/without ssDNA.
  
  Other tools:
@@ -84,7 +84,8 @@ if __name__ == "__main__":
                                                    "apply_alignment",
                                                    "trakEM2_to_affine",
                                                    "chop_paste",
-                                                   "draw_annotation"
+                                                   "draw_annotation",
+                                                   "draw_heatmap"
 
                                                    ) :
         main_usage()
@@ -165,6 +166,10 @@ if __name__ == "__main__":
         from gemtk.draw_annotation import draw_annotation_main
         draw_annotation_main(sys.argv[2:])
         exit(0)
+    elif sys.argv[1] == "draw_heatmap" :
+        from gemtk.draw_heatmap import heatmap_main
+        heatmap_main(sys.argv[2:])
+        exit(0)                              
     else:
         main_usage()
         exit(1)
