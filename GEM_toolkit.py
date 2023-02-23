@@ -45,8 +45,8 @@ Actions:
     mask_h5ad                     mask h5ad data by mask image.
   
  Visualization tools:
-    draw_heatmap                       draw heatmap of expression counts in bin1 resolution with/without cellbin and with/without ssDNA.
-    draw_annotation               draw annotation result in bin1 resolution with/without cellbin and with/without ssDNA.
+    draw_heatmap                  draw heatmap of expression counts in bin1 resolution with/without cellbin and with/without ssDNA.
+    image_blend                   merge image(like heatmap/annotation image) with ssDNA and border image
  
  Other tools:
     chop_paste                    chop or paste ssDNA image. This tools is useful for ultra-large ssDNA image.
@@ -84,7 +84,7 @@ if __name__ == "__main__":
                                                    "apply_alignment",
                                                    "trakEM2_to_affine",
                                                    "chop_paste",
-                                                   "draw_annotation",
+                                                   "image_blend",
                                                    "draw_heatmap"
 
                                                    ) :
@@ -162,9 +162,9 @@ if __name__ == "__main__":
         from gemtk.trakEM2_to_affine import trakEM2_to_affine_main
         trakEM2_to_affine_main(sys.argv[2:])
         exit(0)
-    elif sys.argv[1] == "draw_annotation" :
-        from gemtk.draw_annotation import draw_annotation_main
-        draw_annotation_main(sys.argv[2:])
+    elif sys.argv[1] == "image_blend" :
+        from gemtk.image_blend import image_blend_main
+        image_blend_main(sys.argv[2:])
         exit(0)
     elif sys.argv[1] == "draw_heatmap" :
         from gemtk.draw_heatmap import heatmap_main

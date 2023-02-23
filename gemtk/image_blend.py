@@ -6,15 +6,15 @@ from PIL import Image
 ImageFile.LOAD_TRUNCATED_IMAGES = True
 Image.MAX_IMAGE_PIXELS = None
 
-def draw_annotation_usage():
+def image_blend_usage():
     print("""
-Usage : draw_annotation.py -i <input.tif>
+Usage : GEMtoolkit.py image_blend -i <input.tif>
                             -s <ssdna.tif>
                             -b <border.tif>
                             -o <output.tif>
 """,flush=True)
 
-def draw_annotation_main(argv:[]):
+def image_blend_main(argv:[]):
     infile = ''
     ssdna = ''
     border = ''
@@ -22,12 +22,12 @@ def draw_annotation_main(argv:[]):
     try:
         opts , args =getopt.getopt(argv,"hi:s:b:o:",["help=","input=","ssdna=","border=","output="])
     except getopt.GetoptError:
-        draw_annotation_usage()
+        image_blend_usage()
         sys.exit(2)
 
     for opt,arg in opts:
         if opt in ("-h","--help"):
-            draw_annotation_usage()
+            image_blend_usage()
             sys.exit(0)
         elif opt in ("-i","--input"):
             infile = arg
@@ -40,7 +40,7 @@ def draw_annotation_main(argv:[]):
     
 
     if infile == '' or ssdna == '' or prefix == '':
-        draw_annotation_usage()
+        image_blend_usage()
         sys.exit(2)
 
     img1=Image.open(infile).convert('RGB')
