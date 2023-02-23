@@ -76,7 +76,7 @@ def trakEM2_to_affine_main(argv:[]) :
         elif opt in ('-o' , '--prefix'):
             prefix = arg
 
-    if not valid or not valid1 or prefix == "":
+    if (not valid and not valid1) or prefix == "":
         trackEM2_to_affine_usage()
         sys.exit(2)
 
@@ -94,4 +94,3 @@ def trakEM2_to_affine_main(argv:[]) :
     print(DAPI_to_bin1_affine_base.I.tolist())
     print("The final forward affine matrix :")
     print(DAPI_to_bin1_affine_base.tolist())
-
