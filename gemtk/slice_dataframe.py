@@ -51,6 +51,29 @@ class slice_xyz:
                 coords[index][0],coords[index][1]= bin_mid_x , bin_mid_y
         return coords
 
+def format_colname(df):
+    if len(df.columns) == 4 :
+        return ['geneID','x','y','MIDCounts']
+    elif len(df.columns) == 5:
+        if df.columns[4] in ('cell', 'label'):
+            return  ['geneID','x','y','MIDCounts','cell']
+        else:
+            return ['geneID','x','y','MIDCounts','ExonCount']
+    elif len(df.columns) == 6:
+        return ['geneID','x','y','MIDCounts','ExonCount','cell']
+    elif len(df.columns) == 7:
+        return ['geneID','x','y','MIDCounts','spatial3d_x','spatial3d_y','spatial3d_z']
+    elif len(df.columns) == 8:
+        if df.columns[4] in ('cell','label'):
+            return ['geneID','x','y','MIDCounts','cell','spatial3d_x','spatial3d_y','spatial3d_z']
+        else:
+            return ['geneID','x','y','MIDCounts','ExonCount','spatial3d_x','spatial3d_y','spatial3d_z']
+    elif len(df.columns) == 9:
+        return  ['geneID','x','y','MIDCounts','ExonCount','cell','spatial3d_x','spatial3d_y','spatial3d_z']
+    else:
+        print('Unknow GEM(C) header, please contact guolidong@genomics.cn',flush=True)
+        sys.exit(1)
+
 class slice_dataframe:
     """
     Brief   :
