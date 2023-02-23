@@ -12,6 +12,7 @@ def apply_alignment_usage():
     print("""
 Usage : apply_alignment.py  -i <input.json>
                             -o [outputdir]
+                            -a [F/B , default F]
 
 input.json  :
             {
@@ -26,17 +27,16 @@ input.json  :
 
 Sample : apply_alignment.py  -i input.json \\
                              -o prefix   \\
-                             -F '[[1,0,10], [0,1,0],[0.0, 0.0, 1.0]]'    
-Notice: please provide one of [ -B , -F ], if both present, the later one will overwrite previous one.                             
+                             -a F
     """,flush=True)
 
 def apply_alignment_main(argv:[]):
     jsonfile=''
     affine=''
     prefix=''
- 
+    a="F"
     try:
-         opts ,args =getopt.getopt(argv,"hi:o:",["help=",
+         opts ,args =getopt.getopt(argv,"hi:o:a:",["help=",
                                                      "input=",
                                                      "output=",])
     except getopt.GetoptError:
@@ -51,6 +51,8 @@ def apply_alignment_main(argv:[]):
             jsonfile = arg
         elif opt in ("-o","--output"):
             prefix = arg 
+        elif opt in ("-a"):
+            a = arg
         
     if jsonfile == '' or prefix == '':
         apply_alignment_usage()
@@ -66,15 +68,30 @@ def apply_alignment_main(argv:[]):
     for i in range(N):
         try:
             collection=collections[i]
-            affine=np.matrix(np.array(json.loads(collection[4])))
+            if a == 'F':
+                affine=np.matrix(np.array(json.loads(collection[4])))
+            elif a == "B":
+                affine=np.matrix(np.array(json.loads(collection[4]))).I
         except:
             print("file of json is erro !!!")
             apply_alignment_usage()
             sys.exit(0)
-        affine_gem(collection[0],prefix,affine,i+1,value)
-        affine_h5ad(collection[1],prefix,affine,i+1,value)
-        affine_ssdna(collection[2],prefix,affine,flip,i+1)
-        affine_txt(collection[3],prefix,affine,flip,i+1)
+        try:
+            affine_gem(collection[0],prefix,affine,i+1,value)
+        except:
+            pass
+        try:
+            affine_h5ad(collection[1],prefix,affine,i+1,value)
+        except:
+            pass
+        try:
+            affine_ssdna(collection[2],prefix,affine,flip,i+1)
+        except:
+            pass
+        try:
+            affine_txt(collection[3],prefix,affine,flip,i+1)
+        except:
+            pass
 
 def affine_gem(inputgem,prefix,affine,N,value):
     df = pd.read_csv(inputgem, sep='\t', comment='#')
