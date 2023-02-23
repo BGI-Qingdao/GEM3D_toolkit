@@ -70,7 +70,7 @@ def heatmap_main(argv:[]):
         
     # merge all valid genes here.
     draw.groupby(['x','y']).sum().reset_index()
-
+    draw.columns=['geneID','x','y','MIDCounts','ExonCount']
     # normalise count range from 0 - 255
     countMin = draw["MIDCounts"].min()
     countMax = draw["MIDCounts"].max()
@@ -85,12 +85,12 @@ def heatmap_main(argv:[]):
         x = (np.array(cmap(i)) * 255).astype(int)
         color_list[i,:] = x[:3]
   
-    draw['color_r'] = colors_list[(draw['MIDCounts']).to_list(),0]
-    draw['color_g'] = colors_list[(draw['MIDCounts']).to_list(),1]
-    draw['color_b'] = colors_list[(draw['MIDCounts']).to_list(),2]
+    draw['color_r'] = color_list[(draw['MIDCounts']).to_list(),0]
+    draw['color_g'] = color_list[(draw['MIDCounts']).to_list(),1]
+    draw['color_b'] = color_list[(draw['MIDCounts']).to_list(),2]
 
-    w=np.max(data["x"]-X)+1
-    h=np.max(data["y"]-Y)+1
+    w=np.max(draw["x"])+1
+    h=np.max(draw["y"])+1
     canvas = np.zeros((h,w,3),dtype='uint8')
     canvas[draw['y'],draw['x'],0] = draw['color_r']
     canvas[draw['y'],draw['x'],1] = draw['color_g']
