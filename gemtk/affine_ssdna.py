@@ -62,7 +62,10 @@ def affine_ssdna_main(argv:[]) :
         affine_ssdna_usage()
         sys.exit(2)
     refd = skio.imread(ref)
-    w,h = refd.shape
+    if len(refd.shape)==3:
+         w,h,_= refd.shape
+    else:
+        w,h=refd.shape
     print(f'ref w={w}, h={h}')
 
     dapi_data  = skio.imread(inputf)
