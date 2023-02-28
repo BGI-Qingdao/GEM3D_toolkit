@@ -17,12 +17,10 @@ Usage : apply_alignment.py  -i <input.json>
 
 input.json  :
             {
-                "N"    : {"num" : int  , "values" : [int,int,int,.....,int] },
-                "ssdnafile"   : "fliph/flipv/noflip",
                 "data"  :  [
-                             ["gemfile_1","h5adfile_1","ssdnafile_1","maskfile_1","[[1,0,10], [0,1,0],[0.0, 0.0, 1.0]]"],
+                             ["gemfile_1","h5adfile_1","ssdnafile_1","maskfile_1","[[1,0,10], [0,1,0],[0.0, 0.0, 1.0]]","z_value"],
                                     ....
-                             ["gemfile_N","h5adfile_N","ssdnafile_N","maskfile_N","[[1,0,10], [0,1,0],[0.0, 0.0, 1.0]]"]
+                             ["gemfile_N","h5adfile_N","ssdnafile_N","maskfile_N","[[1,0,10], [0,1,0],[0.0, 0.0, 1.0]]","z_value"]
                                 ]
             }
 
@@ -65,10 +63,8 @@ def apply_alignment_main(argv:[]):
         sys.exit(0)
     json_data=open(jsonfile,'r')
     class_indict = json.load(json_data)
-    N_dict=class_indict["N"]
-    N=int(N_dict["num"])
-    value=N_dict["values"]
-    flip=class_indict["ssdnafile"]
+    N_num=class_indict["data"]
+    N=len(N_num)
     collections=class_indict["data"]
     for i in range(N):
         try:
@@ -82,9 +78,9 @@ def apply_alignment_main(argv:[]):
             apply_alignment_usage()
             sys.exit(0)
         if collection[0]!='':
-            affine_gem(collection[0],prefix,affine,i+1,value[i])
+            affine_gem(collection[0],prefix,affine,i+1,collection[5])
         if collection[1]!='':
-            h5ad=affine_h5ad(collection[1],affine,i+1,value[i])
+            h5ad=affine_h5ad(collection[1],affine,i+1,collection[5])
             if hflag==False:
                 h5ad.write(f'{prefix}_{i+1}.h5ad',compression='gzip')
             else:
@@ -95,9 +91,9 @@ def apply_alignment_main(argv:[]):
                 if int(i+1)==int(N):
                     h5admerge.write(f'{prefix}_merged.h5ad',compression='gzip')
         if collection[2]!='':
-            affine_ssdna(collection[2],prefix,affine,flip,i+1)
+            affine_ssdna(collection[2],prefix,affine,i+1)
         if collection[3]!='':
-            affine_txt(collection[3],prefix,affine,flip,i+1)
+            affine_txt(collection[3],prefix,affine,i+1)
 
 def affine_gem(inputgem,prefix,affine,N,value):
     df = pd.read_csv(inputgem, sep='\t', comment='#')
@@ -126,10 +122,6 @@ def affine_ssdna(inputssdna,prefix,affine,flip,N):
         dapi_data = new_data
     dapi_data = dapi_data.astype('uint8')
     ind = dapi_data
-    if flip == 'fliph':
-        ind = np.fliplr(ind)
-    elif flip == 'flipv':
-        ind = np.flipud(ind)
     outd = nd.affine_transform(ind.T,affine,output_shape=(h,w),order=0)
     outd = outd.T
     outd = outd.astype('uint8')
@@ -148,10 +140,6 @@ def affine_h5ad(inputh5ad,affine,N,value):
 def affine_txt(inputmask,prefix,affine,flip,N):
     ind = np.loadtxt(inputmask,delimiter=' ',dtype=int)
     w,h = ind.shape
-    if flip == 'fliph':
-        ind = np.fliplr(ind)
-    elif flip == 'flipv':
-        ind = np.flipud(ind)
     outd = nd.affine_transform(ind.T,affine,output_shape=(h,w),order=0)
     outd = outd.T
     np.savetxt(f'{prefix}_{N}.txt',outd,fmt="%d")
