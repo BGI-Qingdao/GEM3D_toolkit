@@ -85,7 +85,8 @@ if __name__ == "__main__":
                                                    "trakEM2_to_affine",
                                                    "chop_paste",
                                                    "image_blend",
-                                                   "draw_heatmap"
+                                                   "draw_heatmap",
+                                                   "get_xml_matrix"
 
                                                    ) :
         main_usage()
@@ -169,7 +170,11 @@ if __name__ == "__main__":
     elif sys.argv[1] == "draw_heatmap" :
         from gemtk.draw_heatmap import heatmap_main
         heatmap_main(sys.argv[2:])
-        exit(0)                              
+        exit(0) 
+    elif sys.argv[1] == "get_xml_matrix" :
+        from gem3dtk.get_xml_matrix import get_xml_matrix_main
+        get_xml_matrix_main(sys.argv[2:])
+        exit(0)                             
     else:
         main_usage()
         exit(1)
