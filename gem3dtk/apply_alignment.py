@@ -13,20 +13,24 @@ def apply_alignment_usage():
 Usage : apply_alignment.py  -i <input.json>
                             -o [outputdir]
                             -a [F/B , default F]
+                            -t [True/False,default Flase]
                             -m [merge files of h5ad,default False]
+
 
 input.json  :
             {
                 "data"  :  [
-                             ["gemfile_1","h5adfile_1","ssdnafile_1","maskfile_1","[[1,0,10], [0,1,0],[0.0, 0.0, 1.0]]","z_value"],
+                             ["gemfile_1","h5adfile_1","ssdnafile_1","maskfile_1","[[1,0,10], [0,1,0],[0.0, 0.0, 1.0]]","z_value","[[1,0,0], [0,1,0],[0.0, 0.0, 1]]"],
                                     ....
-                             ["gemfile_N","h5adfile_N","ssdnafile_N","maskfile_N","[[1,0,10], [0,1,0],[0.0, 0.0, 1.0]]","z_value"]
-                                ]
+                             ["gemfile_N","h5adfile_N","ssdnafile_N","maskfile_N","[[1,0,10], [0,1,0],[0.0, 0.0, 1.0]]","z_value","[[1,0,0], [0,1,0],[0.0, 0.0, 1]]"]
+                                ]            
+                ]
             }
 
 Sample : apply_alignment.py  -i input.json \\
                              -o prefix   \\
                              -a F
+                             -t True
                              -m True
     """,flush=True)
 
@@ -37,8 +41,9 @@ def apply_alignment_main(argv:[]):
     a="F"
     hflag=False
     h5admerge=''
+    tflag=False
     try:
-         opts ,args =getopt.getopt(argv,"hi:o:a:m:",["help=",
+         opts ,args =getopt.getopt(argv,"hi:o:a:m:t:",["help=",
                                                      "input=",
                                                      "output=",])
     except getopt.GetoptError:
@@ -57,6 +62,10 @@ def apply_alignment_main(argv:[]):
             a = arg
         elif opt in ('-m'):
             hflag = arg 
+        elif opt in ('-m'):
+            hflag = arg 
+        elif opt in ('-t'):
+            tflag = arg
         
     if jsonfile == '' or prefix == '':
         apply_alignment_usage()
@@ -78,9 +87,17 @@ def apply_alignment_main(argv:[]):
             apply_alignment_usage()
             sys.exit(0)
         if collection[0]!='':
-            affine_gem(collection[0],prefix,affine,i+1,collection[5])
+            if tflag == False:
+                affine_gem(collection[0],prefix,affine,i+1,collection[5])
+            else:
+                transform=np.matmul(np.matrix(np.array(json.loads(collection[6]))),affine)
+                affine_gem(collection[0],prefix,transform,i+1,collection[5])
         if collection[1]!='':
-            h5ad=affine_h5ad(collection[1],affine,i+1,collection[5])
+            if tflag == False:
+                affine_h5ad(collection[0],prefix,affine,i+1,collection[5])
+            else:
+                transform=np.matmul(np.matrix(np.array(json.loads(collection[6]))),affine)
+                h5ad=affine_h5ad(collection[1],transform,i+1,collection[5])
             if hflag==False:
                 h5ad.write(f'{prefix}_{i+1}.h5ad',compression='gzip')
             else:
@@ -127,7 +144,7 @@ def affine_ssdna(inputssdna,prefix,affine,flip,N):
     outd = outd.astype('uint8')
     skio.imsave(f'{prefix}_{N}.tif',outd)
 
-def affine_h5ad(inputh5ad,affine,N,value):
+def affine_h5ad(inputh5ad,affine,value,transform):
     h5ad=anndata.read(inputh5ad)
     h5adxy=np.array(h5ad.obs[["x",'y']])
     h5adxy=np.insert(h5adxy,2,values=np.ones((h5adxy.shape[0],)),axis=1)
