@@ -13,10 +13,11 @@ def apply_alignment_usage():
 Usage : apply_alignment.py  -i <input.json>
                             -o [outputdir]
                             -a [F/B , default F]
+                            -m [merge files of h5ad,default False]
 
 input.json  :
             {
-                "N"    : {"num" : int  , "values" : int },
+                "N"    : {"num" : int  , "values" : [int,int,int,.....,int] },
                 "ssdnafile"   : "fliph/flipv/noflip",
                 "data"  :  [
                              ["gemfile_1","h5adfile_1","ssdnafile_1","maskfile_1","[[1,0,10], [0,1,0],[0.0, 0.0, 1.0]]"],
@@ -28,6 +29,7 @@ input.json  :
 Sample : apply_alignment.py  -i input.json \\
                              -o prefix   \\
                              -a F
+                             -m True
     """,flush=True)
 
 def apply_alignment_main(argv:[]):
@@ -35,8 +37,10 @@ def apply_alignment_main(argv:[]):
     affine=''
     prefix=''
     a="F"
+    hflag=False
+    h5admerge=''
     try:
-         opts ,args =getopt.getopt(argv,"hi:o:a:",["help=",
+         opts ,args =getopt.getopt(argv,"hi:o:a:m:",["help=",
                                                      "input=",
                                                      "output=",])
     except getopt.GetoptError:
@@ -53,16 +57,17 @@ def apply_alignment_main(argv:[]):
             prefix = arg 
         elif opt in ("-a"):
             a = arg
+        elif opt in ('-m'):
+            hflag = arg 
         
     if jsonfile == '' or prefix == '':
         apply_alignment_usage()
         sys.exit(0)
-
     json_data=open(jsonfile,'r')
     class_indict = json.load(json_data)
     N_dict=class_indict["N"]
     N=int(N_dict["num"])
-    value=int(N_dict["values"])
+    value=N_dict["values"]
     flip=class_indict["ssdnafile"]
     collections=class_indict["data"]
     for i in range(N):
@@ -76,22 +81,23 @@ def apply_alignment_main(argv:[]):
             print("file of json is erro !!!")
             apply_alignment_usage()
             sys.exit(0)
-        try:
-            affine_gem(collection[0],prefix,affine,i+1,value)
-        except:
-            pass
-        try:
-            affine_h5ad(collection[1],prefix,affine,i+1,value)
-        except:
-            pass
-        try:
+        if collection[0]!='':
+            affine_gem(collection[0],prefix,affine,i+1,value[i])
+        if collection[1]!='':
+            h5ad=affine_h5ad(collection[1],affine,i+1,value[i])
+            if hflag==False:
+                h5ad.write(f'{prefix}_{i+1}.h5ad',compression='gzip')
+            else:
+                if i==0:
+                    h5admerge=h5ad
+                else:
+                    h5admerge=h5admerge.concatenate(h5ad)
+                if int(i+1)==int(N):
+                    h5admerge.write(f'{prefix}_merged.h5ad',compression='gzip')
+        if collection[2]!='':
             affine_ssdna(collection[2],prefix,affine,flip,i+1)
-        except:
-            pass
-        try:
+        if collection[3]!='':
             affine_txt(collection[3],prefix,affine,flip,i+1)
-        except:
-            pass
 
 def affine_gem(inputgem,prefix,affine,N,value):
     df = pd.read_csv(inputgem, sep='\t', comment='#')
@@ -112,7 +118,8 @@ def affine_ssdna(inputssdna,prefix,affine,flip,N):
         w,h= dapi_data.shape
     if len(dapi_data.shape) == 3 : # RGB tiff to 8 bit gray tiff
         new_data = np.zeros((dapi_data.shape[0],dapi_data.shape[1]),dtype=int)
-        new_data = new_data + dapi_data[:,:,0]
+        new_data = new_data + dapi_data[
+            :,:,0]
         new_data = new_data + dapi_data[:,:,1]
         new_data = new_data + dapi_data[:,:,2]
         new_data = (new_data+2) / 3
@@ -128,15 +135,15 @@ def affine_ssdna(inputssdna,prefix,affine,flip,N):
     outd = outd.astype('uint8')
     skio.imsave(f'{prefix}_{N}.tif',outd)
 
-def affine_h5ad(inputh5ad,prefix,affine,N,value):
+def affine_h5ad(inputh5ad,affine,N,value):
     h5ad=anndata.read(inputh5ad)
     h5adxy=np.array(h5ad.obs[["x",'y']])
     h5adxy=np.insert(h5adxy,2,values=np.ones((h5adxy.shape[0],)),axis=1)
     affine_result=np.dot(affine,h5adxy.T)[0:2,:]
     h5ad.obs['new_x']=np.array(affine_result[0:1,:].T)
     h5ad.obs['new_y']=np.array(affine_result[1:2,:].T)
-    h5ad.obs['z']=np.array([int(value)for _ in range(h5ad.obs.x.shape[0])])
-    h5ad.write(f'{prefix}_{N}.h5ad',compression='gzip')
+    h5ad.obs['z']=np.array([int(value) for _ in range(h5ad.obs.x.shape[0])])
+    return h5ad
 
 def affine_txt(inputmask,prefix,affine,flip,N):
     ind = np.loadtxt(inputmask,delimiter=' ',dtype=int)
@@ -148,4 +155,3 @@ def affine_txt(inputmask,prefix,affine,flip,N):
     outd = nd.affine_transform(ind.T,affine,output_shape=(h,w),order=0)
     outd = outd.T
     np.savetxt(f'{prefix}_{N}.txt',outd,fmt="%d")
-        
