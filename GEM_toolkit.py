@@ -86,7 +86,8 @@ if __name__ == "__main__":
                                                    "chop_paste",
                                                    "image_blend",
                                                    "draw_heatmap",
-                                                   "get_xml_matrix"
+                                                   "get_xml_matrix",
+                                                   "split_gem"
 
                                                    ) :
         main_usage()
@@ -174,7 +175,10 @@ if __name__ == "__main__":
     elif sys.argv[1] == "get_xml_matrix" :
         from gem3dtk.get_xml_matrix import get_xml_matrix_main
         get_xml_matrix_main(sys.argv[2:])
-        exit(0)                             
+        exit(0)
+    elif sys.argv[1] == "split_gem" :
+        from gemtk.split_gem import split_gem_main
+        split_gem_main(sys.argv[2:])                          
     else:
         main_usage()
         exit(1)
