@@ -211,6 +211,12 @@ class slice_dataframe:
 
     def getxy_cellbins(self):
         return self.m_dataframe.groupby('cell')[['x','y']].mean()
+
+    def getarea_cellbins(self):
+        self.m_dataframe['x_y'] = self.m_dataframe.apply(lambda row : f'{row["x"]}_{row["y"]}', axis=1)
+        counts = self.m_dataframe.groupby('cell')['x_y'].nunique().reset_index(name='nSpots').set_index('cell')
+        self.m_dataframe.drop('x_y', axis=1)
+        return counts
            
     def get3dxyz_cellbins(self):
         return self.m_dataframe.groupby('cell')[['spatial3d_x','spatial3d_y','spatial3d_z']].mean()

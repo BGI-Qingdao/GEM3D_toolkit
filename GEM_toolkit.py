@@ -51,6 +51,8 @@ Actions:
  Other tools:
     chop_paste                    chop or paste ssDNA image. This tools is useful for ultra-large ssDNA image.
     trakEM2_to_affine             covert trakEM2_matrix to standart affine matrix.
+    get_xml_matrix                get matrix from trakEM2 xml file.
+    split_gem                     split gem by x or y coordinate.
 
     -----------------------------------------------------------------
     -h/--help               show this short usage

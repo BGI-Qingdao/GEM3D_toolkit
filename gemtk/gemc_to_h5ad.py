@@ -49,14 +49,19 @@ def gemc_to_h5ad_main(argv:[]):
     print(time.strftime("%Y-%m-%d %H:%M:%S"),flush=True)
     cells, cellmap = sdf.get_cellbins()
     cellxy = sdf.getxy_cellbins()
+    cellarea = sdf.getarea_cellbins()
     if sdf.spatial3d:
         cell3dxyz = sdf.get3dxyz_cellbins()
     obs = pd.DataFrame()
     obs['cellid'] = cells
     obs['cellname'] = obs.apply(lambda row: f'cell{row["cellid"]}',axis=1)
     obs = obs.set_index('cellid')
+    #print(obs.head(),flush=True)
+    #print(cellxy.head(),flush=True)
     obs['x'] = cellxy['x']
     obs['y'] = cellxy['y']
+    #print(cellarea.head(),flush=True)
+    obs['nSpots'] = cellarea['nSpots']
     if sdf.spatial3d:
         obs['spatial3d_x'] = cell3dxyz['spatial3d_x']
         obs['spatial3d_y'] = cell3dxyz['spatial3d_y']
