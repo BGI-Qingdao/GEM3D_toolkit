@@ -82,7 +82,20 @@ def gemc_to_h5ad_main(argv:[]):
     data.obsm['spatial'] = obs[['x','y']].to_numpy()
     if sdf.spatial3d:
         data.obsm['spatial3d'] = obs[['spatial3d_x','spatial3d_y','spatial3d_z']].to_numpy()
+    ###############################################
+    # stats for UMI, Gene and Spot
+    ###############################################
+    num_genes = np.sum(densityarray>0,axis=1)
+    num_umi = np.sum(densityarray,axis=1)
+    data.obs['nGenes'] = num_genes
+    data.obs['nUMI'] = num_umi
     print(f'iter done for #cell={ncell}, #gene={ngene}.',flush=True)
+    print(f'average spot = {np.mean(obs["nSpots"])}')
+    print(f'median spot = {np.median(obs["nSpots"])}')
+    print(f'average gene = {np.mean(num_genes)}')
+    print(f'median gene = {np.median(num_genes)}')
+    print(f'average umi = {np.mean(num_umi)}')
+    print(f'median umi = {np.median(num_umi)}')
     print(time.strftime("%Y-%m-%d %H:%M:%S"),flush=True)
     print('save h5ad now...')
     data.write(f'{prefix}.h5ad',compression='gzip')
