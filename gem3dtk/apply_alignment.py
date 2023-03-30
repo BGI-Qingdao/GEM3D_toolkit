@@ -94,10 +94,10 @@ def apply_alignment_main(argv:[]):
                 affine_gem(collection[0],prefix,transform,i+1,collection[5])
         if collection[1]!='':
             if tflag == False:
-                affine_h5ad(collection[0],prefix,affine,i+1,collection[5])
+                h5ad=affine_h5ad(collection[1],affine,collection[5])
             else:
                 transform=np.matmul(np.matrix(np.array(json.loads(collection[6]))),affine)
-                h5ad=affine_h5ad(collection[1],transform,i+1,collection[5])
+                h5ad=affine_h5ad(collection[1],transform,collection[5])
             if hflag==False:
                 h5ad.write(f'{prefix}_{i+1}.h5ad',compression='gzip')
             else:
@@ -144,7 +144,7 @@ def affine_ssdna(inputssdna,prefix,affine,flip,N):
     outd = outd.astype('uint8')
     skio.imsave(f'{prefix}_{N}.tif',outd)
 
-def affine_h5ad(inputh5ad,affine,value,transform):
+def affine_h5ad(inputh5ad,affine,value):
     h5ad=anndata.read(inputh5ad)
     h5adxy=np.array(h5ad.obs[["x",'y']])
     h5adxy=np.insert(h5adxy,2,values=np.ones((h5adxy.shape[0],)),axis=1)
