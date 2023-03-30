@@ -8,10 +8,10 @@ Image.MAX_IMAGE_PIXELS = None
 
 def image_blend_usage():
     print("""
-Usage : GEMtoolkit.py image_blend -i <input.tif>
-                            -s <ssdna.tif>
-                            -b <border.tif>
-                            -o <output.tif>
+Usage : GEMtoolkit.py image_blend -i <input.png>
+                            -s <ssdna.png>
+                            -b <border.png>
+                            -o <output.png>
 """,flush=True)
 
 def image_blend_main(argv:[]):

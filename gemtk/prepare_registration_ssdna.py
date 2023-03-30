@@ -11,7 +11,7 @@ def get_mask_dapi(dapi_file,min_brightness,width_pixel,height_pixel,chip,prefix,
     print(time.strftime("%Y-%m-%d %H:%M:%S"),file=sys.stderr,flush=True)
     dapi_data = skio.imread(dapi_file)
     dapi_data = img_as_ubyte(dapi_data)
-    if len(dapi_data.shape) == 3:  # RGB tiff to 8 bit gray tiff
+    if len(dapi_data.shape) == 3:  # RGB to 8 bit gray
         if dapi_data.shape[2] == 3:
             new_data = np.zeros((dapi_data.shape[0], dapi_data.shape[1]), dtype=int)
             new_data = new_data + dapi_data[:, :, 0]
@@ -40,7 +40,7 @@ def get_mask_dapi(dapi_file,min_brightness,width_pixel,height_pixel,chip,prefix,
         if need_filter:
             filtered_data = sg.medfilt(dapi_data,kernel_size=(5,5))
             dapi_data = np.uint8(filtered_data)
-        skio.imsave(f'{prefix}.ssdna.trackline.tiff',dapi_data)
+        skio.imsave(f'{prefix}.ssdna.trackline.png',dapi_data)
         raw_dapi[ dapi_data == 255 ] = 255
     else:
         dapi_data[ dapi_data <= min_brightness ] = 255 - dapi_data[ dapi_data <= min_brightness ]
@@ -61,7 +61,7 @@ def get_mask_dapi(dapi_file,min_brightness,width_pixel,height_pixel,chip,prefix,
     new_h = int(raw_dapi.shape[0]*height_scale)
     small_dapi = nd.affine_transform(raw_dapi.T, small.I ,output_shape=(new_w,new_h),order=0)
     small_dapi = small_dapi.T
-    skio.imsave(f'{prefix}.ssdna.masked.small.tiff',small_dapi)
+    skio.imsave(f'{prefix}.ssdna.masked.small.png',small_dapi)
 
     print('gen mask_ssdna end ...',file=sys.stderr)
     print(time.strftime("%Y-%m-%d %H:%M:%S"),file=sys.stderr,flush=True)
@@ -73,7 +73,7 @@ def get_mask_dapi(dapi_file,min_brightness,width_pixel,height_pixel,chip,prefix,
 def prepareregistrationdapi_usage():
     print("""
 Usage : GEM_toolkit.py prepare_registration_ssdna \\
-             -d <ssdna tiff file> \\
+             -d <ssdna tif/png file> \\
              -o <output prefix>  \\
              -c [chip500/chip715, default chip715] \\
              -w [um per pixel in width,  default 0.4803250]\\

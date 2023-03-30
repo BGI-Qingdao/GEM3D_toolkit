@@ -372,8 +372,8 @@ def correct_all(heatmap_file,dapi_file,width_scale,height_scale,affine,prefix,ta
 def secondregistration_usage():
     print("""
 Usage : GEM_toolkit.py second_registration \\
-                 -H <heatmap.trackline.tiff>  \\
-                 -d <ssDNA.trackline.tiff> \\
+                 -H <heatmap.trackline.tif/png>  \\
+                 -d <ssDNA.trackline.tif/png> \\
                  -o <output prefix> \\
                  -f [Fujiyama output matrix, default None] \\
                  -t [TrackEM output matrix, default None]\\

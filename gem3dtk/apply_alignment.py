@@ -129,7 +129,7 @@ def affine_ssdna(inputssdna,prefix,affine,flip,N):
         w,h,_=dapi_data.shape
     else:
         w,h= dapi_data.shape
-    if len(dapi_data.shape) == 3 : # RGB tiff to 8 bit gray tiff
+    if len(dapi_data.shape) == 3 : # RGB to 8 bit gray 
         new_data = np.zeros((dapi_data.shape[0],dapi_data.shape[1]),dtype=int)
         new_data = new_data + dapi_data[
             :,:,0]
@@ -142,7 +142,7 @@ def affine_ssdna(inputssdna,prefix,affine,flip,N):
     outd = nd.affine_transform(ind.T,affine,output_shape=(h,w),order=0)
     outd = outd.T
     outd = outd.astype('uint8')
-    skio.imsave(f'{prefix}_{N}.tif',outd)
+    skio.imsave(f'{prefix}_{N}.png',outd)
 
 def affine_h5ad(inputh5ad,affine,value,transform):
     h5ad=anndata.read(inputh5ad)

@@ -8,10 +8,10 @@ import getopt
 def prepare_alignment_image_usage():
     print(""""
 Usage : prepare_alignment_image.py -m <mask.txt>
-                                   -o <output.tif>
+                                   -o <output.png>
                                    -t <celltype.csv>
 Sample : prepare_alignment_image.py -m mask.txt \\
-                                    -o output.tif \\
+                                    -o output.png \\
                                     -t celltype.csv
     """,flush=True)
 

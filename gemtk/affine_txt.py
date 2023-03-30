@@ -18,7 +18,7 @@ Usage : affine_txt.py  -i <input.txt>
 Example :
         affine_txt.py -i input.txt \\
                             -o out.txt \\
-                            -r ref.tif \\
+                            -r ref.png \\
                             -f fliph \\
                             -F '[[1,0,10],[0,1,0],[0.0, 0.0, 1.0]]'   
 Notice: please provide one of [ -B , -F ], if both present, the later one will overwrite previous one.

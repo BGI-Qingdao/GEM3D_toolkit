@@ -5,10 +5,15 @@ import scipy.ndimage as nd
 from skimage import io as skio
 import numpy as np
 
+from PIL import ImageFile
+from PIL import Image
+
+ImageFile.LOAD_TRUNCATED_IMAGES = True
+Image.MAX_IMAGE_PIXELS = None
 # usage
 def affine_ssdna_usage():
     print("""
-Usage : affine_ssdna.py  -i <input.tif> \\
+Usage : affine_ssdna.py  -i <input.tif/png> \\
                              -o <output> \\
                              -B <backword (reverse) affine matrix> \\
                              -F <forword affine matrix> \\
@@ -16,9 +21,9 @@ Usage : affine_ssdna.py  -i <input.tif> \\
                              -f [fliph/flipv/noflip, default noflip] 
 
 Example :
-        affine_ssdna.py -i input.tif \\
-                            -o out.tif \\
-                            -r ref.tif \\
+        affine_ssdna.py -i input.png \\
+                            -o out.png \\
+                            -r ref.png \\
                             -f fliph  \\
                             -F '[[1,0,10],[0,1,0],[0.0, 0.0, 1.0]]'   
 Notice: please provide one of [ -B , -F ], if both present, the later one will overwrite previous one.
@@ -69,7 +74,7 @@ def affine_ssdna_main(argv:[]) :
     print(f'ref w={w}, h={h}')
 
     dapi_data  = skio.imread(inputf)
-    if len(dapi_data.shape) == 3 : # RGB tiff to 8 bit gray tiff
+    if len(dapi_data.shape) == 3 : # RGB to 8 bit gray
         new_data = np.zeros((dapi_data.shape[0],dapi_data.shape[1]),dtype=int)
         new_data = new_data + dapi_data[:,:,0]
         new_data = new_data + dapi_data[:,:,1]

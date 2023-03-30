@@ -12,7 +12,7 @@ from gemtk.save_miscdf import *
 def mask_gem_usage():
     print("""
 Usage : GEM_toolkit.py maskgem -i <input.gem> \\
-                               -m <mask.tif>  \\
+                               -m <mask.png>  \\
                                -o <output-folder> \\
                                -x [default None, xmin] \\
                                -y [default None, ymin]

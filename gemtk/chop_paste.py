@@ -54,29 +54,29 @@ def chop_paste_main(argv:[]):
         img = io.imread(imgname[0])
         if function == 'y':
             img1 = img[0:int(img.shape[0] / num), ]
-            io.imsave(f"{prefix}.img1.tif", img1)
+            io.imsave(f"{prefix}.img1.png", img1)
             for i in range(1,num):
                 img2 = img[int(img.shape[0] * i/ num):int(img.shape[0] * (i+1)/ num),]
-                io.imsave(f"{prefix}.img{i+1}.tif",img2)
+                io.imsave(f"{prefix}.img{i+1}.png",img2)
         elif function == 'x':
             img1 = img[:, 0:int(img.shape[1] / num)]
-            io.imsave(f"{prefix}.img1.tif",img1)
+            io.imsave(f"{prefix}.img1.png",img1)
             for i in range(1,num):
                 img2 = img[:,int(img.shape[1] * i/ num):int(img.shape[1] * (i+1)/ num)]
-                io.imsave(f"{prefix}.img{i+1}.tif",img2)
+                io.imsave(f"{prefix}.img{i+1}.png",img2)
     elif (n > 1)  & (mode == 'paste'):
         if function == 'y':
             img = io.imread(imgname[0])
             for i in range(1,n):
                 img1 = io.imread(imgname[i])
                 img = np.vstack((img,img1))
-            io.imsave(f"{prefix}.after_paste.tif", img)
+            io.imsave(f"{prefix}.after_paste.png", img)
         elif function == 'x':
             img = io.imread(imgname[0])
             for i in range(1,n):
                 img1 = io.imread(imgname[i])
                 img = np.hstack((img,img1))
-            io.imsave(f"{prefix}.after_paste.tif", img)
+            io.imsave(f"{prefix}.after_paste.png", img)
     elif (n == 1) & (mode == 'paste'):
         print("please input file quantity more than one")
     elif (n > 1) & (mode == 'chop'):

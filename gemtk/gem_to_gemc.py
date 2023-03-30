@@ -16,7 +16,7 @@ from skimage import filters
 def gem_to_cfm_usage():
     print("""
 Usage : GEM_toolkit.py gem_to_gemc \\
-             -s <ssdna tiff file> \\
+             -s <ssdna tif/png file> \\
              -g <gem file>  \\
              -b <cell segment outline file> \\
              -m <cell segment mask file>\\
@@ -31,19 +31,19 @@ Usage : GEM_toolkit.py gem_to_gemc \\
              -o <output prefix>
 Notice:
 total 5 model
-    1. -s ssdna.tif -g gem.gem -b border.txt -m mask.txt -r roi_affine.json -o output  
+    1. -s ssdna.png -g gem.gem -b border.txt -m mask.txt -r roi_affine.json -o output  
     function: gem to cfm if you have successful cell segmentation and roi registration results 
     
-    2. -s ssdna.tif -g gem.gem -b border.txt -m mask.txt -a affine_matrix.txt -o output 
+    2. -s ssdna.png -g gem.gem -b border.txt -m mask.txt -a affine_matrix.txt -o output 
     function: gem to cfm if you have successful cell segmentation and all registration results
     
-    3. -s ssdna.tif -g gem.gem -a affine_matrix.txt -o output
+    3. -s ssdna.png -g gem.gem -a affine_matrix.txt -o output
     function: gem to mask gem if you only have all registration results
     
-    4. -s ssdna.tif -o output
+    4. -s ssdna.png -o output
     function: ssdna to mask with specific manner
     
-    5. -M mask.tif -g gem.gem -a affine_matrix.txt -o output
+    5. -M mask.png -g gem.gem -a affine_matrix.txt -o output
     function: gem to mask gem only with a mask which make by yourself
      
 """,flush=True)
@@ -124,7 +124,7 @@ def get_heatmap(gem_data):
 def get_mask(ssdna_file,prefix,value,expand):
     ssdna = skio.imread(ssdna_file)
     ssdna = img_as_ubyte(ssdna)
-    if len(ssdna.shape) == 3:  # RGB tiff to 8 bit gray tiff
+    if len(ssdna.shape) == 3:  # RGB to 8 bit gray 
         if ssdna.shape[2] == 3:
             new_data = np.zeros((ssdna.shape[0], ssdna.shape[1]), dtype=int)
             new_data = new_data + ssdna[:, :, 0]
@@ -168,7 +168,7 @@ def get_mask(ssdna_file,prefix,value,expand):
     # print(edges)
     # edges = edges.astype('uint8')'''
 
-    skio.imsave(f'{prefix}.mask.tif', ssdna_dilation)
+    skio.imsave(f'{prefix}.mask.png', ssdna_dilation)
     return ssdna_dilation
 
 def ssdna_cut_gem(prefix,ssdna_file,gem_file,affine,value,expand,Zip,Name):
@@ -193,8 +193,8 @@ def ssdna_cut_gem(prefix,ssdna_file,gem_file,affine,value,expand,Zip,Name):
        check_call(f'gzip {prefix}.{Name}.gem',shell=True)
     else:
        gem_cut.to_csv(f'{prefix}.{Name}.gem', sep='\t', header=True, index=False)
-    skio.imsave(f'{prefix}.heatmap.tif',heatmap_image)
-    skio.imsave(f'{prefix}.heatmap.mask.tif',heatmap)
+    skio.imsave(f'{prefix}.heatmap.png',heatmap_image)
+    skio.imsave(f'{prefix}.heatmap.mask.png',heatmap)
 
 def mask_cut_gem(prefix,mask_file,gem_file,affine,Zip,Name):
 
@@ -218,8 +218,8 @@ def mask_cut_gem(prefix,mask_file,gem_file,affine,Zip,Name):
        check_call(f'gzip {prefix}.{Name}.gem',shell=True)
     else:
        gem_cut.to_csv(f'{prefix}.{Name}.gem', sep='\t', header=True, index=False)
-    skio.imsave(f'{prefix}.heatmap.tif',heatmap_image)
-    skio.imsave(f'{prefix}.heatmap.mask.tif',heatmap)
+    skio.imsave(f'{prefix}.heatmap.png',heatmap_image)
+    skio.imsave(f'{prefix}.heatmap.mask.png',heatmap)
 
 def gem_to_cfm_main(argv:[]):
     prefix = ''
@@ -293,7 +293,7 @@ def gem_to_cfm_main(argv:[]):
         # load ssdna
         dapi_data = skio.imread(ssdna)
         dapi_data = img_as_ubyte(dapi_data)
-        if len(dapi_data.shape) == 3:  # RGB tiff to 8 bit gray tiff
+        if len(dapi_data.shape) == 3:  # RGB to 8 bit gray 
             if dapi_data.shape[2] == 3:
                 new_data = np.zeros((dapi_data.shape[0], dapi_data.shape[1]), dtype=int)
                 new_data = new_data + dapi_data[:, :, 0]
@@ -311,13 +311,6 @@ def gem_to_cfm_main(argv:[]):
                 dapi_data = dapi_data.astype('uint8')
 
         print(f'ssdna file is {ssdna}')
-        #if len(dapi_data.shape) == 3 : # RGB tiff to 8 bit gray tiff
-        #    new_data = np.zeros((dapi_data.shape[0],dapi_data.shape[1]),dtype=int)
-        #    new_data = new_data + dapi_data[:,:,0]
-        #    new_data = new_data + dapi_data[:,:,1]
-        #    new_data = new_data + dapi_data[:,:,2]
-        #    new_data = (new_data+2) / 3
-        #    dapi_data = new_data
         dapi_data = dapi_data.astype('uint8')
 
         # load cell ids and borders
@@ -359,9 +352,9 @@ def gem_to_cfm_main(argv:[]):
             affined_roi_ssdna = nd.affine_transform(roi_ssdna.T,affineR,output_shape=(wh,hh),order=0)
             affined_roi_ssdna = affined_roi_ssdna.T
             #affined_roi_ssdna = affined_roi_ssdna[300:-300, 300:-300]
-            skio.imsave(f'{prefix}/{item_name}.ssDNA.tif',affined_roi_ssdna)
+            skio.imsave(f'{prefix}/{item_name}.ssDNA.png',affined_roi_ssdna)
             affined_roi_ssdna[affined_roi_border==1]=255
-            skio.imsave(f'{prefix}/{item_name}.ssDNA.border_masked.tif',affined_roi_ssdna)
+            skio.imsave(f'{prefix}/{item_name}.ssDNA.border_masked.png',affined_roi_ssdna)
             print(f'{item_name} mask and border image is saved')
 
             #xh, yh, wh, hh = xh + 300, yh + 300, wh - 600, hh - 600
@@ -392,7 +385,7 @@ def gem_to_cfm_main(argv:[]):
             heatmap_image = heatmap_image.groupby(['x', 'y']).agg(UMI_sum=('MIDCounts', 'sum')).reset_index()
             coords_image[heatmap_image['y'], heatmap_image['x']] = heatmap_image['UMI_sum']
             coords_image = coords_image.astype('uint8')
-            skio.imsave(f'{prefix}/{item_name}.heatmap.tif',coords_image)
+            skio.imsave(f'{prefix}/{item_name}.heatmap.png',coords_image)
 
             cell_cems = choped_gem[choped_gem['cell'] != 0]
             cell_cems = cell_cems.copy()
@@ -400,9 +393,9 @@ def gem_to_cfm_main(argv:[]):
             cell_cems = cell_cems.groupby(['x', 'y']).agg(UMI_sum=('MIDCounts', 'sum')).reset_index()
             coords[cell_cems['y'], cell_cems['x']] = cell_cems['UMI_sum']
             coords = coords.astype('uint8')
-            skio.imsave(f'{prefix}/{item_name}.heatmap.mask.tif',coords)
+            skio.imsave(f'{prefix}/{item_name}.heatmap.mask.png',coords)
             coords[affined_roi_border==1]=255
-            skio.imsave(f'{prefix}/{item_name}.heatmap.border_masked.tif',coords)
+            skio.imsave(f'{prefix}/{item_name}.heatmap.border_masked.png',coords)
 
     elif ssdna != "" and mask != "" and prefix != "" and border != "" and gem != "" and roi_affines == "" and affine !="" and Mask =="":
 
@@ -411,7 +404,7 @@ def gem_to_cfm_main(argv:[]):
         gem_data = pd.read_csv(gem, sep='\t', header=0, compression='infer', comment='#')
         gem_image = gem_data.copy()
         heatmap = get_heatmap(gem_image)
-        skio.imsave(f'{prefix}.heatmap.tif',heatmap)
+        skio.imsave(f'{prefix}.heatmap.png',heatmap)
 
         print(f'gem file is {gem}')
         if len(gem_data.columns) == 4 :
@@ -427,7 +420,7 @@ def gem_to_cfm_main(argv:[]):
         # load ssdna
         ssdna_data = skio.imread(ssdna)
         ssdna_data = img_as_ubyte(ssdna_data)
-        if len(ssdna_data.shape) == 3:  # RGB tiff to 8 bit gray tiff
+        if len(ssdna_data.shape) == 3:  # RGB to 8 bit gray
             if ssdna_data.shape[2] == 3:
                 new_data = np.zeros((ssdna_data.shape[0], ssdna_data.shape[1]), dtype=int)
                 new_data = new_data + ssdna_data[:, :, 0]
@@ -444,7 +437,7 @@ def gem_to_cfm_main(argv:[]):
                 ssdna_data = new_data
                 ssdna_data = ssdna_data.astype('uint8')
             print(f'ssdna file is {ssdna}')
-        #if len(ssdna_data.shape) == 3 : # RGB tiff to 8 bit gray tiff
+        #if len(ssdna_data.shape) == 3 : # RGBto 8 bit gray
         #    new_data = np.zeros((ssdna_data.shape[0],ssdna_data.shape[1]),dtype=int)
         #    new_data = new_data + ssdna_data[:,:,0]
         #    new_data = new_data + ssdna_data[:,:,1]
@@ -472,9 +465,9 @@ def gem_to_cfm_main(argv:[]):
 
         affined_ssdna = nd.affine_transform(ssdna_data.T, affineR, output_shape=heatmap.T.shape, order=0)
         affined_ssdna = affined_ssdna.T
-        skio.imsave(f'{prefix}.ssDNA.tif', affined_ssdna)
+        skio.imsave(f'{prefix}.ssDNA.png', affined_ssdna)
         affined_ssdna[affined_border == 1] = 255
-        skio.imsave(f'{prefix}.ssDNA.border_masked.tif', affined_ssdna)
+        skio.imsave(f'{prefix}.ssDNA.border_masked.png', affined_ssdna)
         print(f'{prefix} mask and border image is saved')
 
 
@@ -508,9 +501,9 @@ def gem_to_cfm_main(argv:[]):
         cell_cems = cell_cems.groupby(['x', 'y']).agg(UMI_sum=('MIDCounts', 'sum')).reset_index()
         coords[cell_cems['y'], cell_cems['x']] = cell_cems['UMI_sum']
         coords = coords.astype('uint8')
-        skio.imsave(f'{prefix}.heatmap.mask.tif', coords)
+        skio.imsave(f'{prefix}.heatmap.mask.png', coords)
         coords[affined_border == 1] = 255
-        skio.imsave(f'{prefix}.heatmap.border_masked.tif', coords)
+        skio.imsave(f'{prefix}.heatmap.border_masked.png', coords)
 
     elif ssdna != "" and mask == "" and prefix != "" and border == "" and gem != "" and roi_affines == "" and affine != "" and Mask == "":
         ssdna_cut_gem(prefix,ssdna,gem,affine,value,expand,Zip,Name)

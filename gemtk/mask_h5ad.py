@@ -9,7 +9,7 @@ from gemtk.h5ad_dataframe import h5ad_dataframe
 def mask_h5ad_usage():
     print("""
 Usage : GEM_toolkit.py maskh5ad -i <input.h5ad> \\
-                               -m <mask.tif>  \\
+                               -m <mask.png>  \\
                                -o <output.h5ad> \\
                                -x [default None, xmin] \\
                                -y [default None, ymin]

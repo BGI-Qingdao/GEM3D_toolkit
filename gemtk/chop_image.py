@@ -19,7 +19,7 @@ def chopimages(roi_json,prefix):
         Width=roi[3]
         Height=roi[4]
         cropped = img.crop((BX,BY,BX+Width,BY+Height))
-        cropped.save("{}/{}.tif".format(prefix,item_name))
+        cropped.save("{}/{}.png".format(prefix,item_name))
     print("{} done".format(slice_name),flush=True)
 
 ############################################################################
