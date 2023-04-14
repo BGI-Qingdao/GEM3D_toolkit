@@ -36,7 +36,7 @@ def merge_h5ad_main(argv:[]):
         except:
             data=anndata.read(filepath+'/'+files[i])
         data.obs.index=pd.DataFrame(data.obs.index)[0].apply(lambda x : 'm'+str(i)+'_'+str(x))
-        data.obs.index.name=''
+        data.obs.index.name='m'+str(i)
         if i==0:
             h5admerge=data
         else:
