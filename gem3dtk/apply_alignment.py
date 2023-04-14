@@ -153,6 +153,7 @@ def affine_h5ad(inputh5ad,affine,value,S):
     h5ad.obs['new_y']=np.array(affine_result[1:2,:].T)
     h5ad.obs['z']=np.array([int(value) for _ in range(h5ad.obs.x.shape[0])])
     if S!='':
+        h5ad.obs.index=pd.DataFrame(h5ad.obs.index)[0].apply(lambda x : str(S)+str(x))
         h5ad.obs.index.name=S
     return h5ad
 
