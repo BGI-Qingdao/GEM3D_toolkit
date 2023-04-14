@@ -18,11 +18,11 @@ Usage : apply_alignment.py  -i <input.json>
 
 
 input.json  :
-            {
+            {       
                 "data"  :  [
-                             ["gemfile_1","h5adfile_1","ssdnafile_1","maskfile_1","[[1,0,10], [0,1,0],[0.0, 0.0, 1.0]]","z_value","[[1,0,0], [0,1,0],[0.0, 0.0, 1]]"],
+                             ['S1',"gemfile_1","h5adfile_1","ssdnafile_1","maskfile_1","[[1,0,10], [0,1,0],[0.0, 0.0, 1.0]]","z_value","[[1,0,0], [0,1,0],[0.0, 0.0, 1]]"],
                                     ....
-                             ["gemfile_N","h5adfile_N","ssdnafile_N","maskfile_N","[[1,0,10], [0,1,0],[0.0, 0.0, 1.0]]","z_value","[[1,0,0], [0,1,0],[0.0, 0.0, 1]]"]
+                             ['Sn',"gemfile_N","h5adfile_N","ssdnafile_N","maskfile_N","[[1,0,10], [0,1,0],[0.0, 0.0, 1.0]]","z_value","[[1,0,0], [0,1,0],[0.0, 0.0, 1]]"]
                                 ]            
                 ]
             }
@@ -79,25 +79,25 @@ def apply_alignment_main(argv:[]):
         try:
             collection=collections[i]
             if a == 'F':
-                affine=np.matrix(np.array(json.loads(collection[4])))
+                affine=np.matrix(np.array(json.loads(collection[5])))
             elif a == "B":
-                affine=np.matrix(np.array(json.loads(collection[4]))).I
+                affine=np.matrix(np.array(json.loads(collection[5]))).I
         except:
             print("file of json is erro !!!")
             apply_alignment_usage()
             sys.exit(0)
-        if collection[0]!='':
-            if tflag == False:
-                affine_gem(collection[0],prefix,affine,i+1,collection[5])
-            else:
-                transform=np.matmul(np.matrix(np.array(json.loads(collection[6]))),affine)
-                affine_gem(collection[0],prefix,transform,i+1,collection[5])
         if collection[1]!='':
             if tflag == False:
-                h5ad=affine_h5ad(collection[1],affine,collection[5])
+                affine_gem(collection[1],prefix,affine,i+1,collection[6])
             else:
-                transform=np.matmul(np.matrix(np.array(json.loads(collection[6]))),affine)
-                h5ad=affine_h5ad(collection[1],transform,collection[5])
+                transform=np.matmul(np.matrix(np.array(json.loads(collection[7]))),affine)
+                affine_gem(collection[1],prefix,transform,i+1,collection[6])
+        if collection[2]!='':
+            if tflag == False:
+                h5ad=affine_h5ad(collection[2],affine,collection[6],collection[0])
+            else:
+                transform=np.matmul(np.matrix(np.array(json.loads(collection[7]))),affine)
+                h5ad=affine_h5ad(collection[2],transform,collection[6],collection[0])
             if hflag==False:
                 h5ad.write(f'{prefix}_{i+1}.h5ad',compression='gzip')
             else:
@@ -107,10 +107,10 @@ def apply_alignment_main(argv:[]):
                     h5admerge=h5admerge.concatenate(h5ad)
                 if int(i+1)==int(N):
                     h5admerge.write(f'{prefix}_merged.h5ad',compression='gzip')
-        if collection[2]!='':
-            affine_ssdna(collection[2],prefix,affine,i+1)
         if collection[3]!='':
-            affine_txt(collection[3],prefix,affine,i+1)
+            affine_ssdna(collection[3],prefix,affine,i+1)
+        if collection[4]!='':
+            affine_txt(collection[4],prefix,affine,i+1)
 
 def affine_gem(inputgem,prefix,affine,N,value):
     df = pd.read_csv(inputgem, sep='\t', comment='#')
@@ -144,7 +144,7 @@ def affine_ssdna(inputssdna,prefix,affine,flip,N):
     outd = outd.astype('uint8')
     skio.imsave(f'{prefix}_{N}.png',outd)
 
-def affine_h5ad(inputh5ad,affine,value):
+def affine_h5ad(inputh5ad,affine,value,S):
     h5ad=anndata.read(inputh5ad)
     h5adxy=np.array(h5ad.obs[["x",'y']])
     h5adxy=np.insert(h5adxy,2,values=np.ones((h5adxy.shape[0],)),axis=1)
@@ -152,6 +152,8 @@ def affine_h5ad(inputh5ad,affine,value):
     h5ad.obs['new_x']=np.array(affine_result[0:1,:].T)
     h5ad.obs['new_y']=np.array(affine_result[1:2,:].T)
     h5ad.obs['z']=np.array([int(value) for _ in range(h5ad.obs.x.shape[0])])
+    if S!='':
+        h5ad.obs.index.name=S
     return h5ad
 
 def affine_txt(inputmask,prefix,affine,flip,N):
