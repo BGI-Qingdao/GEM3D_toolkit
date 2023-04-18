@@ -8,6 +8,12 @@ from skimage import io as skio
 
 from multiprocessing import Pool
 
+from PIL import ImageFile
+from PIL import Image
+
+ImageFile.LOAD_TRUNCATED_IMAGES = True
+Image.MAX_IMAGE_PIXELS = None
+
 def get_fujiyama(param : str) -> np.matrix:
     """
         handle  '0.9789672225355872 -0.014001262294250694 0 0.014001262294229377 0.9789672225355872 0 0 0 0.9790673409653101 -49.386112981985995 -98.51787299912003 0'

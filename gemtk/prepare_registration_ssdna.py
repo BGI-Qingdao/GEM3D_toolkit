@@ -46,7 +46,7 @@ def get_mask_dapi(dapi_file,min_brightness,width_pixel,height_pixel,chip,prefix,
         dapi_data[ dapi_data <= min_brightness ] = 255 - dapi_data[ dapi_data <= min_brightness ]
         dapi_data[ raw_dapi > min_brightness ] = 0
         dapi_data[ dapi_data > 0 ] = 256 - dapi_data[ dapi_data > 0 ]
-        dapi_data[ dapi_data > 0 ] = (255+(100//(min_brightness)))-( (100//(min_brightness)) * dapi_data[ dapi_data > 0 ])
+        dapi_data[ dapi_data > 0 ] = (255-((100//(min_brightness+1)) * dapi_data[ dapi_data > 0 ]))
         raw_dapi[ dapi_data >0 ] = dapi_data[dapi_data>0]
 
     if chip == 'chip715' :

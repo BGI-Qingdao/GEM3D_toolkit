@@ -29,23 +29,25 @@ Usage : GEM_toolkit.py gem_to_gemc \\
              -Z <output the fold gem>
              -N <customize the after_cut.gem file name, default TissueCut>
              -o <output prefix>
+             -x [xshift to heatmap/ssdna, default xmin]
+             -y [yshift to heatmap/ssdna, default ymin]
 Notice:
 total 5 model
     1. -s ssdna.png -g gem.gem -b border.txt -m mask.txt -r roi_affine.json -o output  
     function: gem to cfm if you have successful cell segmentation and roi registration results 
-    
+
     2. -s ssdna.png -g gem.gem -b border.txt -m mask.txt -a affine_matrix.txt -o output 
     function: gem to cfm if you have successful cell segmentation and all registration results
-    
+
     3. -s ssdna.png -g gem.gem -a affine_matrix.txt -o output
     function: gem to mask gem if you only have all registration results
-    
+
     4. -s ssdna.png -o output
     function: ssdna to mask with specific manner
-    
+
     5. -M mask.png -g gem.gem -a affine_matrix.txt -o output
     function: gem to mask gem only with a mask which make by yourself
-     
+
 """,flush=True)
 
 def get_ids(data_map, data):
@@ -53,50 +55,6 @@ def get_ids(data_map, data):
     for index, x in enumerate(data):
         ids[index] = data_map[x]
     return ids
-
-
-
-def gemc_to_cfm_all(gemc,prefix):
-
-    gems = gemc
-    #pd.read_csv(f'{prefix}.gemc', sep='\t',header=0, compression='infer', comment='#')
-    gems.columns = ['geneID', 'x', 'y', 'MIDCounts', 'cell']
-
-    agg_gems = gems.groupby(by=['cell', 'geneID']).agg(np.sum).reset_index()  # ??
-    cells = np.unique(agg_gems['cell'])
-    genes = np.unique(agg_gems['geneID'])
-
-    os.mkdir(f'{prefix}_cfm')
-    np.savetxt(f'{prefix}_cfm/barcodes.tsv', cells.T, fmt="%s")
-    check_call(f'gzip {prefix}_cfm/barcodes.tsv', shell=True)
-    np.savetxt(f'{prefix}_cfm/features.tsv', genes.T, fmt="%s")
-    check_call(f'gzip {prefix}_cfm/features.tsv', shell=True)
-
-    cell_map = {}
-    gene_map = {}
-    for index, gene in enumerate(genes):
-        gene_map[gene] = index + 1
-    for index, cell in enumerate(cells):
-        cell_map[cell] = index + 1
-
-
-    #
-    mtx = pd.DataFrame(columns=('cid', 'gid', 'count'), index=range(len(agg_gems)))
-    mtx['cid'] = get_ids(cell_map, agg_gems['cell'])
-    mtx['gid'] = get_ids(gene_map, agg_gems['geneID'])
-    mtx['count'] = agg_gems['MIDCounts']
-
-    sourceFile = open(f'{prefix}_cfm/mtx.csv', 'w')
-    sourceFile.writelines(
-        """%%MatrixMarket matrix coordinate integer general                                   
-        %metadata_json: {"software_version": "Cell Ranger 4", "format_version": 2}           
-        """)
-    sourceFile.writelines("{} {} {}\n".format(len(gene_map), len(cell_map), len(mtx)))
-    for _, row in mtx.iterrows():
-        sourceFile.writelines("{} {} {}\n".format(row['gid'], row['cid'], row['count']))
-    sourceFile.close()
-    check_call(f'gzip {prefix}_cfm/mtx.csv', shell=True)
-    print(f'{prefix} cfm file is saved')
 
 def get_heatmap(gem_data):
     if len(gem_data.columns) == 4:
@@ -371,13 +329,13 @@ def gem_to_cfm_main(argv:[]):
 
             choped_gem_tosave['x'] = choped_gem_tosave['x'] + gem_data_x_min + xh
             choped_gem_tosave['y'] = choped_gem_tosave['y'] + gem_data_y_min + yh
-            choped_gem_tosave.to_csv(f'{prefix}/{item_name}.gemc', sep='\t', header=True, index=False)
+            #choped_gem_tosave.to_csv(f'{prefix}/{item_name}.gemc', sep='\t', header=True, index=False)
 
             #delete cells outside mask
             cell_cems_tosave = choped_gem_tosave[choped_gem_tosave['cell']!=0]
             deleted_gems_tosave = choped_gem_tosave[choped_gem_tosave['cell']==0]
             cell_cems_tosave.to_csv(f'{prefix}/{item_name}.gemc_saved',sep='\t',header=True,index=False)
-            deleted_gems_tosave.to_csv(f'{prefix}/{item_name}.gemc_deleted',sep='\t',header=True,index=False)
+            #deleted_gems_tosave.to_csv(f'{prefix}/{item_name}.gemc_deleted',sep='\t',header=True,index=False)
             print(f'{item_name} gemc file is saved')
 
             heatmap_image = choped_gem.copy()
@@ -483,16 +441,15 @@ def gem_to_cfm_main(argv:[]):
 
         choped_gem_tosave['x'] = choped_gem_tosave['x'] + gem_data_x_min + choped_gem_x_min
         choped_gem_tosave['y'] = choped_gem_tosave['y'] + gem_data_y_min + choped_gem_y_min
-        choped_gem_tosave.to_csv(f'{prefix}.gemc', sep='\t', header=True, index=False)
+        #choped_gem_tosave.to_csv(f'{prefix}.gemc', sep='\t', header=True, index=False)
 
         # delete cells outside mask
         cell_cems_tosave = choped_gem_tosave[choped_gem_tosave['cell'] != 0]
         deleted_gems_tosave = choped_gem_tosave[choped_gem_tosave['cell'] == 0]
         cell_cems_tosave.to_csv(f'{prefix}.gemc_saved', sep='\t', header=True, index=False)
-        deleted_gems_tosave.to_csv(f'{prefix}.gemc_deleted', sep='\t', header=True, index=False)
+        #deleted_gems_tosave.to_csv(f'{prefix}.gemc_deleted', sep='\t', header=True, index=False)
         print(f'{prefix} gemc file is saved')
 
-        gemc_to_cfm_all(cell_cems_tosave, prefix)
 
         cell_cems = choped_gem[choped_gem['cell'] != 0]
         cell_cems = cell_cems.copy()
