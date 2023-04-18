@@ -53,6 +53,7 @@ Actions:
     trakEM2_to_affine             covert trakEM2_matrix to standart affine matrix.
     get_xml_matrix                get matrix from trakEM2 xml file.
     split_gem                     split gem by x or y coordinate.
+    merge_h5ad                    merge files of h5ad.
 
     -----------------------------------------------------------------
     -h/--help               show this short usage
@@ -89,7 +90,8 @@ if __name__ == "__main__":
                                                    "image_blend",
                                                    "draw_heatmap",
                                                    "get_xml_matrix",
-                                                   "split_gem"
+                                                   "split_gem",
+                                                   "merge_h5ad"
 
                                                    ) :
         main_usage()
@@ -180,7 +182,11 @@ if __name__ == "__main__":
         exit(0)
     elif sys.argv[1] == "split_gem" :
         from gemtk.split_gem import split_gem_main
-        split_gem_main(sys.argv[2:])                          
+        split_gem_main(sys.argv[2:]) 
+    elif sys.argv[1] == "merge_h5ad" :
+        from gemtk.merge_h5ad import merge_h5ad_main
+        merge_h5ad_main(sys.argv[2:])
+        exit(0)                         
     else:
         main_usage()
         exit(1)
