@@ -81,5 +81,14 @@ def gem_to_h5ad_main(argv:[]):
     print(f'iter done for #cell={ncell}, #gene={ngene}.',flush=True)
     print(time.strftime("%Y-%m-%d %H:%M:%S"),flush=True)
     print('save h5ad now...')
+    num_genes = np.sum(densityarray>0,axis=1)
+    num_umi = np.sum(densityarray,axis=1)
+    data.obs['nGenes'] = num_genes
+    data.obs['nUMI'] = num_umi
+    print(f'iter done for #cell={ncell}, #gene={ngene}.',flush=True)
+    print(f'average gene = {np.mean(num_genes)}')
+    print(f'median gene = {np.median(num_genes)}')
+    print(f'average umi = {np.mean(num_umi)}')
+    print(f'median umi = {np.median(num_umi)}')
     data.write(f'{prefix}.h5ad',compression='gzip')
     print('all done')

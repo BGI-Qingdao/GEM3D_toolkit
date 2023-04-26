@@ -165,7 +165,7 @@ class slice_dataframe:
                                                                                   row['x'] - self.min_x],
                                                            axis=1)
         self.m_dataframe = self.m_dataframe[ self.m_dataframe['valid'] != 0 ].copy()
-        self.m_dataframe = self.m_dataframe.drop(columns=['valid'])  
+        self.m_dataframe = self.m_dataframe.drop(columns=['valid'])
 
     def get_expression_count_vector(self,binsize=50) -> np.ndarray:
         """
