@@ -10,7 +10,7 @@ import scipy.ndimage as nd
 #Usage 
 def apply_alignment_usage():
     print("""
-Usage : apply_alignment.py  -i <input.json>
+Usage : apply_alignment.py  -i <input.json or input.csv>
                             -o [outputdir]
                             -a [F/B , default F]
                             -t [True/False,default Flase]
@@ -35,13 +35,23 @@ Sample : apply_alignment.py  -i input.json \\
     """,flush=True)
 
 def apply_alignment_main(argv:[]):
-    jsonfile=''
+    inputfile=''
     affine=''
     prefix=''
     a="F"
     hflag=False
     h5admerge=''
     tflag=False
+    _Z_values=''
+    gem_path=''
+    h5ad_path=''
+    ssdna_path=''
+    mask_path=''
+    _2D=''
+    _3D=''
+    _3D_2D=''
+    _flag=''
+    json_data=''
     try:
          opts ,args =getopt.getopt(argv,"hi:o:a:m:t:",["help=",
                                                      "input=",
@@ -55,7 +65,7 @@ def apply_alignment_main(argv:[]):
             apply_alignment_usage()
             sys.exit(0)
         elif opt in ("-i","--input"):
-            jsonfile = arg
+            inputfile = arg
         elif opt in ("-o","--output"):
             prefix = arg 
         elif opt in ("-a"):
@@ -67,11 +77,49 @@ def apply_alignment_main(argv:[]):
         elif opt in ('-t'):
             tflag = arg
         
-    if jsonfile == '' or prefix == '':
+    if inputfile == '' or prefix == '':
         apply_alignment_usage()
         sys.exit(0)
-    json_data=open(jsonfile,'r')
-    class_indict = json.load(json_data)
+    if '.json' in inputfile:
+        json_data=open(inputfile,'r')
+    if '.csv' in inputfile:
+        data=pd.read_csv(inputfile)
+        _columns=data.columns
+        input_json={}
+        json_list=[]
+        for i in range(len(data)):
+            if 'gem' in _columns:
+                gem_path=data['gem'][i]
+            if 'h5ad' in _columns:
+                h5ad_path=data['h5ad'][i]
+            if 'ssdna' in _columns:
+                ssdna_path=data['sdna'][i]
+            if 'mask' in _columns:
+                mask_path=data['mask'][i]
+            if 'mask' in _columns:
+                mask_path=data['mask'][i]
+            if '2D backdward' in _columns:
+                _2D=data['2D backdward'][i]
+            if '3D forward' in _columns:
+                _3D=data['3D forward'][i]
+            if '3D*2D' in _columns:
+                _3D_2D=data['3D*2D'][i]
+            if 'Z_values' in _columns:
+                _Z_values=data['Z_values'][i]
+            if 'flag' in _columns:
+                _flag=data['flag'][i]
+            if _2D!='' and _3D!='':
+                if a == 'F':
+                    affine=np.matrix(np.array(json.loads(_2D)))
+                elif a == "B":
+                    affine=np.matrix(np.array(json.loads(_2D))).I
+                _3D_2D=np.matmul(np.matrix(np.array(json.loads(_3D))),affine)
+            json_list.append([_flag,gem_path,h5ad_path,ssdna_path,mask_path,_3D_2D,_Z_values,''])
+        input_json["data"]=json_list
+    if json_data!='':
+        class_indict = json.load(json_data)
+    else:
+        class_indict=input_json
     N_num=class_indict["data"]
     N=len(N_num)
     collections=class_indict["data"]
@@ -79,9 +127,15 @@ def apply_alignment_main(argv:[]):
         try:
             collection=collections[i]
             if a == 'F':
-                affine=np.matrix(np.array(json.loads(collection[5])))
+                try:
+                    affine=np.matrix(np.array(json.loads(collection[5])))
+                except:
+                    affine=collection[5]
             elif a == "B":
-                affine=np.matrix(np.array(json.loads(collection[5]))).I
+                try:
+                    affine=np.matrix(np.array(json.loads(collection[5]))).I
+                except:
+                    affine=collection[5].I
         except:
             print("file of json is erro !!!")
             apply_alignment_usage()
