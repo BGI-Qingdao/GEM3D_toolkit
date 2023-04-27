@@ -98,12 +98,12 @@ def apply_alignment_main(argv:[]):
                 mask_path=data['mask'][i]
             if 'mask' in _columns:
                 mask_path=data['mask'][i]
-            if '2D backdward' in _columns:
-                _2D=data['2D backdward'][i]
-            if '3D forward' in _columns:
-                _3D=data['3D forward'][i]
-            if '3D*2D' in _columns:
-                _3D_2D=data['3D*2D'][i]
+            if '2D_backdward' in _columns:
+                _2D=data['2D_backdward'][i]
+            if '3D_forward' in _columns:
+                _3D=data['3D_forward'][i]
+            #if '3D*2D' in _columns:
+            #    _3D_2D=data['3D*2D'][i]
             if 'Z_values' in _columns:
                 _Z_values=data['Z_values'][i]
             if 'flag' in _columns:
@@ -114,6 +114,11 @@ def apply_alignment_main(argv:[]):
                 elif a == "B":
                     affine=np.matrix(np.array(json.loads(_2D))).I
                 _3D_2D=np.matmul(np.matrix(np.array(json.loads(_3D))),affine)
+            elif _3D!='':
+                 _3D_2D=np.matrix(np.array(json.loads(_3D)))
+            else:
+                print('Error: 3D columns not exist! exit ...',flush=True)
+                sys.exit(1)
             json_list.append([_flag,gem_path,h5ad_path,ssdna_path,mask_path,_3D_2D,_Z_values,''])
         input_json["data"]=json_list
     if json_data!='':
