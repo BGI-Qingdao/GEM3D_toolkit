@@ -90,6 +90,8 @@ def gemc_to_h5ad_main(argv:[]):
     data.obs['nGenes'] = num_genes
     data.obs['nUMI'] = num_umi
     print(f'iter done for #cell={ncell}, #gene={ngene}.',flush=True)
+    print(f'total gene = {ngene}')
+    print(f'total cell = {ncell}')
     print(f'average spot = {np.mean(obs["nSpots"])}')
     print(f'median spot = {np.median(obs["nSpots"])}')
     print(f'average gene = {np.mean(num_genes)}')
