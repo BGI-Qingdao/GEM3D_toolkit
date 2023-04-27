@@ -58,7 +58,7 @@ Example :
 # As you see, now you could only need provide available data with any order of your wish.
 #
 # Correspondence between column-name and JSON data item.
-#   **************************************************
+#   ***************************************************************
 #   *         flag (default '') -- 1. Sn                          *
 #   *          gem (default '') -- 2. gemfile_N                   *
 #   *         h5ad (default '') -- 3. h5adfile_N                  *
@@ -70,7 +70,7 @@ Example :
 #   *      outline (default '') -- 9. outlinefile                 *
 #   *      x_shift (default 0 ) -- 10. x shift                    *
 #   *      y_shift (default 0 ) -- 11. y shift                    *
-#   **************************************************
+#   ***************************************************************
 #-------------------------------------------------------------------------------------------
 
 Enjoy :)
@@ -206,9 +206,9 @@ def apply_alignment_main(argv:[]):
         if collection[3]!='': #ssDNA
             affine_ssdna(collection[3],prefix,affine,collection[0],W,H)
         if collection[4]!='': #mask
-            affine_txt(collection[4],prefix,affine,collection[0],'mask')
+            affine_txt(collection[4],prefix,affine,collection[0],W,H,'mask')
         if collection[8]!='': #outline
-            affine_txt(collection[8],prefix,affine,collection[0],'outline')
+            affine_txt(collection[8],prefix,affine,collection[0],W,H,'outline')
 
 def affine_gem(inputgem,prefix,affine,Sn,zvalue,xmin,ymin):
     df = pd.read_csv(inputgem, sep='\t', comment='#')
