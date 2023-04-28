@@ -8,8 +8,20 @@ import json
 def get_xml_matrix_usage():
     print("""
 Usage : get_xml_matrix.py -i <file.xml>
-                         -o  <output>
+                          -o  <output>
     """,flush=True)
+
+def get_trackEM_forward(param :str) -> np.matrix:
+    """
+    handle '-0.010963829,-0.999939895,0.999939895,-0.010963829,-129.2603788,1664.628308'
+    @return reverse affine matrix.
+    """
+    affine = np.zeros((3,3))
+    in_data = np.array(param.split(',')).astype(float).reshape((3,2))
+    affine[0:2,:]=in_data.T
+    affine[2] = [0,0,1]
+    return np.matrix(affine)
+
 
 def get_xml_matrix_main(argv:[]):
     file=''
@@ -45,6 +57,12 @@ def get_xml_matrix_main(argv:[]):
             transform = patch.getAttribute("transform")
             transform = transform[7:-1]
             patch_list.append(transform)
-        json_list.append(patch_list)
+            forward = get_trackEM_forward(transform)
+            backward = forward.I
+            patch_list.append('Forward affine matrix: ')
+            patch_list.append(json.dumps(forward.tolist()))
+            patch_list.append('Backward affine matrix: ')
+            patch_list.append(json.dumps(backward.tolist()))
+            json_list.append(patch_list)
     with open(f"{prefix}.json",'w') as f:
-        json.dump(json_list,f)
+        json.dump(json_list,f,indent='\t')

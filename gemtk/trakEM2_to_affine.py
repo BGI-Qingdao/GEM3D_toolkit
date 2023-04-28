@@ -31,9 +31,9 @@ def trackEM2_to_affine_usage():
 Usage : trackEM2_to_affine.py -t <trakEM ssDNA matrix> \\
                                  -T <trakEM headmap matrix> \\
                                  -o <output prefix> \\
-                                 -c [chip500/chip715, default chip715] \\
-                                 -w [um per pixel in width,  default 0.4803250]\\
-                                 -h [um per pixel in height, default 0.4802272]\\
+                                 -c [chip500/chip715, default chip500] \\
+                                 -w [um per pixel in width,  default 0.5]\\
+                                 -h [um per pixel in height, default 0.5]\\
 
 Example :
      trackEM2_to_affine.py -t '-0.010963829,-0.999939895,0.999939895,-0.010963829,-129.2603788,1664.628308' \\ 
@@ -42,9 +42,9 @@ Example :
 
 
 def trakEM2_to_affine_main(argv:[]) :
-    chip = 'chip715'
-    width_pixel = 0.4803250
-    height_pixel = 0.4802272
+    chip = 'chip500'
+    width_pixel = 0.5
+    height_pixel = 0.5
     affine=np.eye(3)
     affine1=np.eye(3)
     prefix=""
