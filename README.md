@@ -27,43 +27,48 @@ Actions:
 
 ---------------------------------------------------------------------
 
- Workflow for single slice to generate single-cell resolved data:
-    prepare_registration_heatmap  generate 8bit bin1 heatmap with highlighted tracklines.
-    prepare_registration_ssdna    generate 8bit bin1-scaled ssDNA graph with highlighted tracklines.
+Workflow for single slice to generate single-cell resolved data:
+    prepare_registration_heatmap  generate 8bit spot-level heatmap with highlighted tracklines.
+    prepare_registration_ssdna    generate 8bit close-spot-level ssDNA iamge with highlighted tracklines.
     second_registration           second round registration.
     gem_to_gemc                   convert GEM into GEMC based on cellbin result and registration results.
 
- Workflow for multiply slices (3D mode) to generate 3D resolved coordinates:
-    prepare_alignment_image       generate 8bit bin1 binary/annatation image for 3D alignment.
-    apply_alignment               set 3D coordinate for GEM(C)/h5ad/ssDNA/cell.mask.
+Workflow for multiply slices (3D mode) to generate 3D resolved coordinates:
+     prepare_alignment_image       generate 8bit spot-level binary/annatation image for 3D alignment.
+     apply_alignment               set 3D coordinate for GEM(C)/h5ad/ssDNA/cell.mask.
 
- Format coverting tools:
+Format coverting tools:
     gem_to_h5ad                   convert GEM into h5ad by a certain binsize.
     gemc_to_h5ad                  convert GEMC into h5ad.
 
- Affine tools:
+Affine tools:
     affine_gem                    modify the 2D coordinate in GEM(C) by user-defined affine matrix.
     affine_h5ad                   modify the 2D coordinate in GEM(C) by user-defined affine matrix.
     affine_ssdna                  affine the ssdna image by user-defined affine matrix.
+    affine_txt                    affine txt like cell.mask by user-defined affine matrix.
 
- Region of interest(ROI) tools:
-    chopimage                     chop region of interests from whole image.
-    chopgem                       chop region of interests from GEM(C).
+Region of interest(ROI) tools:
+    chop_image                    chop region of interests from whole image.
+    chop_gem                      chop region of interests from GEM(C).
 
- Mask tools:
+Mask tools:
     mask_gem                      mask GEM(C) by mask image.
-    mask_ssdna                    mask ssDNA image by mask image.
     mask_h5ad                     mask h5ad data by mask image.
 
- Visualization tools:
-    heatmap                       draw heatmap of expression counts with/without cellbin and with/without ssDNA.
+Visualization tools:
+    draw_heatmap                  draw heatmap of expression counts in bin1 resolution with/without cellbin and with/without ssDNA.
+    image_blend                   merge image(like heatmap/annotation image) with ssDNA and border image
 
- Other tools:
+Other tools:
     chop_paste                    chop or paste ssDNA image. This tools is useful for ultra-large ssDNA image.
-    handle_trakEM2_matrix         covert trakEM2_matrix to standart affine matrix.
+    trakEM2_to_affine             covert trakEM2_matrix to standart affine matrix.
+    get_xml_matrix                get matrix from trakEM2 xml file.
+    split_gem                     split gem by x or y coordinate.
+    merge_h5ad                    merge files of h5ad.
 
-    -----------------------------------------------------------------
-    -h/--help               show this short usage
+-----------------------------------------------------------------
+-h/--help               show this short usage
+
 ```
 
 ## Frequent Q & A
