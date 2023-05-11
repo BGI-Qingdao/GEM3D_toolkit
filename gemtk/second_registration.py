@@ -72,7 +72,7 @@ def find_best_affine_roi(args:[]):
     s = args[6]
     r = args[7]
     shifts=args[8]
-    xh,yh,wh,hh,xd,yd,wd,hd = args[9:]
+    xh,yh,wh,hh,xd,yd,wd,hd,fake = args[9:]
 
     # load data of whole image
     mask_rna = skio.imread(heatmap_file)
@@ -123,7 +123,8 @@ def find_best_affine_roi(args:[]):
         print('match score of #1 :{}'.format(match_score(mask_rna,mask_dapi,first_affineR)),file=sys.stderr,flush=True)
         print(first_affineR.tolist(),file=sys.stderr,flush=True)
         draw_masks(mask_rna,mask_dapi,first_affineR,prefix,1)
-
+    if fake == True:
+        return 1000,[1,0,0,0]
     ########################################################
     # #2 round registration
     #
@@ -160,7 +161,7 @@ def find_best_affine_roi(args:[]):
 
 def correct_roi(heatmap_file,dapi_file,width_scale,height_scale,affine,prefix,tasks,scales,rotates,shifts,
                 xh,yh,wh,hh,xd,yd,wd,hd,
-                region_name):
+                region_name,fake=False):
     ########################################################
     # find best affine
     #
@@ -178,7 +179,7 @@ def correct_roi(heatmap_file,dapi_file,width_scale,height_scale,affine,prefix,ta
                              s,
                              r,
                              shifts,
-                             xh,yh,wh,hh,xd,yd,wd,hd])
+                             xh,yh,wh,hh,xd,yd,wd,hd,fake])
     fscores=[]
     fparams=[]
     with Pool(tasks) as p:
@@ -262,6 +263,7 @@ def find_best_affine(args:[]):
     s = args[6]
     r = args[7]
     shifts=args[8]
+    fake = args[9]
 
     mask_rna = skio.imread(heatmap_file)
     mask_rna[mask_rna==255] = 1
@@ -286,6 +288,8 @@ def find_best_affine(args:[]):
         print(first_affineR.tolist(),file=sys.stderr,flush=True)
         draw_masks(mask_rna,mask_dapi,first_affineR,prefix,1)
 
+    if fake == True:
+        return 1000,[1,0,0,0]
     ########################################################
     # #2 round registration
     #
@@ -319,7 +323,7 @@ def find_best_affine(args:[]):
     param = fparams[fscores.index(maxhit)]
     return maxhit, param
 
-def correct_all(heatmap_file,dapi_file,width_scale,height_scale,affine,prefix,tasks,scales,rotates,shifts):
+def correct_all(heatmap_file,dapi_file,width_scale,height_scale,affine,prefix,tasks,scales,rotates,shifts,fake=False):
     print('iterate now ...',file=sys.stderr)
     print(time.strftime("%Y-%m-%d %H:%M:%S"),file=sys.stderr,flush=True)
     args = []
@@ -333,7 +337,8 @@ def correct_all(heatmap_file,dapi_file,width_scale,height_scale,affine,prefix,ta
                              prefix,
                              s,
                              r,
-                             shifts])
+                             shifts,
+                             fake])
     fscores=[]
     fparams=[]
     with Pool(tasks) as p:
@@ -384,12 +389,13 @@ Usage : GEM_toolkit.py second_registration \\
                  -f [Fujiyama output matrix, default None] \\
                  -t [TrackEM output matrix, default None]\\
                  -a [3*3 backward affine matrix, default none] \\
-                 -c [chip715/chip500, default chip715] \\
-                 -w [um per pixel in width,  default 0.4803250]\\
-                 -h [um per pixel in height, default 0.4802272]\\
+                 -c [chip715/chip500, default chip500] \\
+                 -w [um per pixel in width,  default 0.5]\\
+                 -h [um per pixel in height, default 0.5]\\
                  -l [S/M/L search area. default S] \\
                  -s [thread number, default 8] \\
                  -r [roi json file, default none ] \\
+                 -F [yes/no, default no. fake round2] \\
 
 Notice :
      please only use one of ( -f , -a , -t ) .
@@ -411,14 +417,15 @@ def secondregistration_main(argv:[]) :
     dapi_file = ''
     prefix = ''
     affine = np.zeros((3,3))
-    chip = 'chip715'
-    width_pixel = 0.4803250
-    height_pixel = 0.4802272
+    chip = 'chip500'
+    width_pixel = 0.5
+    height_pixel = 0.5
     level='S'
     tasks=8
     roi = ''
+    fake = False
     try:
-        opts, args = getopt.getopt(argv,"H:d:o:f:a:t:c:w:h:l:s:r:",["heatmap=",
+        opts, args = getopt.getopt(argv,"H:d:o:f:a:t:c:w:h:l:s:r:F:",["heatmap=",
                                                          "dapi=",
                                                          "output=",
                                                          "fujiyama=",
@@ -459,6 +466,9 @@ def secondregistration_main(argv:[]) :
             tasks = int(arg)
         elif opt in ("-r", "--roi"):
             roi = arg
+        elif opt in ("-F"):
+            if arg == 'yes':
+                fake = True
 
     if  ( heatmap_file == "" or
           dapi_file == "" or
@@ -515,17 +525,14 @@ def secondregistration_main(argv:[]) :
     #######################################################
 
     if roi == '' :
-        correct_all(heatmap_file,dapi_file,width_scale,height_scale,affine,prefix,tasks,scales,rotates,shifts)
+        correct_all(heatmap_file,dapi_file,width_scale,height_scale,affine,prefix,tasks,scales,rotates,shifts,fake)
     else :
         roi_pairs = json.load(open(roi))
         for a_roi_pair in roi_pairs:
             region_name = a_roi_pair[0]
             xh,yh,wh,hh = a_roi_pair[1]
-            #xh,yh,wh,hh = xh*5,yh*5,wh*5,hh*5
             xd,yd,wd,hd = a_roi_pair[2]
-            #xh,yh,wh,hh = xh-300,yh-300,wh+600, hh+600
-            #xd,yd,wd,hd = xd-300,yd-300,wd+600, hd+600
-
-            correct_roi(heatmap_file,dapi_file,width_scale,height_scale,affine,prefix,tasks,scales,rotates,shifts,
-                    xh,yh,wh,hh,xd,yd,wd,hd,region_name)
+            correct_roi(heatmap_file,dapi_file,width_scale,
+                    height_scale,affine,prefix,tasks,scales,rotates,shifts,
+                    xh,yh,wh,hh,xd,yd,wd,hd,region_name,fake)
 

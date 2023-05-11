@@ -143,11 +143,11 @@ def apply_alignment_main(argv:[]):
             if 'h5ad' in _columns:
                 h5ad_path=data['h5ad'][i]
             if 'ssdna' in _columns:
-                ssdna_path=data['sdna'][i]
+                ssdna_path=data['ssdna'][i]
             if 'mask' in _columns:
                 mask_path=data['mask'][i]
-            if '2D_backdward' in _columns:
-                _2D=data['2D_backdward'][i]
+            if '2D_backward' in _columns:
+                _2D=data['2D_backward'][i]
             if '3D_forward' in _columns:
                 _3D=data['3D_forward'][i]
             if 'Z_values' in _columns:
@@ -155,11 +155,11 @@ def apply_alignment_main(argv:[]):
             if 'flag' in _columns:
                 _flag=data['flag'][i]
             if 'outline' in _columns:
-                _flag=data['outline'][i]
-            if 'x' in _columns:
-                x=data['x'][i]
-            if 'y' in _columns:
-                y=data['y'][i]
+                outline =data['outline'][i]
+            if 'x_shift' in _columns:
+                x=data['x_shift'][i]
+            if 'y_shift' in _columns:
+                y=data['y_shift'][i]
             #                    0     1        2         3           4        5   6         7   8      9 10
             collections.append([_flag,gem_path,h5ad_path,ssdna_path,mask_path,_3D,_Z_values,_2D,outline,x,y])
 
@@ -224,8 +224,9 @@ def affine_h5ad(inputh5ad,prefix,affine,Sn,zvalue,xmin,ymin,Sflag,hflag):
     h5ad.obs['new_y']=np.array(affine_result[1,:].T)
     h5ad.obs['z']=zvalue
     if Sflag and hflag:
-        h5ad.obs.index=pd.DataFrame(h5ad.obs.index)[0].apply(lambda x : str(Sn)+'_'+str(x))
-        h5ad.obs.index.name=Sn
+        h5ad.obs['tmp'] = h5ad.obs.index
+        h5ad.obs.index= h5ad.obs.apply(lambda row : str(Sn)+'_'+str(row['tmp']),axis=1)
+        h5ad.obs.drop(columns=['tmp'],inplace=True)
     return h5ad
 
 def affine_ssdna(inputssdna,prefix,affine,Sn,W,H):

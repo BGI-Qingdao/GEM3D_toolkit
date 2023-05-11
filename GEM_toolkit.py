@@ -20,8 +20,12 @@ Actions:
     prepare_registration_heatmap  generate 8bit spot-level heatmap with highlighted tracklines.
     prepare_registration_ssdna    generate 8bit close-spot-level ssDNA iamge with highlighted tracklines.
     second_registration           second round registration.
-    gem_to_gemc                   convert GEM into GEMC based on cellbin result and registration results.
-
+    version1 command:
+        gem_to_gemc               convert GEM into GEMC based on cellbin result and registration results.
+    version2 command:
+        apply_registration        use registration result(with/without ROI) to update ssdna/mask/gem ...
+        apply_cells               add cells column to gem based on registered mask file.
+ 
  Workflow for multiply slices (3D mode) to generate 3D resolved coordinates:
     prepare_alignment_image       generate 8bit spot-level binary/annatation image for 3D alignment.
     apply_alignment               set 3D coordinate for GEM(C)/h5ad/ssDNA/cell.mask.
@@ -85,6 +89,8 @@ if __name__ == "__main__":
                                                    "mask_h5ad",
                                                    "prepare_alignment_image",
                                                    "apply_alignment",
+                                                   "apply_registration",
+                                                   "apply_cells",
                                                    "trakEM2_to_affine",
                                                    "chop_paste",
                                                    "image_blend",
@@ -186,7 +192,15 @@ if __name__ == "__main__":
     elif sys.argv[1] == "merge_h5ad" :
         from gemtk.merge_h5ad import merge_h5ad_main
         merge_h5ad_main(sys.argv[2:])
-        exit(0)                         
+        exit(0)
+    elif sys.argv[1] == "apply_registration" :
+        from gemtk.apply_registration import apply_registration_main
+        apply_registration_main(sys.argv[2:])
+        exit(0)
+    elif sys.argv[1] == "apply_cells" :
+        from gemtk.apply_cells import apply_cells_main
+        apply_cells_main(sys.argv[2:])
+        exit(0)
     else:
         main_usage()
         exit(1)
