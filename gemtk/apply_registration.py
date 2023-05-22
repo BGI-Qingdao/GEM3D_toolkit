@@ -77,7 +77,7 @@ def apply_registration_main(argv:[]):
         elif opt in ("-A"):
             Affine = arg
             affine_count = affine_count + 1
-            affineR = np.matrix(np.array(json.load(arg)))
+            affineR = np.matrix(np.array(json.loads(arg)))
         elif opt in ("-g"):
             gem = arg
         elif opt in ("-b"):
@@ -252,9 +252,9 @@ def apply_registration_main(argv:[]):
                 skio.imsave(f'{prefix}.ssDNA.border_masked.png',affined_roi_ssdna)
         if gem_data is not None:
             if masks is not None:
-                gem_data['cell'] = affined_roi_mask[choped_gem['y'],choped_gem['x']]
-                gem_data['x'] = gem_data['x'] + gem_data_x_min 
-                gem_data['y'] = gem_data['y'] + gem_data_y_min 
+                gem_data['cell'] = affined_roi_mask[gem_data['y'],gem_data['x']]
+                gem_data['x'] = gem_data['x'] + gem_data_x_min
+                gem_data['y'] = gem_data['y'] + gem_data_y_min
                 gem_data = gem_data[gem_data['cell']!=0]
                 gem_data.to_csv(f'{prefix}.gemc_saved',sep='\t',header=True,index=False)
 

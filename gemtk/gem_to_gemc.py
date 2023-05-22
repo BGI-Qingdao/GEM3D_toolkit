@@ -13,6 +13,12 @@ from skimage import img_as_ubyte
 import skimage.morphology as sm
 from skimage import filters
 
+from PIL import ImageFile
+from PIL import Image
+
+ImageFile.LOAD_TRUNCATED_IMAGES = True
+Image.MAX_IMAGE_PIXELS = None
+
 def gem_to_cfm_usage():
     print("""
 Usage : GEM_toolkit.py gem_to_gemc \\
