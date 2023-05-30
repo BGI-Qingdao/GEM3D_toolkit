@@ -1,8 +1,8 @@
 # GEM3D_toolkit
 
-Specially designed for Stereo-seq platform, GEM_toolkit is a collection of scrips that cooperates with ImageJ/TrakEM2 and CellProfiler to semi-automatic generate single-cell and 3D spatial resolved transtriptomics data from gene expression matrix (GEM) and ssDNA image.
+Specifically designed for Stereo-seq platform, GEM_toolkit is a collection of scrips that cooperates with ImageJ/TrakEM2 and CellProfiler to semi-automatically preprocess single-cell or spatially resolved transtriptomics data in 2D/3D using the gene expression matrix (GEM) and ssDNA image.
 
-GEM_toolkit also provide severial handly tools for file convert, image or data subset/mask/ROI/affine coordinate/visualize. Enjoy with GEM_toolkit.
+GEM_toolkit also provides several handly tools for file format conversion, image or data subset, color-code gene heatmap or ssDNA image masking, ROI extraction, affine coordinate calculation, and GEM or other image visualization. Enjoy with GEM_toolkit.
 
 Overview of this workflow :
 
@@ -38,14 +38,14 @@ Workflow for multiply slices (3D mode) to generate 3D resolved coordinates:
      apply_alignment               set 3D coordinate for GEM(C)/h5ad/ssDNA/cell.mask.
 
 Format coverting tools:
-    gem_to_h5ad                   convert GEM into h5ad by a certain binsize.
-    gemc_to_h5ad                  convert GEMC into h5ad.
+    gem_to_h5ad                   convert GEM to h5ad by a certain binsize.
+    gemc_to_h5ad                  convert GEMC to h5ad.
 
 Affine tools:
     affine_gem                    modify the 2D coordinate in GEM(C) by user-defined affine matrix.
     affine_h5ad                   modify the 2D coordinate in GEM(C) by user-defined affine matrix.
-    affine_ssdna                  affine the ssdna image by user-defined affine matrix.
-    affine_txt                    affine txt like cell.mask by user-defined affine matrix.
+    affine_ssdna                  affine the ssdna image based on user-defined affine matrix.
+    affine_txt                    affine txt like cell.mask based on user-defined affine matrix.
 
 Region of interest(ROI) tools:
     chop_image                    chop region of interests from whole image.
@@ -57,11 +57,11 @@ Mask tools:
 
 Visualization tools:
     draw_heatmap                  draw heatmap of expression counts in bin1 resolution with/without cellbin and with/without ssDNA.
-    image_blend                   merge image(like heatmap/annotation image) with ssDNA and border image
+    image_blend                   merge heatmap/annotation image with ssDNA and border image
 
 Other tools:
     chop_paste                    chop or paste ssDNA image. This tools is useful for ultra-large ssDNA image.
-    trakEM2_to_affine             covert trakEM2_matrix to standart affine matrix.
+    trakEM2_to_affine             covert trakEM2_matrix to standard affine matrix.
     get_xml_matrix                get matrix from trakEM2 xml file.
     split_gem                     split gem by x or y coordinate.
     merge_h5ad                    merge files of h5ad.
@@ -73,9 +73,9 @@ Other tools:
 
 ## Frequent Q & A
 
-### Why some valid actions not exist in usage?
+### Why cannot some of the valid actions be found in usage?
 
-We rename some action name in this new version and keep the old action name valid for barkwark compatible:
+We renamed some action names in this new version and keep the old action names valid for backward compatibility:
 
 ```
 prepareregistrationheatmap ==  prepare_registration_heatmap
@@ -88,7 +88,7 @@ gem_to_cfm == gem_to_gemc
 
 Please cite our GitHub url: http://github.com/BGI-Qingdao/GEM3D_toolkit directly.
 
-The registration scripts have no update between dev branch and the old main branch, however, if you really need specify the software version, please cite the zendo doi [![DOI](https://zenodo.org/badge/373742809.svg)](https://zenodo.org/badge/latestdoi/373742809) that we special released for the previous stable codes.
+The registration scripts have no update between dev branch and the old main branch. However, if you need a software version, then please cite the zendo doi [![DOI](https://zenodo.org/badge/373742809.svg)](https://zenodo.org/badge/latestdoi/373742809) that we have specially released for the previous stable codes.
 
 ## References
 
