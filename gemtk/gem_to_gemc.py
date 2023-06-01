@@ -456,6 +456,11 @@ def gem_to_cfm_main(argv:[]):
         #deleted_gems_tosave.to_csv(f'{prefix}.gemc_deleted', sep='\t', header=True, index=False)
         print(f'{prefix} gemc file is saved')
 
+        roi_list = pd.DataFrame(columns=['x', 'y', 'width', 'height'])
+        roi_list.loc['heatmap'] = [0, 0, -1, -1]
+        roi_list.loc['ssdna'] = [0, 0, -1, -1]
+        roi_list.loc['gem'] = [gem_data_x_min, gem_data_y_min, -1,-1]
+        roi_list.to_csv(f'{prefix}.roi.txt', sep='\t', header=True, index=True)
 
         cell_cems = choped_gem[choped_gem['cell'] != 0]
         cell_cems = cell_cems.copy()

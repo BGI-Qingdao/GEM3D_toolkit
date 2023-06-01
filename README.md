@@ -65,6 +65,7 @@ Other tools:
     get_xml_matrix                get matrix from trakEM2 xml file.
     split_gem                     split gem by x or y coordinate.
     merge_h5ad                    merge files of h5ad.
+    gem_xy                        get xmin ymin of gem
 
 -----------------------------------------------------------------
 -h/--help               show this short usage

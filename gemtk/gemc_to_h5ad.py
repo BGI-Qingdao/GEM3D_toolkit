@@ -13,13 +13,15 @@ def gemc_to_h5ad_usage():
     print("""
 Usage : GEM_toolkit.py gemc_to_h5ad  -i <xxx.gemc>  \\
                                      -o <prefix> \\
+                                     -m [xxx.cellmask]
 """)
 
 def gemc_to_h5ad_main(argv:[]):
     prefix=''
     ingemc=''
+    cellmask=''
     try:
-        opts, args = getopt.getopt(argv,"hi:o:",["help","input=","output="])
+        opts, args = getopt.getopt(argv,"hi:o:m:",["help","input=","output="])
     except getopt.GetoptError:
         gemc_to_h5ad_usage()
         sys.exit(2)
@@ -31,6 +33,8 @@ def gemc_to_h5ad_main(argv:[]):
             prefix = arg
         elif opt in ("-i", "--input"):
             ingemc = arg
+        elif opt in ("-m"):
+            cellmask = arg
 
     if ingemc == "" or prefix== "" :
         gemc_to_h5ad_usage()
@@ -38,6 +42,8 @@ def gemc_to_h5ad_main(argv:[]):
 
     print("input gemc is {}".format(ingemc))
     print("output prefix is {}".format(prefix))
+    if cellmask != '':
+        print("cell mask file is {}".format(cellmask))
     print(time.strftime("%Y-%m-%d %H:%M:%S"),flush=True)
     print('loading gemc now...')
     sdf = slice_dataframe()
@@ -54,6 +60,11 @@ def gemc_to_h5ad_main(argv:[]):
         cell3dxyz = sdf.get3dxyz_cellbins()
     obs = pd.DataFrame()
     obs['cellid'] = cells
+    if cellmask != '':
+        masks = np.loadtxt(cellmask,dtype=int,delimiter=' ')
+        unique, counts = np.unique(masks, return_counts=True)
+        maper = dict(zip(unique, counts))
+        obs['nArea'] = obs.apply(lambda row: maper[row['cellid']],axis=1)
     obs['cellname'] = obs.apply(lambda row: f'cell{row["cellid"]}',axis=1)
     obs = obs.set_index('cellid')
     #print(obs.head(),flush=True)

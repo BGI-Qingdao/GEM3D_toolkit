@@ -58,6 +58,7 @@ Actions:
     get_xml_matrix                get matrix from trakEM2 xml file.
     split_gem                     split gem by x or y coordinate.
     merge_h5ad                    merge files of h5ad.
+    gem_xy                        get xmin ymin of gem
 
     -----------------------------------------------------------------
     -h/--help               show this short usage
@@ -79,6 +80,7 @@ if __name__ == "__main__":
                                                    "gem_to_gemc",
                                                    "gemc_to_h5ad",
                                                    "gem_to_h5ad",
+                                                   "gem_xy",
                                                    "chop_image",
                                                    "chop_gem",
                                                    "mask_gem",
@@ -196,6 +198,10 @@ if __name__ == "__main__":
     elif sys.argv[1] == "apply_registration" :
         from gemtk.apply_registration import apply_registration_main
         apply_registration_main(sys.argv[2:])
+        exit(0)
+    elif sys.argv[1] == "gem_xy" :
+        from gemtk.gem_xy import gem_xy_main
+        gem_xy_main(sys.argv[2:])
         exit(0)
     elif sys.argv[1] == "apply_cells" :
         from gemtk.apply_cells import apply_cells_main
