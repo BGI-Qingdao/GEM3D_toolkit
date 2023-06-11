@@ -5,6 +5,12 @@ from skimage import io as skio
 from gemtk.slice_dataframe import slice_dataframe
 from gemtk.save_miscdf import *
 
+from PIL import ImageFile
+from PIL import Image
+
+ImageFile.LOAD_TRUNCATED_IMAGES = True
+Image.MAX_IMAGE_PIXELS = None
+
 ############################################################################
 # section 15 : chopgems
 #############################################################################
