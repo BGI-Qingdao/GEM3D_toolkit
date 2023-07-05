@@ -230,7 +230,6 @@ def affine_h5ad(inputh5ad,prefix,affine,Sn,zvalue,xmin,ymin,Sflag,hflag):
     return h5ad
 
 def affine_ssdna(inputssdna,prefix,affine,Sn,W,H):
-    affine=affine.I
     dapi_data = skio.imread(inputssdna)
     if W=='' or H=='':
         if dapi_data.shape == 3:
@@ -247,7 +246,7 @@ def affine_ssdna(inputssdna,prefix,affine,Sn,W,H):
         dapi_data = new_data
     dapi_data = dapi_data.astype('uint8')
     ind = dapi_data
-    outd = nd.affine_transform(ind.T,affine,output_shape=(W,H),order=0)
+    outd = nd.affine_transform(ind.T,affine.I,output_shape=(W,H),order=0)
     outd = outd.T
     outd = outd.astype('uint8')
     skio.imsave(f'{prefix}_{Sn}.png',outd)
@@ -256,7 +255,7 @@ def affine_txt(inputmask,prefix,affine,Sn,W,H,k):
     ind = np.loadtxt(inputmask,delimiter=' ',dtype=int)
     if W=='' or H=='':
         H,W= ind.shape
-    outd = nd.affine_transform(ind.T,affine,output_shape=(W,H),order=0)
+    outd = nd.affine_transform(ind.T,affine.I,output_shape=(W,H),order=0)
     outd = outd.T
     np.savetxt(f'{prefix}_{Sn}_{k}.txt',outd,fmt="%d")
 
