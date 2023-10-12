@@ -185,7 +185,7 @@ def apply_alignment_main(argv:[]):
             sys.exit(1)
         if collection[1]!='': #gem
             affine_gem(collection[1],prefix,affine,collection[0],collection[6],int(collection[9]),int(collection[10]))
-        if collection[2]!='': #h4ad
+        if collection[2]!='': #h5ad
             h5ad=affine_h5ad(collection[2],prefix,affine,collection[0],collection[6],int(collection[9]),int(collection[10]),Sflag,hflag)
             if hflag==False:
                 h5ad.write(f'{prefix}_{collection[0]}.h5ad',compression='gzip')
@@ -205,11 +205,11 @@ def affine_gem(inputgem,prefix,affine,Sn,zvalue,xmin,ymin):
     df = pd.read_csv(inputgem, sep='\t', comment='#')
     gemxy=df[["x",'y']].copy()
     gemxy['x'] = gemxy['x'] - xmin
-    gemxy['y'] = gemxy['x'] - ymin
+    gemxy['y'] = gemxy['y'] - ymin
     gemxy=np.insert(gemxy.to_numpy(),2,values=np.ones((len(gemxy),)),axis=1)
     affine_result=np.dot(affine,gemxy.T)[0:2,:]
-    df["new_x"]=np.array(affine_result[0:1,:].T)
-    df["new_y"]=np.array(affine_result[1:2,:].T)
+    df["new_x"]=np.array(affine_result[0,:].T)
+    df["new_y"]=np.array(affine_result[1,:].T)
     df["z"]= int(zvalue)
     df.to_csv(f"{prefix}_{Sn}.gem",index=None,sep='\t')
 
